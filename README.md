@@ -2,21 +2,15 @@
 
 An autonomous promotion agent that improves its discount decisions from outcomes stored in persistent memory.
 
-## Core loop
+## Self-learning loop
 
-**Scenario → Agent → Simulator → Evaluator → xmemory → better next decision**
+![Self-learning promotion agent](assets/self-learning-loop.svg)
 
 The demo is intentionally small: the agent chooses one of `0%`, `10%`, `20%`, or `30%` discount levels. A simulator produces sales and gross profit. An evaluator replays all allowed actions, calculates regret, and writes reusable lessons to xmemory. Future decisions retrieve those lessons.
 
-## Interactive learning loop
+The core behavior is:
 
-The interactive animation lives in [`docs/`](docs/) and is intended to be published with GitHub Pages.
-
-Once Pages is enabled for `/docs`, the demo will show two rounds:
-
-1. **Cold memory** — the agent chooses a suboptimal discount.
-2. **Learning** — the evaluator finds the optimal action and stores a lesson.
-3. **Warm memory** — the next similar case retrieves that lesson and changes the agent's choice.
+**scenario → decision → simulated outcome → counterfactual evaluation → lesson write → lesson read → changed next decision**
 
 ## MVP architecture
 
