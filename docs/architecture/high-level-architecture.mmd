@@ -1,0 +1,6 @@
+flowchart LR
+    S[Scenario Generator] --> A[Promotion Agent]
+    X[(xmemory)] -->|Past lessons| A
+    A -->|Promotion| M[Market Simulator]
+    M -->|Outcome| E[Evaluator / Learner]
+    E -->|Cases + lessons| X
