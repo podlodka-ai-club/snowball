@@ -11,25 +11,25 @@ XMD v1 schema: [`schema.xmd.yaml`](schema.xmd.yaml)
 
 Close one visible and reproducible loop:
 
-`scenario -> agent recommendation -> human decision -> simulator oracle -> case -> lesson -> later retrieval -> changed decision`
+`scenario -> agent decision -> simulator outcome -> counterfactual oracle -> case -> lesson -> later retrieval -> changed decision`
 
 The memory schema deliberately contains only three objects:
 
 1. **SKU** — stable product identity and basic economics.
-2. **PromotionCase** — immutable evaluated evidence, including human correction.
+2. **PromotionCase** — immutable evaluated evidence from one autonomous decision.
 3. **Lesson** — compact reusable knowledge retrieved before future decisions.
 
-There is no separate Store, HumanFeedback, SimulatorResult, Counterfactual, or RuleVersion object in the MVP. Those concepts either fit naturally inside a PromotionCase or are implementation details outside durable product memory.
+There is no separate Store, SimulatorResult, Counterfactual, Feedback, or RuleVersion object in the MVP. Those concepts either fit naturally inside a PromotionCase or are implementation details outside durable product memory.
 
-## Why this is better than the previous schema
+## Why this shape
 
-The previous design had `Product`, `StoreCluster`, `PromotionCase`, and `PromotionRule`. The new design keeps the useful evidence-versus-knowledge split but removes structure that does not earn its implementation cost yet.
+The earlier design had `Product`, `StoreCluster`, `PromotionCase`, and `PromotionRule`. The current design keeps the useful evidence-versus-knowledge split but removes structure that does not earn its implementation cost yet.
 
 - `StoreCluster` becomes the scalar `store` field on PromotionCase. We do not currently need store metadata or store-to-store relations.
-- `PromotionRule` becomes **Lesson**, matching the product language and the hackathon learning loop.
-- Human accept/change feedback lives directly in PromotionCase rather than becoming a separate feedback object or agent.
-- Context is stored as explicit scalar buckets instead of `context_tags` arrays. XMD v1 fields are scalar, and explicit fields make retrieval and debugging much easier.
-- Lessons update in place by deterministic `lesson_key`; we do not build rule versioning or superseding machinery until there is evidence that we need it.
+- `PromotionRule` becomes **Lesson**, matching the learning loop terminology.
+- The Promotion Agent has one action: `0%`, `10%`, `20%`, or `30%` discount. That chosen action is applied directly to the simulator.
+- Context is stored as explicit scalar buckets instead of generic tag arrays, which makes retrieval and debugging predictable.
+- Lessons update in place by deterministic `lesson_key`; revision history can wait until there is evidence that it is useful.
 
 ## Objects
 
@@ -49,7 +49,7 @@ For the demo, six understandable categories are enough: ice cream, beer, soft dr
 
 ### PromotionCase
 
-One completed scenario after the human decision, simulator run, and counterfactual evaluation.
+One completed scenario after the Promotion Agent acts, the simulator returns an outcome, and the evaluator replays all four actions.
 
 A case contains four groups of facts.
 
@@ -69,50 +69,36 @@ A case contains four groups of facts.
 
 The raw scenario can still contain richer fields in application code. Only memory-relevant context belongs here.
 
-#### Agent and human decision
+#### Decision
 
-- `agent_discount`: `0 | 10 | 20 | 30`
-- `human_discount`: final approved action
-- `human_changed`: whether the manager overrode the recommendation
-- `human_reason`: short explanation for an override
+- `chosen_discount`: `0 | 10 | 20 | 30`
 
-When the manager accepts the recommendation, `human_discount == agent_discount` and `human_changed == false`.
-
-The human reason is useful evidence, but it is not truth. A manager can say "concert nearby means 30% will win" and still be wrong. The simulator oracle decides whether that correction actually helped.
+There is exactly one applied action. The Promotion Agent chooses it and the simulator evaluates it.
 
 #### Outcome
 
 - `units_sold`
-- `gross_profit` for the human-approved action
-- `agent_gross_profit` for the agent's original action
+- `gross_profit`
 
-If the human accepts the recommendation, those two profit values are equal. If the human overrides it, the evaluator still replays the original agent action so we can measure whether the correction added value.
+Gross profit is the primary KPI for the MVP.
 
 #### Counterfactual evaluation
 
 - `best_discount`
 - `best_gross_profit`
-- `agent_regret = best_gross_profit - agent_gross_profit`
-- `applied_regret = best_gross_profit - gross_profit`
-- `human_profit_delta = gross_profit - agent_gross_profit`
-
-This distinction matters. A human correction should not automatically become a lesson just because a human typed it. We can objectively see whether the override improved gross profit.
+- `regret = best_gross_profit - gross_profit`
+- `regret_pct`
 
 Example:
 
 ```text
-Agent:          10%
-Human:          20%
-Agent profit:   £252
-Human profit:   £281
-Oracle best:    20% / £281
-
-agent_regret:       £29
-applied_regret:      £0
-human_profit_delta: +£29
+Agent chose:     10%
+Gross profit:    £252
+Oracle best:     20% / £281
+Regret:          £29
 ```
 
-That is much stronger feedback than `manager_changed=true`.
+This is the feedback signal that drives learning. The simulator, not another model, provides the objective comparison.
 
 ### Lesson
 
@@ -166,7 +152,7 @@ sku:ICE500|store:London Central|weekend|hot|event:local_event|stock:any
 
 Repeated evidence updates the same Lesson.
 
-For the MVP, a Lesson represents current aggregated knowledge. We intentionally do not create `active/superseded` versions. If revision history becomes useful later, add it as a separate observability feature rather than pretending one primary key can simultaneously identify both the old and replacement records.
+For the MVP, a Lesson represents current aggregated knowledge. We intentionally do not create `active/superseded` versions. If revision history becomes useful later, add it as a separate observability feature.
 
 ## Relations
 
@@ -199,7 +185,7 @@ Optional direct link for SKU-specific lessons. Category-level lessons can rely o
 The Evaluator / Learner writes memory only after all four actions have been replayed by the deterministic simulator.
 
 1. Upsert the SKU.
-2. Write one PromotionCase containing scenario, agent recommendation, human decision, actual outcome, oracle optimum, and regrets.
+2. Write one PromotionCase containing scenario, chosen action, realised outcome, oracle optimum, and regret.
 3. Select the coarse lesson scope/context bucket.
 4. Read the existing Lesson for the deterministic `lesson_key`, if any.
 5. Recalculate supporting evidence using linked PromotionCases.
@@ -208,30 +194,17 @@ The Evaluator / Learner writes memory only after all four actions have been repl
 
 For the first implementation, code should calculate:
 
-- regret;
+- regret and regret percentage;
 - evidence count;
 - profit advantage;
 - lesson key;
 - and preferably validate the recommended discount against supporting simulator outcomes.
 
-The LLM is useful for deciding whether evidence deserves a more general scope and for writing the concise rationale. It should not be allowed to creatively calculate £29 as £47 because language models occasionally treat arithmetic as interpretive dance.
-
-## Human correction policy
-
-Human feedback is valuable, but only evaluated feedback should influence durable lessons.
-
-Recommended MVP rule:
-
-- store every accept/change decision in PromotionCase;
-- treat `human_reason` as candidate context;
-- only strengthen a Lesson when counterfactual evaluation supports the conclusion;
-- if the human override loses profit, preserve the case but do not promote the manager's intuition as truth.
-
-This gives the demo a genuine human-in-the-loop story without letting human authority poison memory automatically.
+The LLM is useful for deciding whether evidence deserves a more general scope and for writing the concise rationale. Arithmetic and action comparison should stay deterministic in code, because giving prose models custody of accounting is how legends begin.
 
 ## Read path
 
-Before recommending a discount, the Promotion Agent asks xmemory for a very small amount of relevant experience.
+Before choosing a discount, the Promotion Agent asks xmemory for a very small amount of relevant experience.
 
 Recommended order:
 
@@ -265,7 +238,7 @@ Do not store:
 - raw source-dataset rows after they have been converted into scenarios;
 - dozens of product/store attributes that the simulator does not use.
 
-The hidden simulator coefficients must remain outside memory. Otherwise the agent is not learning from experience; it is reading the answer key, a beloved human educational tradition that rather defeats the experiment.
+The hidden simulator coefficients must remain outside memory. Otherwise the agent is not learning from experience; it is reading the answer key, which rather ruins the point of the experiment.
 
 ## Minimal implementation for two developers
 
@@ -286,12 +259,10 @@ The final demo should make the entire write -> read -> changed behaviour chain v
 ```text
 CASE-0018
 Ice Cream 500ml · hot weekend · high stock
-Agent: 10%
-Human: 20% — "concert nearby"
-Agent GP: £252
-Applied GP: £281
+Agent chose: 10%
+Gross profit: £252
 Oracle: 20% / £281
-Human delta: +£29
+Regret: £29
         |
         v
 LESSON
