@@ -5,9 +5,8 @@ title: FMCG Promotion Agent Memory
 description: >-
   Durable memory for a self-learning FMCG promotion agent. Store only three domain
   objects: SKU, evaluated PromotionCase evidence, and compact Lesson objects that are
-  retrieved before future discount decisions. Human corrections are part of the case.
-  Do not store prompts, hidden reasoning, simulator internals, or every counterfactual
-  action as separate memory records.
+  retrieved before future discount decisions. Do not store prompts, hidden reasoning,
+  simulator internals, or every counterfactual action as separate memory records.
 
 objects:
   SKU:
@@ -23,7 +22,7 @@ objects:
       name:
         type: str
         required: false
-        description: Human-readable demo product name, for example Ice Cream 500ml.
+        description: Display product name, for example Ice Cream 500ml.
       category:
         type: str
         required: true
@@ -43,9 +42,8 @@ objects:
   PromotionCase:
     description: >-
       One completed promotion decision after the market simulator and counterfactual
-      evaluator have run. It stores scenario context, the agent recommendation, the final
-      human decision, the realised outcome, and the simulator oracle. A human correction
-      is not a separate feedback object; it is part of this case. Cases are factual
+      evaluator have run. It stores scenario context, the discount chosen by the Promotion
+      Agent, the realised outcome, the simulator oracle, and regret. Cases are factual
       evidence and should be treated as immutable after evaluation except for bad-data fixes.
     fields:
       case_id:
@@ -59,7 +57,7 @@ objects:
       store:
         type: str
         required: true
-        description: Human-readable store or store cluster label, for example London Central.
+        description: Store or store-cluster label, for example London Central.
       price:
         type: float
         required: true
@@ -102,44 +100,21 @@ objects:
         type: str
         required: false
         description: >-
-          Optional human-readable event context, for example concert_nearby. This is for
-          explanation; the simulator should use event_type or deterministic application inputs.
-      agent_discount:
+          Optional descriptive event context, for example concert_nearby. The simulator
+          should use event_type or deterministic application inputs.
+      chosen_discount:
         type: int
         required: true
         enum: [0, 10, 20, 30]
-        description: Discount percentage originally recommended by the Promotion Agent.
-      human_discount:
-        type: int
-        required: true
-        enum: [0, 10, 20, 30]
-        description: >-
-          Final discount approved by the category manager and applied in the simulator.
-          When the manager accepts the agent recommendation, this equals agent_discount.
-      human_changed:
-        type: bool
-        required: true
-        description: True only when the manager changed the agent recommendation.
-      human_reason:
-        type: str
-        required: false
-        description: >-
-          Short manager explanation for an override. Treat this as useful context or a
-          hypothesis, not as ground truth until simulator evidence supports it.
+        description: Discount percentage chosen by the Promotion Agent and applied in the simulator.
       units_sold:
         type: int
         required: true
-        description: Units sold for the final human-approved discount.
+        description: Units sold for the chosen discount.
       gross_profit:
         type: float
         required: true
-        description: Gross profit produced by the final human-approved discount.
-      agent_gross_profit:
-        type: float
-        required: true
-        description: >-
-          Gross profit the simulator produces for the agent's original recommendation.
-          When human_changed is false this equals gross_profit.
+        description: Gross profit produced by the chosen discount.
       best_discount:
         type: int
         required: true
@@ -149,24 +124,18 @@ objects:
         type: float
         required: true
         description: Highest gross profit found by replaying all allowed discounts.
-      agent_regret:
+      regret:
         type: float
         required: true
         description: >-
-          Gross-profit regret of the agent recommendation, calculated in code as
-          best_gross_profit minus agent_gross_profit.
-      applied_regret:
-        type: float
-        required: true
-        description: >-
-          Gross-profit regret of the final human-approved decision, calculated in code as
+          Gross-profit regret of the chosen action, calculated in code as
           best_gross_profit minus gross_profit.
-      human_profit_delta:
+      regret_pct:
         type: float
         required: true
         description: >-
-          Gross-profit change caused by the human correction, calculated in code as
-          gross_profit minus agent_gross_profit. Zero when the recommendation is accepted.
+          Regret divided by best_gross_profit and expressed as a percentage. Calculate this
+          in application code rather than deriving it with the model.
     primary_key: [case_id]
 
   Lesson:
