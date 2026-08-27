@@ -38,12 +38,13 @@ Detailed design lives in a separate directory per component as we implement it. 
 
 ![xmemory schema](assets/xmemory-schema.svg)
 
-xmemory stores two distinct layers:
+The MVP memory schema contains only three domain objects:
 
-- **PromotionCase** — immutable evaluated evidence: scenario, chosen promotion, result, counterfactual optimum, and regret.
-- **PromotionRule** — compact reusable policy that is updated as evidence accumulates and retrieved before future decisions.
+- **SKU** — stable product identity and basic economics.
+- **PromotionCase** — immutable evaluated evidence: scenario, agent recommendation, final human decision, outcome, simulator optimum, and regret.
+- **Lesson** — compact reusable knowledge updated from linked cases and retrieved before later decisions.
 
-Products and store clusters are first-class objects, and evaluated cases are explicitly linked to the rules they support. This makes the hackathon write → read → changed behaviour trace visible and reproducible.
+Human accept/change feedback is part of the PromotionCase, not a separate agent or feedback entity. Each Lesson links back to the PromotionCases that produced it, making the hackathon write → read → changed behaviour trace visible and reproducible.
 
 - Detailed design: [`docs/xmemory/README.md`](docs/xmemory/README.md)
 - XMD v1 schema: [`docs/xmemory/schema.xmd.yaml`](docs/xmemory/schema.xmd.yaml)
@@ -70,6 +71,7 @@ Compare:
 - optimal action rate
 - average regret
 - gross profit
+- human correction rate
 
 - Benchmark notes: [`docs/benchmark/README.md`](docs/benchmark/README.md)
 - Editable diagram source: [`docs/benchmark/benchmark.mmd`](docs/benchmark/benchmark.mmd)
