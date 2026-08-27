@@ -29,6 +29,25 @@ The important property is:
 
 Editable Mermaid source: [`docs/high-level-architecture.mmd`](docs/high-level-architecture.mmd)
 
+## Component deep dives
+
+Detailed design lives in a separate directory per component as we implement it. Keep each block independently understandable and resist turning hackathon documentation into a distributed-systems archaeology site.
+
+### xmemory
+
+![xmemory schema](assets/xmemory-schema.svg)
+
+xmemory stores two distinct layers:
+
+- **PromotionCase** — immutable evaluated evidence: scenario, chosen promotion, result, counterfactual optimum, and regret.
+- **PromotionRule** — compact reusable policy that is updated as evidence accumulates and retrieved before future decisions.
+
+Products and store clusters are first-class objects, and evaluated cases are explicitly linked to the rules they support. This makes the hackathon write → read → changed behaviour trace visible and reproducible.
+
+- Detailed design: [`docs/xmemory/README.md`](docs/xmemory/README.md)
+- XMD v1 schema: [`docs/xmemory/schema.xmd.yaml`](docs/xmemory/schema.xmd.yaml)
+- Editable diagram source: [`docs/xmemory/schema.mmd`](docs/xmemory/schema.mmd)
+
 ## Benchmark
 
 ![Benchmark clean memory vs learned memory](assets/benchmark.svg)
