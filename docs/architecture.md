@@ -1,20 +1,31 @@
 # High-Level Architecture
 
-This diagram shows the logical service boundaries, persistent storage, and the main learning and benchmark flows. The MVP can still run as one application process; these are responsibility boundaries, not required deployment boundaries.
+The MVP architecture is intentionally small. These are logical responsibilities, not required deployment boundaries.
 
 ![Self-learning FMCG promotion agent high-level architecture](../assets/high-level-architecture.svg)
 
 Editable source: [`high-level-architecture.mmd`](high-level-architecture.mmd)
 
-## Reading the diagram
+## Components
 
-- **Scenario Generator** owns scenario construction, not promotion decisions.
-- **Promotion Agent** reads xmemory before choosing one allowed discount.
-- **Market Simulator** is the hidden external world and produces objective outcomes.
-- **Evaluator / Learner** computes counterfactual regret and turns results into durable experience.
-- **xmemory** persists completed cases and reusable lessons across runs.
-- **Benchmark Runner** holds the model, prompt, simulator, and test scenarios constant while comparing clean versus trained memory.
+- **Scenario Generator** creates a normalized promotion scenario.
+- **Promotion Agent** reads relevant past lessons from **xmemory** and chooses one discount action.
+- **Market Simulator** acts as the hidden external world and returns the business outcome.
+- **Evaluator / Learner** measures the decision and turns the result into reusable experience.
+- **xmemory** persists cases and lessons across runs.
 
-The important feedback path is:
+The core feedback loop is:
 
-`Scenario -> Memory Read -> Decision -> Simulation -> Evaluation -> Memory Write -> Next Scenario`
+`Scenario -> Decision -> Outcome -> Learning -> Memory -> Better next decision`
+
+Counterfactual replay, regret calculation, lesson confidence, and memory structure are implementation details of the Evaluator / Learner and xmemory. They are deliberately omitted from the high-level diagram.
+
+## Benchmark
+
+Benchmarking is kept separate from the product architecture:
+
+![Benchmark clean memory vs learned memory](../assets/benchmark.svg)
+
+Editable source: [`benchmark.mmd`](benchmark.mmd)
+
+The Benchmark Runner executes the same fixed scenarios with clean and trained memory and compares optimal action rate, average regret, and gross profit.
