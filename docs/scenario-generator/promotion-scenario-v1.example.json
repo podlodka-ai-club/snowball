@@ -4,8 +4,8 @@
   "scenario_id": "SCN-20260718-LONDON_CENTRAL-ICE500",
   "generated_at": "2026-07-18T06:00:00Z",
   "source": {
-    "type": "simulation",
-    "reference": "fixture-0018"
+    "type": "dataset",
+    "reference": "dunnhumby-batf:fixture-0018"
   },
   "scenario": {
     "date": "2026-07-18",
