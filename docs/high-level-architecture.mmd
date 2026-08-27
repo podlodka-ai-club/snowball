@@ -1,41 +1,6 @@
 flowchart LR
-    subgraph INPUTS["Scenario Inputs"]
-        BASE["Historical / Synthetic Sales Baseline"]
-        EXT["Simulated External Conditions"]
-    end
-
-    subgraph RUNTIME["Promotion Learning Runtime"]
-        SG["Scenario Generator\nService"]
-        PA["Promotion Agent\nAI Agent"]
-        MS["Market Simulator\nService"]
-        EL["Evaluator / Learner\nAI + Deterministic Logic"]
-
-        SG -->|PromotionScenario| PA
-        PA -->|PromotionDecision| MS
-        SG -->|Scenario context| MS
-        MS -->|PromotionOutcome| EL
-        EL -.->|Counterfactual replay: 0 / 10 / 20 / 30%| MS
-    end
-
-    subgraph MEMORY["Persistent Memory"]
-        XM[("xmemory")]
-        CASES["Promotion Cases"]
-        LESSONS["Lessons"]
-
-        XM --> CASES
-        XM --> LESSONS
-    end
-
-    subgraph BENCH["Benchmark / Evaluation"]
-        BR["Benchmark Runner\nEvaluation Service"]
-        MET["Metrics\nOptimal Action Rate\nAverage Regret\nGross Profit\nMemory Retrieval Rate"]
-        BR --> MET
-    end
-
-    BASE --> SG
-    EXT --> SG
-    XM -->|Read relevant lessons| PA
-    EL -->|Write case + lesson| XM
-    BR -.->|Fixed scenario suite| SG
-    BR -.->|Clean vs trained memory| XM
-    EL -.->|Regret + outcome data| MET
+    S[Scenario Generator] --> A[Promotion Agent]
+    X[(xmemory)] -->|Past lessons| A
+    A -->|Promotion| M[Market Simulator]
+    M -->|Outcome| E[Evaluator / Learner]
+    E -->|Cases + lessons| X
