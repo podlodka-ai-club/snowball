@@ -20,13 +20,14 @@ The architecture is intentionally small:
 
 - **Scenario Generator** fetches baseline market data through a source adapter, normalizes it, and publishes scenario events to Kafka.
 - **Kafka** topic `promotion.scenarios.v1` decouples data collection/scheduling from decision logic.
-- **Promotion Agent** consumes scenarios, reads relevant lessons from **xmemory**, and chooses a discount.
+- **Promotion Agent** consumes scenarios, reads a few relevant lessons from **xmemory**, chooses one discount, and journals the exact decision durably for idempotency and traceability.
+- **Kafka** topic `promotion.decisions.v1` carries the validated decision plus scenario snapshot to the simulator.
 - **Market Simulator** produces the business outcome.
 - **Evaluator / Learner** measures the decision and writes new experience back to **xmemory**.
 
 The important property is:
 
-**market data → scenario event → decision → outcome → learning → memory → better next decision**
+**market data → scenario event → memory-backed decision → decision event → outcome → learning → memory → better next decision**
 
 - Architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
 - Editable diagram source: [`docs/architecture/high-level-architecture.mmd`](docs/architecture/high-level-architecture.mmd)
@@ -56,6 +57,32 @@ For the hackathon the market is fixed to **London Central** (`LONDON_CENTRAL`, `
 - Example event: [`docs/scenario-generator/promotion-scenario-v1.example.json`](docs/scenario-generator/promotion-scenario-v1.example.json)
 - Editable diagram source: [`docs/scenario-generator/architecture.mmd`](docs/scenario-generator/architecture.mmd)
 
+### Promotion Agent
+
+![Promotion Agent architecture](assets/promotion-agent-architecture.svg)
+
+The Promotion Agent is also a Kotlin/Spring Boot service for the MVP. Its runtime path is deliberately narrow:
+
+- consume `promotion.scenarios.v1` using consumer group `promotion-agent-v1`;
+- validate the event before business logic;
+- use `scenario_id` as the idempotency key in a file-backed H2 `DecisionJournal`;
+- query xmemory through its REST `/read` API for candidate Lessons;
+- deterministically filter/rank candidates and pass at most `3` Lessons to the model;
+- keep the model prompt identical between clean-memory and trained-memory benchmark runs;
+- validate the model result against allowed discounts `0 | 10 | 20 | 30`;
+- retry an invalid/failed model call once, then use deterministic `0%` fallback;
+- persist the exact decision payload before publishing it;
+- publish a versioned `promotion.decisions.v1` event for the Market Simulator.
+
+The decision event carries the validated scenario snapshot forward. The Market Simulator therefore consumes one event and does not need to join the scenario and decision topics.
+
+Operational idempotency/trace data stays in the agent's H2 journal, not in xmemory. xmemory remains product learning memory containing only SKU, PromotionCase, and Lesson.
+
+- Detailed design: [`docs/promotion-agent/README.md`](docs/promotion-agent/README.md)
+- Kafka JSON Schema: [`docs/promotion-agent/promotion-decision-v1.schema.json`](docs/promotion-agent/promotion-decision-v1.schema.json)
+- Example event: [`docs/promotion-agent/promotion-decision-v1.example.json`](docs/promotion-agent/promotion-decision-v1.example.json)
+- Editable diagram source: [`docs/promotion-agent/architecture.mmd`](docs/promotion-agent/architecture.mmd)
+
 ### xmemory
 
 ![xmemory schema](assets/xmemory-schema.svg)
@@ -63,7 +90,7 @@ For the hackathon the market is fixed to **London Central** (`LONDON_CENTRAL`, `
 The MVP memory schema contains only three domain objects:
 
 - **SKU** — stable product identity and basic economics.
-- **PromotionCase** — immutable evaluated evidence: scenario, chosen discount, outcome, simulator optimum, and regret.
+- **PromotionCase** — immutable evaluated evidence: scenario, chosen discount, outcome, all four replay profits, simulator optimum, and regret.
 - **Lesson** — compact reusable knowledge updated from linked cases and retrieved before later decisions.
 
 Each Lesson links back to the PromotionCases that produced it, making the hackathon write → read → changed behaviour trace visible and reproducible.

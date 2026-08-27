@@ -6,7 +6,7 @@ description: >-
   Durable memory for a self-learning FMCG promotion agent. Store only three domain
   objects: SKU, evaluated PromotionCase evidence, and compact Lesson objects that are
   retrieved before future discount decisions. Do not store prompts, hidden reasoning,
-  simulator internals, or every counterfactual action as separate memory records.
+  simulator internals, or counterfactual actions as separate memory records.
 
 objects:
   SKU:
@@ -43,8 +43,9 @@ objects:
     description: >-
       One completed promotion decision after the market simulator and counterfactual
       evaluator have run. It stores scenario context, the discount chosen by the Promotion
-      Agent, the realised outcome, the simulator oracle, and regret. Cases are factual
-      evidence and should be treated as immutable after evaluation except for bad-data fixes.
+      Agent, the realised outcome, all four counterfactual gross profits, the simulator
+      oracle, and regret. Cases are factual evidence and should be treated as immutable
+      after evaluation except for bad-data fixes.
     fields:
       case_id:
         type: str
@@ -115,6 +116,22 @@ objects:
         type: float
         required: true
         description: Gross profit produced by the chosen discount.
+      profit_0:
+        type: float
+        required: true
+        description: Gross profit from replaying this exact scenario with a 0 percent discount.
+      profit_10:
+        type: float
+        required: true
+        description: Gross profit from replaying this exact scenario with a 10 percent discount.
+      profit_20:
+        type: float
+        required: true
+        description: Gross profit from replaying this exact scenario with a 20 percent discount.
+      profit_30:
+        type: float
+        required: true
+        description: Gross profit from replaying this exact scenario with a 30 percent discount.
       best_discount:
         type: int
         required: true

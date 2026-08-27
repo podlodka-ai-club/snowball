@@ -1,8 +1,9 @@
 flowchart LR
     D[Market data / fixture] --> S[Scenario Generator]
-    S --> K[(promotion.scenarios.v1)]
-    K --> A[Promotion Agent]
+    S --> K1[(promotion.scenarios.v1)]
+    K1 --> A[Promotion Agent]
     X[(xmemory)] -->|Past lessons| A
-    A -->|Promotion| M[Market Simulator]
+    A --> K2[(promotion.decisions.v1)]
+    K2 --> M[Market Simulator]
     M -->|Outcome| E[Evaluator / Learner]
     E -->|Cases + lessons| X

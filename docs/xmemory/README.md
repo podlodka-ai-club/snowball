@@ -30,6 +30,7 @@ The earlier design had `Product`, `StoreCluster`, `PromotionCase`, and `Promotio
 - The Promotion Agent has one action: `0%`, `10%`, `20%`, or `30%` discount. That chosen action is applied directly to the simulator.
 - Context is stored as explicit scalar buckets instead of generic tag arrays, which makes retrieval and debugging predictable.
 - Lessons update in place by deterministic `lesson_key`; revision history can wait until there is evidence that it is useful.
+- The four counterfactual gross profits are stored as scalar fields on PromotionCase, not as four new objects. This preserves enough evaluated evidence to rebuild action rankings after restart without polluting the domain model.
 
 ## Objects
 
@@ -84,6 +85,10 @@ Gross profit is the primary KPI for the MVP.
 
 #### Counterfactual evaluation
 
+- `profit_0`
+- `profit_10`
+- `profit_20`
+- `profit_30`
 - `best_discount`
 - `best_gross_profit`
 - `regret = best_gross_profit - gross_profit`
@@ -94,11 +99,16 @@ Example:
 ```text
 Agent chose:     10%
 Gross profit:    £252
+Replay profits:  0%=£240 · 10%=£252 · 20%=£281 · 30%=£263
 Oracle best:     20% / £281
 Regret:          £29
 ```
 
-This is the feedback signal that drives learning. The simulator, not another model, provides the objective comparison.
+The four replay-profit fields are intentionally redundant with `best_discount` and `best_gross_profit`. That redundancy is useful: after a process restart, the learner can reconstruct the full action ranking and recompute lesson strength without rerunning the hidden simulator.
+
+This is still one PromotionCase object, not four Counterfactual records.
+
+This evaluated vector is the feedback signal that drives learning. The simulator, not another model, provides the objective comparison.
 
 ### Lesson
 
@@ -185,18 +195,19 @@ Optional direct link for SKU-specific lessons. Category-level lessons can rely o
 The Evaluator / Learner writes memory only after all four actions have been replayed by the deterministic simulator.
 
 1. Upsert the SKU.
-2. Write one PromotionCase containing scenario, chosen action, realised outcome, oracle optimum, and regret.
+2. Write one PromotionCase containing scenario, chosen action, realised outcome, `profit_0`, `profit_10`, `profit_20`, `profit_30`, oracle optimum, and regret.
 3. Select the coarse lesson scope/context bucket.
 4. Read the existing Lesson for the deterministic `lesson_key`, if any.
-5. Recalculate supporting evidence using linked PromotionCases.
+5. Recalculate supporting evidence using linked PromotionCases and their stored replay-profit vectors.
 6. Create or update the Lesson.
 7. Link every case actually used as evidence through `lesson_evidence`.
 
 For the first implementation, code should calculate:
 
 - regret and regret percentage;
+- all four replay profits from simulator results;
 - evidence count;
-- profit advantage;
+- action ranking and profit advantage from stored case vectors;
 - lesson key;
 - and preferably validate the recommended discount against supporting simulator outcomes.
 
@@ -215,13 +226,7 @@ Recommended order:
 
 For the MVP, retrieve at most `3` Lessons and optionally `2` supporting PromotionCases per Lesson.
 
-Example request intent:
-
-```text
-Find the strongest lessons relevant to Ice Cream 500ml,
-London Central, hot weekend, local event, high stock.
-Include evidence only when needed to explain the recommendation.
-```
+The Promotion Agent performs this through xmemory's REST `/instances/{instance_id}/read` API, asks for structured `xresponse` candidates, then applies deterministic local eligibility/ranking before putting Lessons into the model prompt. The exact runtime request and ranking rules live in [`../promotion-agent/README.md`](../promotion-agent/README.md).
 
 The retrieved lesson is evidence, not a mandatory instruction. The Promotion Agent can still choose another action when the current scenario differs materially.
 
@@ -232,20 +237,21 @@ Do not store:
 - full prompts or conversations;
 - chain-of-thought or hidden reasoning;
 - simulator coefficients / hidden ground truth;
-- all four counterfactual outcomes as separate objects;
+- counterfactual actions as separate memory objects;
 - random noise values;
 - embeddings or hand-maintained vector indexes;
 - raw source-dataset rows after they have been converted into scenarios;
+- Kafka offsets, duplicate markers, or Promotion Agent operational journal state;
 - dozens of product/store attributes that the simulator does not use.
 
-The hidden simulator coefficients must remain outside memory. Otherwise the agent is not learning from experience; it is reading the answer key, which rather ruins the point of the experiment.
+The four evaluated gross-profit numbers do belong on PromotionCase because they are observed training evidence. The hidden coefficients that generated them do not. Otherwise the agent is not learning from experience; it is reading the answer key, which rather ruins the point of the experiment.
 
 ## Minimal implementation for two developers
 
 1. Create the xmemory instance from [`schema.xmd.yaml`](schema.xmd.yaml).
-2. Implement `write_promotion_case()`.
+2. Implement `write_promotion_case()` including all four replay-profit fields.
 3. Implement deterministic `build_lesson_key()`.
-4. Implement `update_lesson_from_cases()`.
+4. Implement `update_lesson_from_cases()` using stored replay-profit vectors.
 5. Implement `read_relevant_lessons()` in the Promotion Agent.
 6. Log retrieved Lesson IDs with every recommendation.
 7. Run the same fixed benchmark scenarios with clean and trained memory.
@@ -261,6 +267,7 @@ CASE-0018
 Ice Cream 500ml · hot weekend · high stock
 Agent chose: 10%
 Gross profit: £252
+Replay: 0=£240 · 10=£252 · 20=£281 · 30=£263
 Oracle: 20% / £281
 Regret: £29
         |

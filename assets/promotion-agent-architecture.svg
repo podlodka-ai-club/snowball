@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="820" viewBox="0 0 1700 820" role="img" aria-labelledby="title desc">
+  <title id="title">Promotion Agent architecture</title>
+  <desc id="desc">The Promotion Agent consumes validated scenarios from Kafka, checks a durable H2 decision journal, retrieves a few relevant lessons from xmemory, builds a stable model input, validates one discount decision, persists the exact event, and publishes it to the Market Simulator through a second Kafka topic.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
+    <marker id="arrowKafka" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker>
+    <marker id="arrowMemory" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#10b981"/></marker>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.subtitle{font:400 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.service{fill:#eff6ff;stroke:#3b82f6;stroke-width:2.5}.kafka{fill:#f5f3ff;stroke:#8b5cf6;stroke-width:2.5}.memory{fill:#ecfdf5;stroke:#10b981;stroke-width:2.5}.journal{fill:#fff7ed;stroke:#f59e0b;stroke-width:2.5}.group{fill:none;stroke:#cbd5e1;stroke-width:2;stroke-dasharray:9 8}.h{font:700 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.body{font:400 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.small{font:500 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.label{font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.arrow{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}.arrowKafka{fill:none;stroke:#7c3aed;stroke-width:3;marker-end:url(#arrowKafka)}.arrowMemory{fill:none;stroke:#10b981;stroke-width:3;marker-end:url(#arrowMemory)}
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1700" height="820" rx="24"/>
+  <text class="title" x="54" y="58">Promotion Agent: bounded memory → one durable decision</text>
+  <text class="subtitle" x="54" y="88">Kotlin/Spring Boot · at-least-once Kafka · file-backed H2 idempotency · xmemory REST reads</text>
+
+  <rect class="kafka" x="50" y="205" width="230" height="105" rx="16"/>
+  <text class="h" x="75" y="246">promotion.scenarios.v1</text>
+  <text class="body" x="75" y="274">key: store_id:sku_id</text>
+  <text class="small" x="75" y="296">at-least-once input</text>
+
+  <rect class="group" x="330" y="135" width="985" height="545" rx="20"/>
+  <text class="label" x="355" y="166">KOTLIN PROMOTION AGENT</text>
+
+  <rect class="service" x="375" y="205" width="205" height="105" rx="16"/>
+  <text class="h" x="400" y="244">ScenarioListener</text>
+  <text class="body" x="400" y="270">group: promotion-agent-v1</text>
+  <text class="small" x="400" y="293">manual offset ack</text>
+
+  <rect class="service" x="620" y="205" width="205" height="105" rx="16"/>
+  <text class="h" x="645" y="244">Validate + Map</text>
+  <text class="body" x="645" y="270">schema v1 → domain</text>
+  <text class="small" x="645" y="293">reject invalid producer data</text>
+
+  <rect class="journal" x="865" y="195" width="400" height="125" rx="16"/>
+  <text class="h" x="890" y="236">DecisionJournal · file-backed H2</text>
+  <text class="body" x="890" y="263">scenario_id PK · STARTED / DECIDED / COMPLETED</text>
+  <text class="small" x="890" y="288">idempotency + exact payload + lesson trace</text>
+  <text class="small" x="890" y="307">persistent volume: /data/promotion-agent</text>
+
+  <rect class="service" x="375" y="385" width="205" height="105" rx="16"/>
+  <text class="h" x="400" y="424">Memory Retriever</text>
+  <text class="body" x="400" y="451">xmemory REST /read</text>
+  <text class="small" x="400" y="474">up to 8 candidates</text>
+
+  <rect class="memory" x="70" y="440" width="210" height="105" rx="16"/>
+  <text class="h" x="95" y="480">xmemory</text>
+  <text class="body" x="95" y="506">durable Lessons + cases</text>
+  <text class="small" x="95" y="529">no simulator internals</text>
+
+  <rect class="service" x="620" y="385" width="205" height="105" rx="16"/>
+  <text class="h" x="645" y="424">Filter + Rank</text>
+  <text class="body" x="645" y="451">SKU before category</text>
+  <text class="small" x="645" y="474">max 3 Lessons to model</text>
+
+  <rect class="service" x="865" y="385" width="180" height="105" rx="16"/>
+  <text class="h" x="890" y="424">PromptBuilder</text>
+  <text class="body" x="890" y="451">stable benchmark prompt</text>
+  <text class="small" x="890" y="474">scenario + lessons only</text>
+
+  <rect class="service" x="1085" y="385" width="180" height="105" rx="16"/>
+  <text class="h" x="1110" y="424">DecisionModel</text>
+  <text class="body" x="1110" y="451">0 · 10 · 20 · 30</text>
+  <text class="small" x="1110" y="474">structured result</text>
+
+  <rect class="service" x="865" y="535" width="400" height="105" rx="16"/>
+  <text class="h" x="890" y="574">Validate Decision</text>
+  <text class="body" x="890" y="601">scenario_id match · discount enum · retry once</text>
+  <text class="small" x="890" y="624">second failure → deterministic 0% fallback</text>
+
+  <rect class="service" x="1360" y="205" width="265" height="105" rx="16"/>
+  <text class="h" x="1385" y="246">KafkaDecisionPublisher</text>
+  <text class="body" x="1385" y="273">publish persisted DECIDED payload</text>
+  <text class="small" x="1385" y="296">wait for broker acknowledgement</text>
+
+  <rect class="kafka" x="1360" y="400" width="265" height="110" rx="16"/>
+  <text class="h" x="1385" y="441">promotion.decisions.v1</text>
+  <text class="body" x="1385" y="468">scenario snapshot + discount</text>
+  <text class="small" x="1385" y="491">deterministic decision_id</text>
+
+  <rect class="service" x="1360" y="610" width="265" height="90" rx="16"/>
+  <text class="h" x="1385" y="650">Market Simulator</text>
+  <text class="body" x="1385" y="677">consumes one decision event</text>
+
+  <path class="arrowKafka" d="M280 257 H365"/>
+  <path class="arrow" d="M580 257 H610"/>
+  <path class="arrow" d="M825 257 H855"/>
+  <path class="arrow" d="M1065 320 V350 H478 V375"/>
+  <text class="label" x="480" y="344">new / STARTED</text>
+  <path class="arrowMemory" d="M280 492 H365"/>
+  <path class="arrow" d="M580 437 H610"/>
+  <path class="arrow" d="M825 437 H855"/>
+  <path class="arrow" d="M1045 437 H1075"/>
+  <path class="arrow" d="M1175 490 V525"/>
+  <path class="arrow" d="M1065 535 V505 H1105 Q1120 505 1120 320"/>
+  <text class="label" x="1128" y="520">persist DECIDED</text>
+  <path class="arrow" d="M1265 257 H1350"/>
+  <text class="label" x="1278" y="241">DECIDED payload</text>
+  <path class="arrowKafka" d="M1492 310 V390"/>
+  <path class="arrowKafka" d="M1492 510 V600"/>
+  <path class="arrow" d="M1360 255 H1300 Q1280 255 1265 280"/>
+  <text class="label" x="1285" y="332">publish confirmed → COMPLETED → source ack</text>
+</svg>

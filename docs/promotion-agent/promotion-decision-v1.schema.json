@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "promotion-decision-v1.schema.json",
+  "title": "Promotion Decision Event v1",
+  "description": "Validated promotion decision published by the Promotion Agent for the Market Simulator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_type",
+    "schema_version",
+    "decision_id",
+    "scenario_id",
+    "decided_at",
+    "scenario",
+    "decision"
+  ],
+  "properties": {
+    "event_type": {
+      "const": "promotion.decision.created"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "decision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scenario": {
+      "$ref": "../scenario-generator/promotion-scenario-v1.schema.json#/properties/scenario"
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discount"],
+      "properties": {
+        "discount": {
+          "type": "integer",
+          "enum": [0, 10, 20, 30]
+        }
+      }
+    }
+  }
+}
