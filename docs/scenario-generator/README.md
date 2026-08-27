@@ -6,7 +6,8 @@ The Scenario Generator is the ingestion boundary of the promotion system. Its jo
 
 Editable diagram source: [`architecture.mmd`](architecture.mmd)  
 Kafka contract: [`promotion-scenario-v1.schema.json`](promotion-scenario-v1.schema.json)  
-Example event: [`promotion-scenario-v1.example.json`](promotion-scenario-v1.example.json)
+Example event: [`promotion-scenario-v1.example.json`](promotion-scenario-v1.example.json)  
+Dataset preparation: [`dataset-preparation.md`](dataset-preparation.md)
 
 ## Design goal
 
@@ -20,15 +21,39 @@ That gives us a useful extension model:
 
 ```text
 Today:
-Dataset / simulation adapter -> Scenario Generator -> Kafka -> Promotion Agent
+Prepared dataset adapter -> Scenario Generator -> Kafka -> Promotion Agent
 
 Later:
-SAP adapter                -> Scenario Generator -> Kafka -> Promotion Agent
-Database adapter           -> Scenario Generator -> Kafka -> Promotion Agent
-API adapter                -> Scenario Generator -> Kafka -> Promotion Agent
+SAP adapter              -> Scenario Generator -> Kafka -> Promotion Agent
+Database adapter         -> Scenario Generator -> Kafka -> Promotion Agent
+API adapter              -> Scenario Generator -> Kafka -> Promotion Agent
 ```
 
 Nothing downstream changes when the source changes.
+
+## Hackathon market: one location
+
+For the MVP, every scenario belongs to one logical market:
+
+```text
+store_id: LONDON_CENTRAL
+store_name: London Central
+timezone: Europe/London
+```
+
+This is intentionally fixed. Multiple stores would multiply scenario combinations, retrieval dimensions, weather inputs, and benchmark variance without helping us prove the memory loop.
+
+Keep `store_id` and `store_name` in the event contract anyway. The one-location rule is a deployment configuration, not a schema limitation, so multi-location support can be added later without changing the Promotion Agent contract.
+
+`London Central` is a synthetic demo market. The public retail dataset supplies baseline sales/price patterns; it is not presented as literal London transaction history.
+
+Recommended configuration:
+
+```text
+MARKET_ID=LONDON_CENTRAL
+MARKET_NAME=London Central
+MARKET_TIMEZONE=Europe/London
+```
 
 ## Kotlin microservice
 
@@ -73,12 +98,9 @@ interface BaselineSource {
 }
 ```
 
-Implement only one source adapter first.
+Implement only one source adapter first:
 
-Recommended MVP options:
-
-- `DatasetBaselineSource` reading prepared dunnhumby/M5-derived fixtures;
-- or `SimulationBaselineSource` generating deterministic baseline records.
+- `DatasetBaselineSource` reading the normalized fixture produced from dunnhumby.
 
 Future adapters can implement the same port:
 
@@ -86,11 +108,13 @@ Future adapters can implement the same port:
 - `JdbcBaselineSource`
 - `HttpBaselineSource`
 
-A baseline record should contain only source facts such as SKU, store, price, cost, stock, and baseline sales. It should not know anything about xmemory, promotion decisions, or lessons.
+A baseline record should contain only source facts such as SKU, price, cost, stock, and baseline sales. The hackathon market identity is injected from fixed configuration rather than repeated in every fixture row.
+
+The baseline source must not know anything about xmemory, promotion decisions, or lessons.
 
 ### 3. `ContextEnricher` port
 
-Adds context that is useful for promotion decisions but may come from another source.
+Adds context useful for promotion decisions but not present in the baseline dataset.
 
 Conceptually:
 
@@ -100,24 +124,24 @@ interface ContextEnricher {
 }
 ```
 
-For the MVP implement one deterministic enricher that creates:
+For the MVP implement one deterministic enricher for the fixed London market. It creates:
 
 - `day_type`: `weekday | weekend`
 - `weather`: `normal | hot | rain`
 - `temperature_c`
 - `event_type`: `none | local_event`
 
-This keeps the source boundary realistic without requiring Open-Meteo, Ticketmaster, SAP, and whatever other integration humans can invent before lunch.
+The fixed `MARKET_TIMEZONE=Europe/London` is used for calendar/day calculations.
 
-Later the deterministic enricher can be replaced or composed with real weather/event adapters without changing the Kafka contract.
+Later the deterministic enricher can be replaced or composed with real London weather/event adapters without changing the Kafka contract.
 
 ### 4. `ScenarioGenerationService`
 
 The application service orchestrates one generation cycle:
 
-1. fetch baseline records;
-2. enrich context;
-3. normalize source-specific values;
+1. fetch normalized baseline records;
+2. inject the fixed market identity;
+3. enrich context;
 4. derive stable buckets such as `stock_level`;
 5. create deterministic `scenario_id`;
 6. validate the contract;
@@ -157,7 +181,13 @@ Use:
 <store_id>:<sku_id>
 ```
 
-This preserves ordering for one store/SKU stream if the system later runs multiple consumers. For the hackathon a single consumer is sufficient, but choosing a useful key now costs nothing.
+For the hackathon this becomes, for example:
+
+```text
+LONDON_CENTRAL:ICE500
+```
+
+This preserves ordering for one store/SKU stream if the system later runs multiple consumers.
 
 ### Delivery semantics
 
@@ -186,8 +216,8 @@ The event has a small envelope plus the normalized scenario.
   "scenario_id": "SCN-20260718-LONDON_CENTRAL-ICE500",
   "generated_at": "2026-07-18T06:00:00Z",
   "source": {
-    "type": "simulation",
-    "reference": "fixture-0018"
+    "type": "dataset",
+    "reference": "dunnhumby-batf:fixture-0018"
   },
   "scenario": {
     "date": "2026-07-18",
@@ -256,22 +286,26 @@ This is intentionally boring. Boring contracts are useful contracts.
 
 ## Data gathering strategy
 
-### MVP
+Use **dunnhumby Breakfast at the Frat** as the primary baseline dataset and prepare it once offline.
 
-Use prepared baseline data plus deterministic context generation.
+The detailed download, filtering, donor-store selection, SKU mapping, baseline calculation, and fixture format are documented in [`dataset-preparation.md`](dataset-preparation.md).
 
-Recommended pipeline:
+Runtime flow:
 
 ```text
-Dunnhumby/M5 sample
+dunnhumby raw files
         |
         v
-small normalized fixture
+one-time preparation script
+        |
+        v
+small normalized baseline fixture
         |
         v
 DatasetBaselineSource
         |
-        +--> DeterministicContextEnricher
+        +--- fixed London Central market config
+        +--- deterministic London context
         |
         v
 PromotionScenarioEvent
@@ -280,9 +314,13 @@ PromotionScenarioEvent
 promotion.scenarios.v1
 ```
 
-Prepare the dataset offline into a tiny fixture instead of teaching the running service to understand a large public dataset. The service should exercise your architecture, not become an ETL internship.
+The public dataset should provide baseline retail patterns, not become a runtime dependency. A few hundred normalized rows are enough to train and benchmark the memory loop.
 
-A fixture of a few hundred baseline rows is enough to train and benchmark the memory loop.
+### Why dunnhumby first
+
+The source includes weekly unit sales plus base price, actual shelf price, and promotional-support indicators. That makes it practical to identify non-promotional observations and estimate a clean baseline before our own simulator applies `0/10/20/30%` actions.
+
+The source is weekly, so the preparation step converts selected non-promotional weekly demand into an approximate daily baseline. The simulator owns all later weekday/weather/event/discount effects.
 
 ### Real-world extension
 
@@ -311,6 +349,9 @@ Make schedule configuration external:
 SCENARIO_GENERATION_ENABLED=true
 SCENARIO_GENERATION_CRON=0 0 6 * * *
 SCENARIO_BATCH_SIZE=100
+MARKET_ID=LONDON_CENTRAL
+MARKET_NAME=London Central
+MARKET_TIMEZONE=Europe/London
 ```
 
 For the hackathon, use a faster schedule or manual trigger during demos.
@@ -374,7 +415,6 @@ scenario-generator/
     adapter/
       source/
         DatasetBaselineSource.kt
-        SimulationBaselineSource.kt
       context/
         DeterministicContextEnricher.kt
       kafka/
@@ -383,6 +423,7 @@ scenario-generator/
         GenerationController.kt
     config/
       KafkaConfig.kt
+      MarketConfig.kt
       ScenarioGenerationConfig.kt
 ```
 
@@ -390,14 +431,15 @@ Do not create `SapBaselineSource`, weather APIs, or several source implementatio
 
 ## MVP implementation order
 
-1. Define Kotlin DTOs from the JSON schema.
-2. Add producer/consumer contract tests using the example event.
-3. Implement `DatasetBaselineSource` or `SimulationBaselineSource`.
-4. Implement deterministic context enrichment.
-5. Implement `ScenarioGenerationService`.
-6. Publish to local Kafka/Redpanda.
-7. Make the Promotion Agent consume `promotion.scenarios.v1` and deduplicate by `scenario_id`.
-8. Add scheduler + manual trigger.
-9. Only then consider a second real data adapter.
+1. Download and prepare the dunnhumby fixture using [`dataset-preparation.md`](dataset-preparation.md).
+2. Define Kotlin DTOs from the JSON schema.
+3. Add producer/consumer contract tests using the example event.
+4. Implement `DatasetBaselineSource`.
+5. Implement fixed `MarketConfig` and deterministic context enrichment.
+6. Implement `ScenarioGenerationService`.
+7. Publish to local Kafka/Redpanda.
+8. Make the Promotion Agent consume `promotion.scenarios.v1` and deduplicate by `scenario_id`.
+9. Add scheduler + manual trigger.
+10. Only then consider a second real data adapter.
 
 The architectural proof is simple: switch the configured `BaselineSource`, produce the same contract, and the Promotion Agent continues working unchanged.
