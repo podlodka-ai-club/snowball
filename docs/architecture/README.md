@@ -8,14 +8,23 @@ Editable source: [`high-level-architecture.mmd`](high-level-architecture.mmd)
 
 ## Components
 
-- **Scenario Generator** creates a normalized promotion scenario.
-- **Promotion Agent** reads relevant past lessons from **xmemory** and chooses one discount action.
+- **Market Data Source** is a fixture/simulation for the MVP and can later be SAP, a database, or another API.
+- **Scenario Generator** is a Kotlin microservice that fetches source data through an adapter, normalizes it, and publishes immutable scenario events.
+- **Kafka** topic `promotion.scenarios.v1` is the contract boundary between data acquisition and decision logic.
+- **Promotion Agent** consumes scenarios, reads relevant past lessons from **xmemory**, and chooses one discount action.
 - **Market Simulator** acts as the hidden external world and returns the business outcome.
 - **Evaluator / Learner** measures the decision and turns the result into reusable experience.
 - **xmemory** persists evaluated cases and lessons across runs.
 
 The core feedback loop is:
 
-`Scenario -> Decision -> Outcome -> Learning -> Memory -> Better next decision`
+`Market data -> Scenario event -> Decision -> Outcome -> Learning -> Memory -> Better next decision`
 
-Counterfactual replay, regret calculation, lesson confidence, and memory structure are deliberately omitted from the high-level diagram. See [`../xmemory/`](../xmemory/) for the memory design.
+Kafka is deliberately used at the ingestion boundary because it decouples source scheduling and adapters from the Promotion Agent. The rest of the MVP does not need to become an event-driven theme park.
+
+Detailed components:
+
+- Scenario Generator: [`../scenario-generator/`](../scenario-generator/)
+- xmemory: [`../xmemory/`](../xmemory/)
+
+Counterfactual replay, regret calculation, lesson confidence, and memory structure remain outside this high-level view.
