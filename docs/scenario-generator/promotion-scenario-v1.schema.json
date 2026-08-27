@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "promotion-scenario-v1.schema.json",
+  "title": "Promotion Scenario Event v1",
+  "description": "Normalized immutable scenario published by Scenario Generator for the Promotion Agent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_type",
+    "schema_version",
+    "scenario_id",
+    "generated_at",
+    "source",
+    "scenario"
+  ],
+  "properties": {
+    "event_type": {
+      "const": "promotion.scenario.created"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "reference"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Source adapter identifier such as simulation, dataset, sap, or jdbc."
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable source-side record or fixture reference used for traceability and deterministic scenario identity."
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "date",
+        "store_id",
+        "sku_id",
+        "category",
+        "price",
+        "cost",
+        "stock",
+        "baseline_sales",
+        "stock_level",
+        "day_type",
+        "weather",
+        "event_type"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "store_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "store_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sku_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sku_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "price": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0
+        },
+        "stock": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "baseline_sales": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stock_level": {
+          "type": "string",
+          "enum": ["normal", "high"]
+        },
+        "day_type": {
+          "type": "string",
+          "enum": ["weekday", "weekend"]
+        },
+        "weather": {
+          "type": "string",
+          "enum": ["normal", "hot", "rain"]
+        },
+        "temperature_c": {
+          "type": "number"
+        },
+        "event_type": {
+          "type": "string",
+          "enum": ["none", "local_event"]
+        },
+        "event_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
