@@ -1,0 +1,20 @@
+flowchart LR
+    P["Product\nSKU · brand · category"]
+    C["StoreCluster\ncluster_id · market"]
+    PC["PromotionCase\nscenario + chosen action\noutcome + optimum + regret"]
+    R["PromotionRule\ncontext · recommendation\nevidence · confidence · status"]
+
+    P -->|case_product| PC
+    C -->|case_cluster| PC
+    PC -->|case_supports_rule| R
+
+    E["Evaluator / Learner"] -->|writes case + updates rule| PC
+    R -->|top relevant active rules| A["Promotion Agent"]
+
+    classDef entity fill:#ffffff,stroke:#cbd5e1,stroke-width:2px,color:#0f172a;
+    classDef memory fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
+    classDef actor fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
+
+    class P,C entity;
+    class PC,R memory;
+    class E,A actor;
