@@ -29,6 +29,8 @@ flowchart LR
     X -->|Relevant lessons| B
 ```
 
+For service boundaries, persistent storage, counterfactual flow, and benchmarking, see [High-Level Architecture](docs/architecture.md).
+
 ## Evaluation
 
 Keep everything constant except memory:
