@@ -21,11 +21,8 @@ Keep everything else constant:
 Compare:
 
 - **optimal action rate** — how often the agent chooses the simulator oracle discount;
-- **average regret** — `best_gross_profit - agent_gross_profit`;
-- **gross profit** — profit produced by the agent recommendation across the fixed scenario set;
-- **human correction rate** — how often a category manager would need to override the recommendation in an interactive run.
-
-For the clean-vs-trained automated benchmark, evaluate the agent recommendation itself before any human override. Human decisions belong to training/product runs and are stored in `PromotionCase`; otherwise a helpful manager could hide a bad agent and make the benchmark rather inspirational than scientific.
+- **average regret** — `best_gross_profit - gross_profit`;
+- **gross profit** — profit produced by the chosen discount across the fixed scenario set.
 
 The intended claim is deliberately narrow: **same agent, better decisions because accumulated memory changes its behaviour.**
 
