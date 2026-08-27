@@ -18,14 +18,15 @@ The core behavior is:
 
 The architecture is intentionally small:
 
-- **Scenario Generator** creates a promotion scenario.
-- **Promotion Agent** reads relevant lessons from **xmemory** and chooses a discount.
+- **Scenario Generator** fetches baseline market data through a source adapter, normalizes it, and publishes scenario events to Kafka.
+- **Kafka** topic `promotion.scenarios.v1` decouples data collection/scheduling from decision logic.
+- **Promotion Agent** consumes scenarios, reads relevant lessons from **xmemory**, and chooses a discount.
 - **Market Simulator** produces the business outcome.
 - **Evaluator / Learner** measures the decision and writes new experience back to **xmemory**.
 
 The important property is:
 
-**scenario → decision → outcome → learning → memory → better next decision**
+**market data → scenario event → decision → outcome → learning → memory → better next decision**
 
 - Architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
 - Editable diagram source: [`docs/architecture/high-level-architecture.mmd`](docs/architecture/high-level-architecture.mmd)
@@ -33,6 +34,25 @@ The important property is:
 ## Component deep dives
 
 Detailed design lives in a separate directory per component as we implement it. Keep each block independently understandable and resist turning hackathon documentation into a distributed-systems archaeology site.
+
+### Scenario Generator
+
+![Scenario Generator architecture](assets/scenario-generator-architecture.svg)
+
+The Scenario Generator is a Kotlin microservice and the ingestion boundary of the system:
+
+- source adapters hide whether baseline data comes from a fixture, simulation, SAP, database, or API;
+- a scheduler or manual trigger starts scenario generation;
+- context enrichment adds normalized weather/event/day context;
+- the service publishes one validated immutable event to `promotion.scenarios.v1` per scenario;
+- the Promotion Agent depends only on the versioned event contract, never source-specific DTOs.
+
+For the MVP, use prepared dataset/simulation fixtures and deterministic context. A real SAP or JDBC adapter can be added later without changing the Promotion Agent.
+
+- Detailed design: [`docs/scenario-generator/README.md`](docs/scenario-generator/README.md)
+- Kafka JSON Schema: [`docs/scenario-generator/promotion-scenario-v1.schema.json`](docs/scenario-generator/promotion-scenario-v1.schema.json)
+- Example event: [`docs/scenario-generator/promotion-scenario-v1.example.json`](docs/scenario-generator/promotion-scenario-v1.example.json)
+- Editable diagram source: [`docs/scenario-generator/architecture.mmd`](docs/scenario-generator/architecture.mmd)
 
 ### xmemory
 
