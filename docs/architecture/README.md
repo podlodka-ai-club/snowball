@@ -12,10 +12,10 @@ Editable source: [`high-level-architecture.mmd`](high-level-architecture.mmd)
 - **Promotion Agent** reads relevant past lessons from **xmemory** and chooses one discount action.
 - **Market Simulator** acts as the hidden external world and returns the business outcome.
 - **Evaluator / Learner** measures the decision and turns the result into reusable experience.
-- **xmemory** persists cases and rules across runs.
+- **xmemory** persists evaluated cases and lessons across runs.
 
 The core feedback loop is:
 
 `Scenario -> Decision -> Outcome -> Learning -> Memory -> Better next decision`
 
-Counterfactual replay, regret calculation, rule confidence, and memory structure are deliberately omitted from the high-level diagram. See [`../xmemory/`](../xmemory/) for the memory design.
+Counterfactual replay, regret calculation, lesson confidence, and memory structure are deliberately omitted from the high-level diagram. See [`../xmemory/`](../xmemory/) for the memory design.
