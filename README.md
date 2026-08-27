@@ -16,24 +16,41 @@ The core behavior is:
 
 ![High-level architecture](assets/high-level-architecture.svg)
 
+The architecture is intentionally small:
+
+- **Scenario Generator** creates a promotion scenario.
+- **Promotion Agent** reads relevant lessons from **xmemory** and chooses a discount.
+- **Market Simulator** produces the business outcome.
+- **Evaluator / Learner** measures the decision and writes new experience back to **xmemory**.
+
+The important property is:
+
+**scenario → decision → outcome → learning → memory → better next decision**
+
 Editable Mermaid source: [`docs/high-level-architecture.mmd`](docs/high-level-architecture.mmd)
 
-For the architectural responsibilities and flow explanation, see [High-Level Architecture](docs/architecture.md).
+## Benchmark
 
-## Evaluation
+![Benchmark clean memory vs learned memory](assets/benchmark.svg)
 
-Keep everything constant except memory:
+To prove self-improvement, the Benchmark Runner compares the same agent with:
+
+- **clean xmemory**
+- **trained xmemory**
+
+Everything else stays constant:
 
 - same model
 - same prompt
 - same simulator
-- same fixed test scenarios
+- same fixed scenarios
 
 Compare:
 
 - optimal action rate
 - average regret
 - gross profit
-- memory retrieval hit rate
+
+Editable Mermaid source: [`docs/benchmark.mmd`](docs/benchmark.mmd)
 
 The hackathon claim should be simple: **same agent, better decisions because accumulated memory changes its behavior.**
