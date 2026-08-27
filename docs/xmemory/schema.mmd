@@ -1,20 +1,23 @@
 flowchart LR
-    P["Product\nSKU · brand · category"]
-    C["StoreCluster\ncluster_id · market"]
-    PC["PromotionCase\nscenario + chosen action\noutcome + optimum + regret"]
-    R["PromotionRule\ncontext · recommendation\nevidence · confidence · status"]
+    S["SKU\ncategory · base_price · cost"]
+    C["PromotionCase\nscenario · agent + human decision\noutcome · oracle · regret"]
+    L["Lesson\nscope · conditions · recommendation\nevidence · confidence · profit advantage"]
 
-    P -->|case_product| PC
-    C -->|case_cluster| PC
-    PC -->|case_supports_rule| R
+    S -->|case_sku| C
+    C -->|lesson_evidence| L
+    L -.->|lesson_sku_scope\noptional| S
 
-    E["Evaluator / Learner"] -->|writes case + updates rule| PC
-    R -->|top relevant active rules| A["Promotion Agent"]
+    H["Category Manager"] -->|accept / change + reason| C
+    E["Evaluator / Learner"] -->|writes evaluated case| C
+    E -->|creates / updates lesson| L
+    L -->|top relevant lessons| A["Promotion Agent"]
 
     classDef entity fill:#ffffff,stroke:#cbd5e1,stroke-width:2px,color:#0f172a;
     classDef memory fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
     classDef actor fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
+    classDef human fill:#fff7ed,stroke:#f59e0b,stroke-width:2px,color:#0f172a;
 
-    class P,C entity;
-    class PC,R memory;
+    class S entity;
+    class C,L memory;
     class E,A actor;
+    class H human;
