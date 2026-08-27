@@ -14,22 +14,11 @@ The core behavior is:
 
 ## MVP architecture
 
-```mermaid
-flowchart LR
-    A[Scenario Generator] --> B[Promotion Agent]
-    X[(xmemory)] --> B
-    B --> C[Chosen Discount]
-    C --> D[Market Simulator]
-    A --> D
-    D --> E[Sales + Gross Profit]
-    E --> F[Evaluator / Learner]
-    B --> F
-    A --> F
-    F -->|Save case + lesson| X
-    X -->|Relevant lessons| B
-```
+![High-level architecture](assets/high-level-architecture.svg)
 
-For service boundaries, persistent storage, counterfactual flow, and benchmarking, see [High-Level Architecture](docs/architecture.md).
+Editable Mermaid source: [`docs/high-level-architecture.mmd`](docs/high-level-architecture.mmd)
+
+For the architectural responsibilities and flow explanation, see [High-Level Architecture](docs/architecture.md).
 
 ## Evaluation
 
