@@ -41,15 +41,17 @@ Detailed design lives in a separate directory per component as we implement it. 
 
 The Scenario Generator is a Kotlin microservice and the ingestion boundary of the system:
 
-- source adapters hide whether baseline data comes from a fixture, simulation, SAP, database, or API;
+- source adapters hide whether baseline data comes from a fixture, SAP, database, or API;
 - a scheduler or manual trigger starts scenario generation;
 - context enrichment adds normalized weather/event/day context;
 - the service publishes one validated immutable event to `promotion.scenarios.v1` per scenario;
 - the Promotion Agent depends only on the versioned event contract, never source-specific DTOs.
 
-For the MVP, use prepared dataset/simulation fixtures and deterministic context. A real SAP or JDBC adapter can be added later without changing the Promotion Agent.
+For the hackathon the market is fixed to **London Central** (`LONDON_CENTRAL`, `Europe/London`) and the primary baseline source is a small fixture prepared offline from **dunnhumby Breakfast at the Frat**. The raw public dataset never becomes a runtime dependency.
 
 - Detailed design: [`docs/scenario-generator/README.md`](docs/scenario-generator/README.md)
+- Dataset preparation: [`docs/scenario-generator/dataset-preparation.md`](docs/scenario-generator/dataset-preparation.md)
+- Baseline fixture example: [`docs/scenario-generator/baseline-fixture.example.csv`](docs/scenario-generator/baseline-fixture.example.csv)
 - Kafka JSON Schema: [`docs/scenario-generator/promotion-scenario-v1.schema.json`](docs/scenario-generator/promotion-scenario-v1.schema.json)
 - Example event: [`docs/scenario-generator/promotion-scenario-v1.example.json`](docs/scenario-generator/promotion-scenario-v1.example.json)
 - Editable diagram source: [`docs/scenario-generator/architecture.mmd`](docs/scenario-generator/architecture.mmd)
