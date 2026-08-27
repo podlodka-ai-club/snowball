@@ -1,13 +1,15 @@
 flowchart LR
     T["Scheduler / manual trigger"] --> G["ScenarioGenerationService"]
 
-    D["Dataset / fixture"] --> DS["DatasetBaselineSource"]
+    D["dunnhumby prepared fixture"] --> DS["DatasetBaselineSource"]
     R["SAP / DB / API later"] --> RS["Source adapter"]
     DS --> B["BaselineSource port"]
     RS --> B
     B --> G
 
-    C["ContextEnricher\ndeterministic now · real adapters later"] --> G
+    M["MarketConfig\nLONDON_CENTRAL · Europe/London"] --> C["ContextEnricher\ndeterministic now · real adapters later"]
+    M --> G
+    C --> G
 
     G --> N["Normalize · derive buckets\nvalidate · scenario_id"]
     N --> P["KafkaScenarioPublisher"]
@@ -18,8 +20,10 @@ flowchart LR
     classDef service fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
     classDef port fill:#f8fafc,stroke:#64748b,stroke-width:2px,color:#0f172a;
     classDef kafka fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
+    classDef config fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#0f172a;
 
     class D,R,DS,RS,C source;
     class T,G,N,P,A service;
     class B port;
     class K kafka;
+    class M config;
