@@ -41,10 +41,10 @@ Detailed design lives in a separate directory per component as we implement it. 
 The MVP memory schema contains only three domain objects:
 
 - **SKU** — stable product identity and basic economics.
-- **PromotionCase** — immutable evaluated evidence: scenario, agent recommendation, final human decision, outcome, simulator optimum, and regret.
+- **PromotionCase** — immutable evaluated evidence: scenario, chosen discount, outcome, simulator optimum, and regret.
 - **Lesson** — compact reusable knowledge updated from linked cases and retrieved before later decisions.
 
-Human accept/change feedback is part of the PromotionCase, not a separate agent or feedback entity. Each Lesson links back to the PromotionCases that produced it, making the hackathon write → read → changed behaviour trace visible and reproducible.
+Each Lesson links back to the PromotionCases that produced it, making the hackathon write → read → changed behaviour trace visible and reproducible.
 
 - Detailed design: [`docs/xmemory/README.md`](docs/xmemory/README.md)
 - XMD v1 schema: [`docs/xmemory/schema.xmd.yaml`](docs/xmemory/schema.xmd.yaml)
@@ -71,7 +71,6 @@ Compare:
 - optimal action rate
 - average regret
 - gross profit
-- human correction rate
 
 - Benchmark notes: [`docs/benchmark/README.md`](docs/benchmark/README.md)
 - Editable diagram source: [`docs/benchmark/benchmark.mmd`](docs/benchmark/benchmark.mmd)
