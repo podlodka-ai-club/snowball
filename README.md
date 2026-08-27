@@ -27,7 +27,8 @@ The important property is:
 
 **scenario → decision → outcome → learning → memory → better next decision**
 
-Editable Mermaid source: [`docs/high-level-architecture.mmd`](docs/high-level-architecture.mmd)
+- Architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
+- Editable diagram source: [`docs/architecture/high-level-architecture.mmd`](docs/architecture/high-level-architecture.mmd)
 
 ## Component deep dives
 
@@ -70,6 +71,7 @@ Compare:
 - average regret
 - gross profit
 
-Editable Mermaid source: [`docs/benchmark.mmd`](docs/benchmark.mmd)
+- Benchmark notes: [`docs/benchmark/README.md`](docs/benchmark/README.md)
+- Editable diagram source: [`docs/benchmark/benchmark.mmd`](docs/benchmark/benchmark.mmd)
 
 The hackathon claim should be simple: **same agent, better decisions because accumulated memory changes its behavior.**
