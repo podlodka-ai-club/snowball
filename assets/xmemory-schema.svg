@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700" role="img" aria-labelledby="title desc">
+  <title id="title">xmemory schema for FMCG promotion agent</title>
+  <desc id="desc">Product and StoreCluster connect to PromotionCase. Evaluated PromotionCases support reusable PromotionRules. The evaluator writes cases and updates rules, while the Promotion Agent reads active rules.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowMemory" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}
+      .title{font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}
+      .subtitle{font:400 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
+      .entity{fill:#fff;stroke:#cbd5e1;stroke-width:2.5}
+      .memory{fill:#f5f3ff;stroke:#8b5cf6;stroke-width:2.5}
+      .actor{fill:#eff6ff;stroke:#3b82f6;stroke-width:2.5}
+      .h{font:700 19px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}
+      .body{font:400 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
+      .small{font:500 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
+      .label{font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
+      .memoryLabel{font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#6d28d9}
+      .arrow{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}
+      .arrowMemory{fill:none;stroke:#7c3aed;stroke-width:3;marker-end:url(#arrowMemory)}
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="700" rx="24"/>
+  <text class="title" x="54" y="58">xmemory: evidence becomes reusable promotion policy</text>
+  <text class="subtitle" x="54" y="88">Keep factual evaluated cases separate from compact rules that influence future decisions.</text>
+
+  <rect class="entity" x="80" y="180" width="260" height="150" rx="16"/>
+  <text class="h" x="105" y="220">Product</text>
+  <text class="body" x="105" y="250">PK: sku</text>
+  <text class="small" x="105" y="280">name · brand · category</text>
+  <text class="small" x="105" y="305">one SKU → many cases</text>
+
+  <rect class="entity" x="80" y="410" width="260" height="150" rx="16"/>
+  <text class="h" x="105" y="450">StoreCluster</text>
+  <text class="body" x="105" y="480">PK: cluster_id</text>
+  <text class="small" x="105" y="510">name · market</text>
+  <text class="small" x="105" y="535">one cluster → many cases</text>
+
+  <rect class="memory" x="505" y="245" width="350" height="245" rx="18"/>
+  <text class="h" x="530" y="285">PromotionCase</text>
+  <text class="body" x="530" y="315">PK: case_id</text>
+  <text class="small" x="530" y="348">Scenario</text>
+  <text class="body" x="625" y="348">price · baseline · stock · timing · competitor</text>
+  <text class="small" x="530" y="380">Decision</text>
+  <text class="body" x="625" y="380">chosen discount</text>
+  <text class="small" x="530" y="412">Outcome</text>
+  <text class="body" x="625" y="412">units · gross profit</text>
+  <text class="small" x="530" y="444">Evaluation</text>
+  <text class="body" x="625" y="444">optimal discount · regret · quality</text>
+  <text class="body" x="530" y="474">Immutable evidence after evaluation</text>
+
+  <rect class="memory" x="1015" y="245" width="320" height="245" rx="18"/>
+  <text class="h" x="1040" y="285">PromotionRule</text>
+  <text class="body" x="1040" y="315">PK: rule_key</text>
+  <text class="small" x="1040" y="348">context_summary</text>
+  <text class="small" x="1040" y="378">recommended_discount</text>
+  <text class="small" x="1040" y="408">rationale</text>
+  <text class="small" x="1040" y="438">evidence_count · confidence</text>
+  <text class="small" x="1040" y="468">status: active | superseded</text>
+
+  <rect class="actor" x="505" y="570" width="280" height="85" rx="16"/>
+  <text class="h" x="530" y="607">Evaluator / Learner</text>
+  <text class="body" x="530" y="633">writes case · updates rule</text>
+
+  <rect class="actor" x="1025" y="570" width="280" height="85" rx="16"/>
+  <text class="h" x="1050" y="607">Promotion Agent</text>
+  <text class="body" x="1050" y="633">reads top active rules</text>
+
+  <path class="arrow" d="M340 255 H470 Q490 255 505 285"/>
+  <text class="label" x="365" y="238">case_product</text>
+
+  <path class="arrow" d="M340 485 H470 Q490 485 505 452"/>
+  <text class="label" x="365" y="512">case_cluster</text>
+
+  <path class="arrowMemory" d="M855 365 H1005"/>
+  <text class="memoryLabel" x="875" y="347">case_supports_rule</text>
+
+  <path class="arrowMemory" d="M645 570 V510"/>
+  <text class="memoryLabel" x="665" y="545">write evidence</text>
+
+  <path class="arrowMemory" d="M785 612 H930 Q980 612 1015 485"/>
+  <text class="memoryLabel" x="820" y="595">update rule</text>
+
+  <path class="arrowMemory" d="M1175 490 V560"/>
+  <text class="memoryLabel" x="1192" y="535">retrieve</text>
+</svg>
