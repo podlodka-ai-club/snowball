@@ -1,0 +1,588 @@
+# Evaluator / Learner
+
+The Evaluator / Learner closes the self-learning loop. It turns one chosen-action market outcome into objective evaluated evidence, then turns accumulated evidence into compact reusable Lessons in xmemory.
+
+![Evaluator / Learner architecture](../../assets/evaluator-learner-architecture.svg)
+
+Editable diagram source: [`architecture.mmd`](architecture.mmd)
+
+## Design goal
+
+Keep one visible deterministic loop:
+
+```text
+PromotionOutcomeV1
+        |
+        v
+Evaluator
+  replay 0 / 10 / 20 / 30
+  oracle + regret
+        |
+        v
+PromotionCase
+        |
+        v
+Learner
+  aggregate linked cases
+  recompute recommendation
+        |
+        v
+xmemory Lesson
+```
+
+The Market Simulator provides results. The Evaluator turns results into evaluated evidence. The Learner turns accumulated evidence into reusable knowledge. Those are separate responsibilities even though the MVP deploys them in the same Kotlin/Spring Boot process.
+
+## Runtime boundary
+
+Use the **same Kotlin/Spring Boot deployable as Market Simulator**, but keep sibling packages/modules and explicit ports:
+
+```text
+simulation-learning-runtime/
+  market-simulator/
+  evaluator-learner/
+```
+
+There is no `promotion.outcomes.v1` Kafka topic in the MVP.
+
+Market Simulator already exposes:
+
+```kotlin
+interface OutcomeSink {
+    fun accept(outcome: PromotionOutcomeV1)
+}
+```
+
+The Evaluator implements that port. The Market Simulator Kafka listener acknowledges `promotion.decisions.v1` only after `OutcomeSink.accept(...)` succeeds. Therefore the Evaluator has no separate Kafka consumer group, offset, or retry policy in v1. The existing simulator listener owns the external at-least-once boundary.
+
+If this component becomes a separate process later, `PromotionOutcomeV1` is already versioned and can become a Kafka payload without redesigning the domain.
+
+## Responsibility boundary
+
+Market Simulator owns:
+
+- hidden coefficients and simulator configuration;
+- deterministic `(scenario, discount)` simulation;
+- deterministic scenario noise;
+- chosen-action `PromotionOutcomeV1`.
+
+Evaluator / Learner owns:
+
+- replay orchestration for all allowed discounts;
+- replay validation;
+- oracle selection and action ranking;
+- regret metrics;
+- immutable `PromotionCase` creation;
+- deterministic Lesson bucket selection;
+- Lesson aggregation and contradiction handling;
+- xmemory writes and evidence relations.
+
+The Evaluator never reads simulator coefficients. It can call the same `SimulationEngine` capability, but it sees only `SimulationResult` values.
+
+## Input contract
+
+Input is one validated `PromotionOutcomeV1` from Market Simulator containing:
+
+- `outcome_id`;
+- `decision_id`;
+- `scenario_id`;
+- `simulator_version`;
+- normalized scenario snapshot;
+- chosen discount;
+- chosen `units_sold`;
+- chosen `gross_profit`.
+
+Stable IDs are already defined upstream:
+
+```text
+decision_id = DEC-<scenario_id>
+outcome_id  = OUT-<decision_id>
+```
+
+Evaluator derives:
+
+```text
+case_id = CASE-<scenario_id>
+```
+
+A duplicate outcome therefore addresses the same case and the same Lesson keys.
+
+## Internal ports
+
+```kotlin
+interface CounterfactualSimulator {
+    fun simulate(
+        scenarioId: String,
+        scenario: PromotionScenario,
+        discount: Int
+    ): SimulationResult
+}
+
+interface LearningMemory {
+    fun findCase(caseId: String): PromotionCaseSnapshot?
+    fun findSku(skuId: String): SkuSnapshot?
+    fun findLessonWithEvidence(lessonKey: String): LessonEvidenceSnapshot?
+    fun writeCase(case: PromotionCase, sku: SkuSnapshot)
+    fun writeLesson(recalculation: LessonRecalculation)
+}
+```
+
+For the shared-runtime MVP, `CounterfactualSimulator` is an adapter over the same pure `SimulationEngine` used by Market Simulator. It does not expose simulator configuration.
+
+## Counterfactual evaluation
+
+Allowed actions are fixed:
+
+```text
+[0, 10, 20, 30]
+```
+
+For every input outcome, call the same simulator capability four times using the exact same:
+
+- `scenario_id`;
+- normalized scenario snapshot;
+- `SIMULATOR_VERSION`;
+- deterministic noise semantics.
+
+The simulator v1 noise key excludes discount, so every action is compared under the same scenario shock.
+
+The Evaluator replays the chosen action too. Its replayed `units_sold` and `gross_profit` must equal the original `PromotionOutcomeV1`. A mismatch is an integrity failure and no memory is written.
+
+### Oracle selection
+
+Gross profits are already rounded to currency cents by Market Simulator. Evaluator therefore uses **exact cent comparison**, not a fuzzy floating-point tolerance.
+
+```text
+best_gross_profit = max(profit_0, profit_10, profit_20, profit_30)
+best_discount = lowest discount whose profit == best_gross_profit
+```
+
+Tie order is therefore:
+
+```text
+0 < 10 < 20 < 30
+```
+
+This avoids rewarding a deeper discount when it produces no extra gross profit.
+
+### Regret
+
+```text
+regret = best_gross_profit - chosen_gross_profit
+
+regret_pct =
+  0                                      when best_gross_profit == 0
+  regret / best_gross_profit * 100       otherwise
+```
+
+Money arithmetic uses `BigDecimal`. Persisted percentage metrics are rounded to two decimal places with `HALF_UP`.
+
+The Evaluator also computes a deterministic action ranking for logs, but only the four profits, oracle fields, and regret fields need to be stored on `PromotionCase`.
+
+## PromotionCase
+
+One completed four-action evaluation becomes one immutable `PromotionCase`.
+
+It stores:
+
+- scenario context;
+- chosen discount;
+- chosen units sold and gross profit;
+- `profit_0`, `profit_10`, `profit_20`, `profit_30`;
+- `best_discount`, `best_gross_profit`;
+- `regret`, `regret_pct`.
+
+The case contains enough evidence to rebuild lesson statistics after restart without rerunning the simulator.
+
+### Duplicate case rule
+
+Before creating a case, read by deterministic `case_id`.
+
+- no case -> create it;
+- identical case -> treat as a retry and continue the Lesson repair/recompute path;
+- same `case_id` with different scenario, simulator version, action, or business values -> integrity failure; never overwrite it silently.
+
+`PromotionCase` is factual evidence, not mutable learner state.
+
+## Lesson candidate policy
+
+Every evaluated case contributes to exactly **two** deterministic Lesson buckets:
+
+1. exact SKU coarse-context bucket;
+2. category coarse-context bucket.
+
+The coarse context is:
+
+- `day_type`;
+- `weather`;
+- `stock_level`.
+
+For v1:
+
+- `store_scope` is empty / `store:any` because the hackathon uses one market;
+- `event_type` is stored on `PromotionCase` but is `event:any` in Lesson keys;
+- no Cartesian combinations of omitted/present context dimensions are generated.
+
+Keys are:
+
+```text
+sku:<sku_id>|store:any|<day_type>|<weather>|event:any|stock:<stock_level>
+
+category:<category>|store:any|<day_type>|<weather>|event:any|stock:<stock_level>
+```
+
+Example:
+
+```text
+sku:ICE500|store:any|weekend|hot|event:any|stock:high
+category:ice_cream|store:any|weekend|hot|event:any|stock:high
+```
+
+This is intentionally boring. Two buckets per case give SKU-specific learning plus category transfer without manufacturing dozens of weak Lessons from one event.
+
+Event-aware or store-specific Lessons can be added later only if the benchmark proves the coarse policy is insufficient.
+
+## Lesson evidence
+
+`lesson_evidence` is authoritative provenance.
+
+A case affects a Lesson only when the learner has explicitly linked that case to that Lesson. `evidence_count` is the number of unique linked PromotionCases used in recomputation.
+
+The learner never increments `evidence_count` as a counter. It recomputes the count from unique evidence links, which makes retries harmless.
+
+## Recommended discount
+
+For one Lesson, let its linked evidence set contain `N` PromotionCases.
+
+For each discount, sum the stored counterfactual profits:
+
+```text
+sum_0  = Σ case.profit_0
+sum_10 = Σ case.profit_10
+sum_20 = Σ case.profit_20
+sum_30 = Σ case.profit_30
+```
+
+Because every action has the same `N`, maximizing total profit is equivalent to maximizing mean profit without introducing division-rounding into the choice.
+
+```text
+recommended_discount = action with highest summed gross profit
+```
+
+Exact ties prefer the lower discount.
+
+This is expected-gross-profit learning, not majority voting and not an LLM opinion.
+
+## Average profit advantage
+
+Let:
+
+```text
+mean_recommended = sum_recommended / N
+mean_best_alternative = max(mean of the other three actions)
+```
+
+Then:
+
+```text
+avg_profit_advantage_pct =
+  (mean_recommended - mean_best_alternative)
+  / max(abs(mean_best_alternative), 0.01)
+  * 100
+```
+
+The £0.01 denominator floor only handles zero-profit evidence. The result is rounded to two decimals.
+
+This metric answers a demo-friendly question: **how much better is the Lesson's action, on average, than the strongest alternative?**
+
+## Confidence
+
+Confidence is deterministic and bounded `0.0..1.0`.
+
+For a Lesson with `N` linked cases:
+
+```text
+evidence_score  = min(N / 5, 1)
+
+agreement_score =
+  count(case.best_discount == recommended_discount) / N
+
+advantage_score =
+  clamp(avg_profit_advantage_pct / 10, 0, 1)
+
+confidence = round2(
+    0.60 * evidence_score
+  + 0.25 * agreement_score
+  + 0.15 * advantage_score
+)
+```
+
+Interpretation:
+
+- evidence reaches full weight after five cases;
+- conflicting oracle winners reduce confidence;
+- tiny differences between actions reduce confidence;
+- large profit separation helps, but cannot compensate for almost no evidence.
+
+One case creates a visible Lesson but normally leaves it modestly confident. Two to three consistent cases become materially stronger. There is no hard suppression threshold in v1; the Promotion Agent already treats Lessons as evidence, ranks by confidence/evidence, and never treats them as mandatory rules.
+
+## Rationale
+
+No LLM is needed for Lesson generation in the MVP.
+
+Use a deterministic short template from already calculated facts, for example:
+
+```text
+For category:ice_cream on hot weekends with high stock, 20% has the highest
+mean gross profit across 7 evaluated cases, beating the next-best action by 8.6%.
+```
+
+The model does not choose:
+
+- `recommended_discount`;
+- `evidence_count`;
+- `avg_profit_advantage_pct`;
+- `confidence`.
+
+A later optional model adapter may polish wording only, but it must receive computed facts and may not change them.
+
+## Contradiction handling
+
+A Lesson is current aggregated knowledge, not an append-only prose diary.
+
+When new evidence arrives:
+
+```text
+same lesson_key
+-> add missing lesson_evidence relation
+-> read all linked PromotionCases
+-> recompute all four action totals
+-> recompute recommendation + strength + confidence
+-> update the same Lesson
+```
+
+Example:
+
+```text
+old recommendation: 20%
+new accumulated evidence: 10% now has the highest total gross profit
+-> same lesson_key
+-> recommended_discount becomes 10%
+-> confidence recalculated from all evidence
+```
+
+This naturally resolves contradictions and makes recommendation flips easy to demonstrate.
+
+## Forgetting
+
+No forgetting or time decay in v1.
+
+The benchmark simulator is stationary, so deleting older evidence would mostly add knobs rather than value. A future extension can recompute from the most recent `N` linked cases or a scenario-date window without changing the schema.
+
+## xmemory API path
+
+Use xmemory's REST API directly from Kotlin.
+
+```text
+POST /instances/{instance_id}/read
+POST /instances/{instance_id}/write
+```
+
+Use `mode=xresponse` for object/relation reads and **structured mutations** for writes. Do not use free-form extraction for known application objects.
+
+All runtime read/write calls should include:
+
+```text
+trace_id   = case_id or lesson_key-triggering case_id
+session_id = evaluator-learner
+```
+
+### Case write
+
+1. Read `PromotionCase` by `case_id` and SKU by `sku_id`.
+2. Validate existing objects if present.
+3. When the case is new, send one structured write containing, as needed:
+   - create/update SKU;
+   - create PromotionCase;
+   - create `case_sku` relation.
+
+A successful case write is the durable checkpoint before Lesson mutation.
+
+### Lesson recomputation write
+
+For each of the two deterministic `lesson_key` values:
+
+1. Read the Lesson and its `lesson_evidence` relations using `relations_scope=all_relations`.
+2. Materialize the unique linked PromotionCases.
+3. Add the current case to the local evidence set if its relation is not present.
+4. Recompute all Lesson fields in application code.
+5. Send one structured write:
+   - create Lesson or update the existing Lesson;
+   - create the missing `lesson_evidence` relation, if needed;
+   - for an SKU-scoped Lesson, create `lesson_sku_scope` if missing.
+
+The Lesson object update and its new evidence relation therefore happen in the same xmemory write call.
+
+There is no cross-system transaction with Kafka. Successful xmemory writes are durable checkpoints; Kafka redelivery repairs incomplete work using the same deterministic IDs.
+
+## Idempotency and retry
+
+Duplicate `PromotionOutcomeV1` deliveries must not create new product memory.
+
+Idempotency comes from:
+
+```text
+case_id       = CASE-<scenario_id>
+lesson_key    = deterministic scope/context key
+case_sku      = unique case -> SKU relation
+lesson_evidence = unique lesson + case relation
+lesson_sku_scope = unique lesson + SKU relation
+```
+
+Retry algorithm:
+
+- if PromotionCase already exists and matches, do not create another;
+- if Lesson already contains the case relation, do not add it again;
+- always recompute Lesson fields from unique linked cases rather than incrementally mutating counters;
+- if an existing deterministic ID contains conflicting values, stop with an integrity error.
+
+No exactly-once Kafka or distributed transaction machinery is required.
+
+## Failure behavior
+
+| Failure | Behavior |
+| --- | --- |
+| One of four replays fails | Write nothing. Propagate failure so the upstream decision is not acknowledged. |
+| Chosen-action replay differs from `PromotionOutcomeV1` | Integrity failure. Write nothing. |
+| Malformed replay value | Write nothing. Log scenario/action/version and fail. |
+| xmemory unavailable before case write | Propagate failure. Existing Market Simulator downstream retry/backoff applies. |
+| PromotionCase write succeeds, Lesson write fails | Redelivery finds the same immutable case and resumes Lesson recomputation. |
+| Lesson relation/update write fails | Redelivery rereads the Lesson/evidence state and recomputes from durable links. |
+| Duplicate outcome arrives | Verify the existing case, repair/recompute Lessons idempotently, return success. |
+| Same deterministic ID has different values | Fail loudly; never silently replace evidence. |
+
+Never publish or persist a Lesson from fewer than four valid action evaluations.
+
+## Learning and benchmark modes
+
+One configuration switch controls writes:
+
+```text
+LEARNING_ENABLED=true | false
+```
+
+### Training
+
+```text
+200-300 generated scenarios
+LEARNING_ENABLED=true
+XMEM_INSTANCE_ID=trained-memory
+```
+
+Evaluator replays all actions, creates PromotionCases, and Learner updates both Lesson buckets.
+
+### Benchmark
+
+```text
+50 fixed scenarios
+LEARNING_ENABLED=false
+```
+
+Run the same fixed scenario IDs twice:
+
+```text
+clean run   -> XMEM_INSTANCE_ID=clean-memory
+trained run -> XMEM_INSTANCE_ID=trained-memory
+```
+
+The Promotion Agent still reads Lessons normally. Evaluator still computes oracle and regret so benchmark metrics exist, but it performs **no xmemory writes** and does not invoke the Learner write path.
+
+Separate clean/trained instances plus disabled learning prevent the benchmark itself from contaminating either memory.
+
+## Observability
+
+For every evaluation log one causal record:
+
+```text
+scenario_id
+decision_id
+outcome_id
+simulator_version
+chosen_discount
+chosen_gross_profit
+profit_0 / profit_10 / profit_20 / profit_30
+best_discount
+best_gross_profit
+regret
+regret_pct
+case_id
+lesson_keys
+learning_enabled
+```
+
+For every Lesson recomputation log:
+
+```text
+lesson_key
+trigger_case_id
+previous_recommended_discount
+new_recommended_discount
+evidence_count
+agreement_score
+avg_profit_advantage_pct
+confidence
+```
+
+A recommendation flip is an important event, not something to hide in debug noise.
+
+The demo should be able to show:
+
+```text
+CASE-SCN-0018
+  -> category:ice_cream|... created/reinforced
+
+later
+
+SCN-0051 Promotion Agent retrieved that Lesson
+  -> chose 20%
+  -> oracle also 20%
+  -> regret 0
+```
+
+## Suggested Kotlin structure
+
+```text
+evaluator-learner/
+  src/main/kotlin/.../
+    evaluator/
+      PromotionOutcomeSink.kt
+      PromotionEvaluator.kt
+      OracleCalculator.kt
+      PromotionCaseFactory.kt
+    learner/
+      LessonCandidatePolicy.kt
+      LessonAggregator.kt
+      LessonConfidence.kt
+      LessonRationale.kt
+    port/
+      CounterfactualSimulator.kt
+      LearningMemory.kt
+    adapter/xmemory/
+      XmemoryLearningMemory.kt
+      XmemoryStructuredMutationMapper.kt
+```
+
+Keep arithmetic classes pure and table-test them heavily. The xmemory adapter should mostly translate deterministic domain objects to structured mutations and back.
+
+## MVP implementation order
+
+1. Implement oracle/regret arithmetic and exact tie tests.
+2. Implement `PromotionCaseFactory` and duplicate-integrity comparison.
+3. Implement the two-bucket `LessonCandidatePolicy`.
+4. Implement aggregation, advantage, and confidence formulas from in-memory PromotionCases.
+5. Implement xmemory structured read/write adapter.
+6. Wire Evaluator as Market Simulator `OutcomeSink`.
+7. Add retry/idempotency integration tests.
+8. Add `LEARNING_ENABLED` benchmark isolation.
+9. Run 200-300 training scenarios and preserve a few visible recommendation-flip traces for the demo.
+
+The proof is deliberately simple: **objective cases accumulate, deterministic Lessons change, xmemory survives restart, and later decisions improve because the same Promotion Agent reads different durable evidence.**
