@@ -112,25 +112,33 @@ The same pure simulation capability is called by the Evaluator for counterfactua
 
 ![Evaluator / Learner architecture](assets/evaluator-learner-architecture.svg)
 
-The Evaluator / Learner closes the autonomous write → read learning loop:
+This component has one job:
 
-- receive chosen-action `PromotionOutcomeV1` through the Market Simulator `OutcomeSink` port;
-- replay `0`, `10`, `20`, and `30` through the same deterministic simulator capability;
-- verify the chosen-action replay matches the original outcome;
-- choose oracle action with exact-cent comparison and lower-discount tie breaking;
-- calculate regret and create deterministic `CASE-<simulator_version>-<scenario_id>`;
-- write the immutable PromotionCase to xmemory;
-- update exactly two Lesson buckets per case: exact SKU and category, both keyed by `day_type + weather + stock_level`;
-- recompute recommended discount from aggregate counterfactual gross profit across linked cases;
-- recompute deterministic evidence count, profit advantage, confidence, and rationale;
-- update the same Lesson when new evidence contradicts old evidence.
+**take one finished promotion → compare all four discounts → save one evaluated PromotionCase → improve two reusable Lessons.**
 
-No LLM performs accounting or chooses the Lesson recommendation. `lesson_evidence` is the authoritative provenance relation, so retries cannot silently increment evidence twice.
+Tiny example:
 
-For benchmarks, `LEARNING_ENABLED=false` keeps evaluation/oracle metrics active while disabling all xmemory writes. An in-process evaluation observer lets Benchmark Runner aggregate the exact same evaluation results without adding another Kafka topic.
+```text
+Agent chose 10% -> £252
 
-- Detailed design: [`docs/evaluator-learner/README.md`](docs/evaluator-learner/README.md)
-- Editable diagram source: [`docs/evaluator-learner/architecture.mmd`](docs/evaluator-learner/architecture.mmd)
+Replay:
+0%  -> £240
+10% -> £252
+20% -> £281  <- best
+30% -> £263
+
+Regret = £29
+```
+
+That becomes one immutable PromotionCase. The case then updates exactly two Lesson buckets: one for the exact SKU and one for its category. Each Lesson is recomputed from all linked PromotionCases, so new evidence can strengthen or even change the recommendation.
+
+No LLM does arithmetic or chooses the Lesson recommendation.
+
+![Evaluator / Learner sequence](assets/evaluator-learner-sequence.svg)
+
+- Detailed design and examples: [`docs/evaluator-learner/README.md`](docs/evaluator-learner/README.md)
+- Overview diagram source: [`docs/evaluator-learner/architecture.mmd`](docs/evaluator-learner/architecture.mmd)
+- Sequence diagram source: [`docs/evaluator-learner/sequence.mmd`](docs/evaluator-learner/sequence.mmd)
 
 ### xmemory
 
