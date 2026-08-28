@@ -50,7 +50,10 @@ objects:
       case_id:
         type: str
         required: true
-        description: Stable application case identifier, for example CASE-0042.
+        description: >-
+          Stable application case identifier in the form
+          CASE-<simulator_version>-<scenario_id>, for example
+          CASE-v1-SCN-20260718-LONDON_CENTRAL-ICE500.
       scenario_date:
         type: str
         required: false
