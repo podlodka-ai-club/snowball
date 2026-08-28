@@ -1,0 +1,37 @@
+schema: spec-driven
+
+context: |
+  Project: HackerSprint2 self-learning FMCG Promotion Agent.
+  Primary stack: Kotlin, Spring Boot, Kafka, Jackson, JSON Schema, REST.
+  Promotion action is exactly one-day discount from 0, 10, 20, or 30 percent.
+  Hackathon market is fixed to LONDON_CENTRAL in Europe/London.
+  The core experiment compares the same model, prompt, scenarios, and simulator with clean vs trained durable xmemory.
+  Existing files under docs/ are architectural source material and MUST be read before implementation.
+  Versioned JSON schemas under docs/ define external contracts and MUST NOT be silently changed while implementing a component.
+  Market Simulator hidden coefficients, oracle results, counterfactual profits for the current scenario, and deterministic noise MUST NOT be exposed to the Promotion Agent or xmemory retrieval path.
+  Prefer the smallest implementation that preserves deterministic behavior, restart safety, observability, and the write -> read -> changed-decision proof.
+
+rules:
+  proposal:
+    - Keep each change scoped to one logical component and name its upstream and downstream boundaries.
+    - State non-goals when scope could leak into another component.
+  specs:
+    - Write observable behavior contracts using SHALL/MUST and WHEN/THEN scenarios.
+    - Reference committed JSON/XMD contracts instead of inventing parallel DTO formats.
+    - Include idempotency, restart, failure, and deterministic behavior where relevant.
+  design:
+    - Preserve ports-and-adapters boundaries from docs and explain any deviation explicitly.
+    - Do not add infrastructure merely for architectural symmetry.
+    - Call out any path that could leak simulator ground truth into the agent.
+  tasks:
+    - Put contract and pure-domain tests before transport integration.
+    - Keep tasks small enough for a coding agent to implement and verify independently.
+    - Include a final integration/acceptance task proving the component boundary.
+
+operations:
+  apply:
+    guidance:
+      - Read the referenced docs and schemas before changing code.
+      - Do not modify another component's versioned contract unless a separate OpenSpec change explicitly requires it.
+      - Run relevant tests before marking a task complete.
+      - Avoid unrequested frameworks, databases, Kafka topics, and distributed-systems machinery.
