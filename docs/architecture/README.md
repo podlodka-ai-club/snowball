@@ -12,9 +12,9 @@ Editable source: [`high-level-architecture.mmd`](high-level-architecture.mmd)
 - **Scenario Generator** is a Kotlin microservice that fetches source data through an adapter, normalizes it, and publishes immutable scenario events.
 - **Kafka** topic `promotion.scenarios.v1` is the contract boundary between data acquisition and decision logic.
 - **Promotion Agent** consumes scenarios, reads a few relevant past Lessons from **xmemory**, chooses one discount action, and durably journals the decision for idempotency/traceability.
-- **Kafka** topic `promotion.decisions.v1` is the contract boundary between agent/model execution and the Market Simulator.
-- **Market Simulator** consumes the decision event, applies the hidden market model, and produces the business outcome.
-- **Evaluator / Learner** replays all four allowed discounts, measures regret, and turns evaluated evidence into reusable experience.
+- **Kafka** topic `promotion.decisions.v1` is the contract boundary between agent/model execution and the hidden market world.
+- **Market Simulator** consumes the decision, applies immutable hidden `SIMULATOR_VERSION=v1` logic, and produces a deterministic chosen-action `PromotionOutcomeV1`.
+- **Evaluator / Learner** shares the same Kotlin/Spring Boot runtime as the simulator, replays all four discounts through the exact same `SimulationEngine`, measures regret, and turns evaluated evidence into reusable experience.
 - **xmemory** persists evaluated PromotionCases and Lessons across runs.
 
 The core feedback loop is:
@@ -25,17 +25,22 @@ Kafka is deliberately used only at two meaningful runtime boundaries:
 
 ```text
 Scenario Generator -> promotion.scenarios.v1 -> Promotion Agent
-Promotion Agent     -> promotion.decisions.v1 -> Market Simulator
+Promotion Agent     -> promotion.decisions.v1 -> Simulation + Learning Runtime
 ```
 
-The second topic is justified because it makes decisions replayable and prevents the Market Simulator from being coupled to model latency or xmemory availability. The decision event carries the normalized scenario snapshot forward, so the simulator consumes one topic and does not need to join scenario and decision streams.
+The second topic is justified because it makes decisions replayable and prevents the hidden market world from being coupled to model latency or xmemory availability. The decision event carries the normalized scenario snapshot forward, so the simulator consumes one topic and does not need to join scenario and decision streams.
 
-Internal memory reads, prompt construction, model validation, simulator arithmetic, and learner calculations remain ordinary in-process calls. Two Kafka topics are enough for this MVP; Kafka does not receive a participation trophy for every method boundary.
+There is deliberately **no `promotion.outcomes.v1` Kafka topic in the MVP**. Market Simulator and Evaluator / Learner are separate modules inside one process. The chosen-action result is handed over as versioned `PromotionOutcomeV1`, while evaluator replay calls the same pure simulation engine directly for `0`, `10`, `20`, and `30`.
+
+This keeps the hidden ground-truth boundary explicit without inventing another service and four replay messages per case. Kafka has two useful jobs here; it does not need a third for morale.
+
+The Promotion Agent never receives simulator coefficients, deterministic noise, or current counterfactual results. The Evaluator sees only simulation results and uses them to create PromotionCases and Lessons. The hidden simulator configuration is not written to xmemory.
 
 Detailed components:
 
 - Scenario Generator: [`../scenario-generator/`](../scenario-generator/)
 - Promotion Agent: [`../promotion-agent/`](../promotion-agent/)
+- Market Simulator: [`../market-simulator/`](../market-simulator/)
 - xmemory: [`../xmemory/`](../xmemory/)
 
-Counterfactual replay, lesson aggregation, and benchmark orchestration remain outside this high-level view.
+Counterfactual replay arithmetic, regret calculation, lesson aggregation, and benchmark orchestration remain owned by Evaluator / Learner and Benchmark Runner rather than Market Simulator.

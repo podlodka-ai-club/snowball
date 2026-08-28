@@ -4,6 +4,13 @@ flowchart LR
     K1 --> A[Promotion Agent]
     X[(xmemory)] -->|Past lessons| A
     A --> K2[(promotion.decisions.v1)]
-    K2 --> M[Market Simulator]
-    M -->|Outcome| E[Evaluator / Learner]
+
+    subgraph R["Simulation + Learning Runtime"]
+        M["Market Simulator\nSIMULATOR_VERSION=v1"]
+        E[Evaluator / Learner]
+        M -->|PromotionOutcomeV1| E
+        E -. "replay 0 / 10 / 20 / 30" .-> M
+    end
+
+    K2 --> M
     E -->|Cases + lessons| X

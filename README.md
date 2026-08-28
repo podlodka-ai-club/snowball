@@ -22,12 +22,15 @@ The architecture is intentionally small:
 - **Kafka** topic `promotion.scenarios.v1` decouples data collection/scheduling from decision logic.
 - **Promotion Agent** consumes scenarios, reads a few relevant lessons from **xmemory**, chooses one discount, and journals the exact decision durably for idempotency and traceability.
 - **Kafka** topic `promotion.decisions.v1` carries the validated decision plus scenario snapshot to the simulator.
-- **Market Simulator** produces the business outcome.
-- **Evaluator / Learner** measures the decision and writes new experience back to **xmemory**.
+- **Market Simulator** applies a hidden deterministic market model and produces a versioned chosen-action outcome.
+- **Evaluator / Learner** shares the same Kotlin/Spring Boot runtime as the simulator, replays all four discounts through the same pure engine, measures regret, and writes new experience back to **xmemory**.
+- **xmemory** persists evaluated PromotionCases and Lessons across restarts.
 
 The important property is:
 
 **market data → scenario event → memory-backed decision → decision event → outcome → learning → memory → better next decision**
+
+Kafka remains limited to two meaningful runtime boundaries. The simulator-to-evaluator handoff and all four counterfactual replays are in-process calls, because adding another topic to move six fields across one JVM would mostly demonstrate that Kafka has excellent marketing.
 
 - Architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
 - Editable diagram source: [`docs/architecture/high-level-architecture.mmd`](docs/architecture/high-level-architecture.mmd)
@@ -86,6 +89,29 @@ Operational idempotency/trace data stays in the agent's H2 journal, not in xmemo
 - Kafka JSON Schema: [`docs/promotion-agent/promotion-decision-v1.schema.json`](docs/promotion-agent/promotion-decision-v1.schema.json)
 - Example event: [`docs/promotion-agent/promotion-decision-v1.example.json`](docs/promotion-agent/promotion-decision-v1.example.json)
 
+### Market Simulator
+
+![Market Simulator architecture](assets/market-simulator-architecture.svg)
+
+The Market Simulator is the hidden market world used for both the chosen action and evaluator replay:
+
+- consume and validate `promotion.decisions.v1` using consumer group `market-simulator-v1`;
+- run a pure deterministic `SimulationEngine`;
+- apply category/context demand factors plus context-sensitive promotion elasticity;
+- cap units by exact stock and calculate gross profit with fixed rounding rules;
+- use a small deterministic SHA-256 scenario shock shared by all four actions;
+- return a versioned `PromotionOutcomeV1` directly to the Evaluator / Learner;
+- expose the same engine in-process for replay of `0 | 10 | 20 | 30`.
+
+For the MVP, Market Simulator and Evaluator / Learner are separate modules in one Kotlin/Spring Boot runtime. There is deliberately no `promotion.outcomes.v1` Kafka topic yet. Stable `outcome_id`, deterministic replay, and evaluator idempotency are enough without adding another database or transport boundary.
+
+The hidden coefficients, noise factor, and formula internals never enter the Promotion Agent prompt or xmemory. `SIMULATOR_VERSION=v1` pins formula, coefficients, noise, and rounding for both training and benchmark runs.
+
+- Detailed design: [`docs/market-simulator/README.md`](docs/market-simulator/README.md)
+- Editable diagram source: [`docs/market-simulator/architecture.mmd`](docs/market-simulator/architecture.mmd)
+- Outcome JSON Schema: [`docs/market-simulator/promotion-outcome-v1.schema.json`](docs/market-simulator/promotion-outcome-v1.schema.json)
+- Example outcome: [`docs/market-simulator/promotion-outcome-v1.example.json`](docs/market-simulator/promotion-outcome-v1.example.json)
+
 ### xmemory
 
 ![xmemory schema](assets/xmemory-schema.svg)
@@ -115,8 +141,8 @@ Everything else stays constant:
 
 - same model
 - same prompt
-- same simulator
-- same fixed scenarios
+- same simulator version and configuration
+- same fixed scenarios and scenario IDs
 
 Compare:
 

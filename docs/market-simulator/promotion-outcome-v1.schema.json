@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "promotion-outcome-v1.schema.json",
+  "title": "Promotion Outcome v1",
+  "description": "Chosen-action business outcome produced by Market Simulator and handed to Evaluator / Learner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_type",
+    "schema_version",
+    "outcome_id",
+    "decision_id",
+    "scenario_id",
+    "simulated_at",
+    "simulator_version",
+    "scenario",
+    "decision",
+    "outcome"
+  ],
+  "properties": {
+    "event_type": {
+      "const": "promotion.outcome.created"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "outcome_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "simulated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "simulator_version": {
+      "type": "string",
+      "const": "v1"
+    },
+    "scenario": {
+      "$ref": "../scenario-generator/promotion-scenario-v1.schema.json#/properties/scenario"
+    },
+    "decision": {
+      "$ref": "../promotion-agent/promotion-decision-v1.schema.json#/properties/decision"
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "units_sold",
+        "gross_profit"
+      ],
+      "properties": {
+        "units_sold": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gross_profit": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

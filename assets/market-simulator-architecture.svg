@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="650" viewBox="0 0 1600 650" role="img" aria-labelledby="title desc">
+  <title id="title">Market Simulator architecture</title>
+  <desc id="desc">The promotion decision Kafka topic enters a Simulation and Learning Runtime. A DecisionListener validates the event and calls a pure deterministic SimulationEngine using hidden simulator v1 configuration and scenario-seeded noise. The engine returns PromotionOutcomeV1 to the Evaluator, which replays all four discounts through the same engine.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
+    <marker id="arrowReplay" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#f59e0b"/></marker>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.subtitle{font:400 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.runtime{fill:#fff;fill-opacity:.6;stroke:#94a3b8;stroke-width:2;stroke-dasharray:8 7}.kafka{fill:#f5f3ff;stroke:#8b5cf6;stroke-width:2.5}.service{fill:#eff6ff;stroke:#3b82f6;stroke-width:2.5}.engine{fill:#ecfdf5;stroke:#10b981;stroke-width:2.5}.config{fill:#fff7ed;stroke:#f59e0b;stroke-width:2.5}.outcome{fill:#fff;stroke:#cbd5e1;stroke-width:2.5}.eval{fill:#fff7ed;stroke:#f59e0b;stroke-width:2.5}.h{font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.body{font:400 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.label{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.replayLabel{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#b45309}.runtimeLabel{font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.arrow{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}.arrowReplay{fill:none;stroke:#f59e0b;stroke-width:2.5;stroke-dasharray:6 5;marker-end:url(#arrowReplay)}
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="650" rx="24"/>
+  <text class="title" x="52" y="58">Market Simulator</text>
+  <text class="subtitle" x="52" y="89">one hidden deterministic engine for chosen-action simulation and all counterfactual replay</text>
+
+  <rect class="kafka" x="45" y="245" width="220" height="112" rx="16"/>
+  <text class="h" x="70" y="286">Kafka</text>
+  <text class="body" x="70" y="312">promotion.decisions.v1</text>
+  <text class="body" x="70" y="332">group: market-simulator-v1</text>
+
+  <rect class="runtime" x="315" y="135" width="1235" height="420" rx="22"/>
+  <text class="runtimeLabel" x="340" y="162">SIMULATION + LEARNING RUNTIME Â· ONE KOTLIN / SPRING BOOT PROCESS</text>
+
+  <rect class="service" x="360" y="245" width="205" height="112" rx="16"/>
+  <text class="h" x="383" y="284">DecisionListener</text>
+  <text class="body" x="383" y="309">schema + invariant validation</text>
+  <text class="body" x="383" y="329">manual Kafka ackowledgement</text>
+
+  <rect class="engine" x="635" y="245" width="235" height="112" rx="16"/>
+  <text class="h" x="660" y="281">SimulationEngine</text>
+  <text class="body" x="660" y="306">pure deterministic function</text>
+  <text class="body" x="660" y="326">stock cap + gross profit</text>
+
+  <rect class="outcome" x="940" y="245" width="225" height="112" rx="16"/>
+  <text class="h" x="964" y="281">PromotionOutcomeV1</text>
+  <text class="body" x="964" y="306">stable outcome_id</text>
+  <text class="body" x="964" y="326">units_sold + gross_profit</text>
+
+  <rect class="eval" x="1235" y="245" width="260" height="112" rx="16"/>
+  <text class="h" x="1260" y="281">Evaluator / Learner</text>
+  <text class="body" x="1260" y="306">oracle replay + regret</text>
+  <text class="body" x="1260" y="326">PromotionCase + Lesson</text>
+
+  <rect class="config" x="590" y="410" width="255" height="105" rx="16"/>
+  <text class="h" x="614" y="447">SimulatorV1Config</text>
+  <text class="body" x="614" y="472">hidden coefficients</text>
+  <text class="body" x="614" y="491">SIMULATOR_VERSION=v1</text>
+
+  <rect class="config" x="875" y="410" width="270" height="105" rx="16"/>
+  <text class="h" x="900" y="447">Deterministic noise</text>
+  <text class="body" x="900" y="472">SHA-256(v1|scenario_id)</text>
+  <text class="body" x="900" y="491">same shock for all actions</text>
+
+  <path class="arrow" d="M265 301 H350"/>
+  <path class="arrow" d="MMMHÌHŒH‹Ï‚ˆ]Û\ÜÏH˜\œ›ÝÈˆH“NÌÌHLÌ‹Ï‚ˆ]Û\ÜÏH˜\œ›ÝÈˆH“LLMHÌHLŒH‹Ï‚ˆ]Û\ÜÏH˜\œ›ÝÈˆH“MÌNLŒÍÈ‹Ï‚ˆ]Û\ÜÏH˜\œ›ÝÈˆH“LLLŒÍÈ‹Ï‚‚ˆ]Û\ÜÏH˜\œ›ÝÔ™\^HˆH“LLÍHÍMÈLÍHÍLÈŒÍÈ‹Ï‚ˆ^Û\ÜÏHœ™\^SX™[ˆHŽLˆOHLÍHœ™\^HÈLÈŒÈÌ›ÝYÚH^XÝØ[YH[™Ú[™OÝ^‚‚ˆ^Û\ÜÏH›X™[ˆHŒÎˆˆOHŒŒŒˆ˜[YXÚ\Ú[Ûˆ]™[Ý^‚ˆ^Û\ÜÏH›X™[ˆHŽMHˆOHŒŒŒˆš[‹\›ØÙ\ÜÈÛÛ˜XÝ›ÝØYšØOÝ^‚ÜÝ™Ï‚
