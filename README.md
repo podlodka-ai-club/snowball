@@ -6,7 +6,7 @@ An autonomous promotion agent that improves its discount decisions from outcomes
 
 ![Self-learning promotion agent](assets/self-learning-loop.svg)
 
-The demo is intentionally small: the agent chooses one of `0%`, `10%`, `20%`, or `30%` discount levels. A simulator produces sales and gross profit. An evaluator replays all allowed actions, calculates regret, and writes evaluated evidence. A learner turns that evidence into reusable lessons in xmemory. Future decisions retrieve those lessons.
+The demo is intentionally small: the agent chooses one of `0%`, `10%`, `20%`, or `30%` discount levels. A simulator produces sales and gross profit. An evaluator replays all allowed actions, calculates regret, and writes evaluated evidence. A learner turns accumulated evidence into reusable lessons in xmemory. Future decisions retrieve those lessons.
 
 The core behavior is:
 
@@ -23,22 +23,20 @@ The architecture is intentionally small:
 - **Promotion Agent** consumes scenarios, reads a few relevant lessons from **xmemory**, chooses one discount, and journals the exact decision durably for idempotency and traceability.
 - **Kafka** topic `promotion.decisions.v1` carries the validated decision plus scenario snapshot to the simulator.
 - **Market Simulator** applies a hidden deterministic market model and produces one versioned `PromotionOutcomeV1` containing the chosen-action business result.
-- **Evaluator** replays all four discounts through the same simulator capability, chooses the oracle-best action, calculates regret, and produces one immutable **PromotionCase**.
-- **Learner** uses evaluated PromotionCases as evidence and creates or updates a reusable **Lesson**.
-- **xmemory** persists PromotionCases and Lessons across restarts.
+- **Evaluator** replays all four discounts through the same pure simulator capability, chooses the oracle-best action, calculates regret, and creates one immutable **PromotionCase**.
+- **Learner** assigns each case to exactly two deterministic Lesson buckets, recomputes aggregate evidence, and creates or updates reusable **Lessons**.
+- **xmemory** persists SKU, PromotionCases, Lessons, and evidence relations across restarts.
 
 The important property is:
 
 **market data → scenario → memory-backed decision → outcome → evaluated case → reusable lesson → better next decision**
 
-Kafka remains limited to two meaningful runtime boundaries. Simulator output, evaluation, and learning may share one deployable Spring Boot process for the MVP, but they remain separate logical components. Apparently putting classes in one JVM does not require pretending they have the same job.
+Kafka remains limited to two meaningful external boundaries. Market Simulator, Evaluator, and Learner share one deployable Kotlin/Spring Boot runtime for the MVP but remain separate logical components. One JVM is a deployment choice, not a philosophical union of unrelated responsibilities.
 
 - Architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
 - Editable diagram source: [`docs/architecture/high-level-architecture.mmd`](docs/architecture/high-level-architecture.mmd)
 
 ## Component deep dives
-
-Detailed design lives in a separate directory per component as we implement it. Keep each block independently understandable and resist turning hackathon documentation into a distributed-systems archaeology site.
 
 ### Scenario Generator
 
@@ -65,7 +63,7 @@ For the hackathon the market is fixed to **London Central** (`LONDON_CENTRAL`, `
 
 ![Promotion Agent runtime flow](assets/promotion-agent-flow.svg)
 
-The Promotion Agent is also a Kotlin/Spring Boot service for the MVP. The runtime flow above makes its job explicit:
+The Promotion Agent is also a Kotlin/Spring Boot service for the MVP. Its runtime flow is explicit:
 
 - consume and validate `promotion.scenarios.v1`;
 - use `scenario_id` as the durable idempotency key in the H2 `DecisionJournal`;
@@ -77,9 +75,7 @@ The Promotion Agent is also a Kotlin/Spring Boot service for the MVP. The runtim
 - publish `promotion.decisions.v1`;
 - mark the journal `COMPLETED` and acknowledge the source offset only after publish succeeds.
 
-On restart, a `DECIDED` scenario republishes the already persisted decision instead of calling xmemory or the model again. A `COMPLETED` scenario is simply acknowledged as a duplicate. That keeps Kafka at-least-once delivery from quietly turning into repeated LLM decisions, because apparently one source of nondeterminism was enough.
-
-The decision event carries the validated scenario snapshot forward. The Market Simulator therefore consumes one event and does not need to join the scenario and decision topics.
+On restart, a `DECIDED` scenario republishes the already persisted decision instead of calling xmemory or the model again. A `COMPLETED` scenario is acknowledged as a duplicate.
 
 Operational idempotency/trace data stays in the agent's H2 journal, not in xmemory. xmemory remains product learning memory containing only SKU, PromotionCase, and Lesson.
 
@@ -105,9 +101,7 @@ The Market Simulator is only the hidden market world:
 
 **Its scope ends at `PromotionOutcomeV1`.** It does not calculate oracle actions or regret, create PromotionCases, update Lessons, or write xmemory.
 
-The same pure simulation capability can later be called by the Evaluator for counterfactual actions, but replay orchestration belongs to the Evaluator, not to Market Simulator. The two may still share one deployable runtime for the hackathon without sharing responsibility boundaries.
-
-The hidden coefficients, noise factor, and formula internals never enter the Promotion Agent prompt or xmemory. `SIMULATOR_VERSION=v1` pins formula, coefficients, noise, and rounding for both training and benchmark runs.
+The same pure simulation capability is called by the Evaluator for counterfactual actions, but replay orchestration belongs to the Evaluator. Hidden coefficients and noise internals never enter the Promotion Agent prompt or xmemory.
 
 - Detailed design: [`docs/market-simulator/README.md`](docs/market-simulator/README.md)
 - Editable diagram source: [`docs/market-simulator/architecture.mmd`](docs/market-simulator/architecture.mmd)
@@ -116,31 +110,27 @@ The hidden coefficients, noise factor, and formula internals never enter the Pro
 
 ### Evaluator / Learner
 
-This is a separate logical scope from Market Simulator. The detailed implementation design is intentionally deferred, but its input and outputs are already fixed by the learning loop.
+![Evaluator / Learner architecture](assets/evaluator-learner-architecture.svg)
 
-**Evaluator input:**
+The Evaluator / Learner closes the autonomous write → read learning loop:
 
-- chosen-action `PromotionOutcomeV1`;
-- access to the same deterministic simulator capability for counterfactual replay.
+- receive chosen-action `PromotionOutcomeV1` through the Market Simulator `OutcomeSink` port;
+- replay `0`, `10`, `20`, and `30` through the same deterministic simulator capability;
+- verify the chosen-action replay matches the original outcome;
+- choose oracle action with exact-cent comparison and lower-discount tie breaking;
+- calculate regret and create deterministic `CASE-<scenario_id>`;
+- write the immutable PromotionCase to xmemory;
+- update exactly two Lesson buckets per case: exact SKU and category, both keyed by `day_type + weather + stock_level`;
+- recompute recommended discount from aggregate counterfactual gross profit across linked cases;
+- recompute deterministic evidence count, profit advantage, confidence, and rationale;
+- update the same Lesson when new evidence contradicts old evidence.
 
-**Evaluator output: `PromotionCase`**
+No LLM performs accounting or chooses the Lesson recommendation. `lesson_evidence` is the authoritative provenance relation, so retries cannot silently increment evidence twice.
 
-- original scenario and chosen discount;
-- realised units sold and gross profit;
-- `profit_0`, `profit_10`, `profit_20`, `profit_30`;
-- `best_discount` and `best_gross_profit`;
-- `regret` and `regret_pct`.
+For benchmarks, `LEARNING_ENABLED=false` keeps evaluation/oracle metrics active while disabling all xmemory writes.
 
-**Learner output: `Lesson`**
-
-- deterministic scope/context key;
-- recommended discount;
-- confidence;
-- evidence count;
-- average profit advantage;
-- concise evidence-grounded rationale.
-
-The Evaluator therefore converts simulator results into **evaluated evidence**. The Learner converts accumulated evaluated evidence into **reusable knowledge**. Both objects are written to xmemory; only Lessons are retrieved by the Promotion Agent during future decisions.
+- Detailed design: [`docs/evaluator-learner/README.md`](docs/evaluator-learner/README.md)
+- Editable diagram source: [`docs/evaluator-learner/architecture.mmd`](docs/evaluator-learner/architecture.mmd)
 
 ### xmemory
 
@@ -150,9 +140,9 @@ The MVP memory schema contains only three domain objects:
 
 - **SKU** — stable product identity and basic economics.
 - **PromotionCase** — immutable evaluated evidence: scenario, chosen discount, outcome, all four replay profits, simulator optimum, and regret.
-- **Lesson** — compact reusable knowledge updated from linked cases and retrieved before later decisions.
+- **Lesson** — compact reusable knowledge recomputed from linked cases and retrieved before later decisions.
 
-Each Lesson links back to the PromotionCases that produced it, making the hackathon write → read → changed behaviour trace visible and reproducible.
+Each Lesson links back to the PromotionCases that produced it, making the hackathon write → read → changed-behaviour trace visible and reproducible.
 
 - Detailed design: [`docs/xmemory/README.md`](docs/xmemory/README.md)
 - XMD v1 schema: [`docs/xmemory/schema.xmd.yaml`](docs/xmemory/schema.xmd.yaml)
@@ -164,21 +154,23 @@ Each Lesson links back to the PromotionCases that produced it, making the hackat
 
 To prove self-improvement, the Benchmark Runner compares the same agent with:
 
-- **clean xmemory**
-- **trained xmemory**
+- **clean xmemory**;
+- **trained xmemory**.
 
 Everything else stays constant:
 
-- same model
-- same prompt
-- same simulator version and configuration
-- same fixed scenarios and scenario IDs
+- same model;
+- same prompt;
+- same simulator version and configuration;
+- same fixed scenarios and scenario IDs.
+
+Training uses roughly `200-300` scenarios with `LEARNING_ENABLED=true`. The benchmark uses `50` fixed scenarios with `LEARNING_ENABLED=false` for both clean and trained memory, so measurement itself cannot create new Lessons.
 
 Compare:
 
-- optimal action rate
-- average regret
-- gross profit
+- optimal action rate;
+- average regret;
+- gross profit.
 
 - Benchmark notes: [`docs/benchmark/README.md`](docs/benchmark/README.md)
 - Editable diagram source: [`docs/benchmark/benchmark.mmd`](docs/benchmark/benchmark.mmd)
