@@ -1,17 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1850" height="650" viewBox="0 0 1850 650" role="img" aria-labelledby="title desc">
   <title id="title">Self-learning FMCG promotion agent architecture</title>
-  <desc id="desc">Market data becomes a scenario, the Promotion Agent chooses a discount using past Lessons, Market Simulator produces PromotionOutcomeV1, Evaluator turns chosen and counterfactual outcomes into a PromotionCase, Learner turns accumulated cases into a Lesson, and both durable objects are stored in xmemory.</desc>
+  <desc id="desc">Market data becomes a scenario, the Promotion Agent chooses a discount using past Lessons, Market Simulator produces PromotionOutcomeV1, Evaluator turns chosen and counterfactual outcomes into a PromotionCase, Learner recomputes deterministic Lessons from accumulated evidence, and xmemory persists the write-read loop.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
     <marker id="arrowMemory" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker>
     <marker id="arrowReplay" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#f59e0b"/></marker>
     <style>
-      .bg{fill:#f8fafc}.node{fill:#fff;stroke:#cbd5e1;stroke-width:2.5}.agent{fill:#eff6ff;stroke:#3b82f6;stroke-width:2.5}.memory{fill:#f5f3ff;stroke:#8b5cf6;stroke-width:2.5}.sim{fill:#ecfdf5;stroke:#10b981;stroke-width:2.5}.eval{fill:#fff7ed;stroke:#f59e0b;stroke-width:2.5}.learn{fill:#fefce8;stroke:#ca8a04;stroke-width:2.5}.contract{fill:#fff;stroke:#64748b;stroke-width:2.5}.title{font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.subtitle{font:400 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.h{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.body{font:400 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.label{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.memoryLabel{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#6d28d9}.replayLabel{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#b45309}.arrow{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}.arrowMemory{fill:none;stroke:#7c3aed;stroke-width:3;marker-end:url(#arrowMemory)}.arrowReplay{fill:none;stroke:#f59e0b;stroke-width:2.5;stroke-dasharray:6 5;marker-end:url(#arrowReplay)}
+      .bg{fill:#f8fafc}.node{fill:#fff;stroke:#cbd5e1;stroke-width:2.5}.agent{fill:#eff6ff;stroke:#3b82f6;stroke-width:2.5}.memory{fill:#f5f3ff;stroke:#8b5cf6;stroke-width:2.5}.sim{fill:#ecfdf5;stroke:#10b981;stroke-width:2.5}.eval{fill:#fff7ed;stroke:#f59e0b;stroke-width:2.5}.learn{fill:#fefce8;stroke:#ca8a04;stroke-width:2.5}.contract{fill:#fff;stroke:#64748b;stroke-width:2.5}.runtime{fill:none;stroke:#94a3b8;stroke-width:2;stroke-dasharray:8 7}.title{font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.subtitle{font:400 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.h{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.body{font:400 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.label{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.memoryLabel{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#6d28d9}.replayLabel{font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#b45309}.runtimeLabel{font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.arrow{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}.arrowMemory{fill:none;stroke:#7c3aed;stroke-width:3;marker-end:url(#arrowMemory)}.arrowReplay{fill:none;stroke:#f59e0b;stroke-width:2.5;stroke-dasharray:6 5;marker-end:url(#arrowReplay)}
     </style>
   </defs>
   <rect class="bg" width="1850" height="650" rx="24"/>
   <text class="title" x="48" y="54">Self-Learning FMCG Promotion Agent</text>
-  <text class="subtitle" x="48" y="84">scenario → decision → market outcome → evaluated case → reusable lesson → better next decision</text>
+  <text class="subtitle" x="48" y="84">scenario → decision → market outcome → evaluated case → recomputed lesson → better next decision</text>
+
+  <rect class="runtime" x="970" y="145" width="845" height="185" rx="20"/>
+  <text class="runtimeLabel" x="990" y="165">same Kotlin/Spring Boot deployable · separate logical responsibilities</text>
 
   <rect class="node" x="25" y="190" width="145" height="106" rx="16"/>
   <text class="h" x="45" y="230">Market Data</text><text class="body" x="45" y="254">prepared fixture</text>
@@ -29,7 +32,7 @@
   <text class="h" x="805" y="228">Kafka</text><text class="body" x="805" y="252">promotion.decisions.v1</text>
 
   <rect class="sim" x="985" y="190" width="185" height="106" rx="16"/>
-  <text class="h" x="1005" y="226">Market Simulator</text><text class="body" x="1005" y="250">hidden deterministic world</text><text class="body" x="1005" y="269">scope ends at outcome</text>
+  <text class="h" x="1005" y="226">Market Simulator</text><text class="body" x="1005" y="250">chosen action only</text><text class="body" x="1005" y="269">scope ends at outcome</text>
 
   <rect class="contract" x="1195" y="190" width="170" height="106" rx="16"/>
   <text class="h" x="1215" y="226">PromotionOutcomeV1</text><text class="body" x="1215" y="250">units sold</text><text class="body" x="1215" y="269">gross profit</text>
@@ -38,12 +41,12 @@
   <text class="h" x="1410" y="226">Evaluator</text><text class="body" x="1410" y="250">replay + oracle</text><text class="body" x="1410" y="269">regret → PromotionCase</text>
 
   <rect class="learn" x="1590" y="190" width="210" height="106" rx="16"/>
-  <text class="h" x="1610" y="226">Learner</text><text class="body" x="1610" y="250">aggregate evaluated cases</text><text class="body" x="1610" y="269">→ Lesson</text>
+  <text class="h" x="1610" y="226">Learner</text><text class="body" x="1610" y="250">2 deterministic buckets</text><text class="body" x="1610" y="269">recompute Lesson</text>
 
   <rect class="memory" x="665" y="445" width="430" height="115" rx="18"/>
   <text class="h" x="690" y="483">xmemory</text>
-  <text class="body" x="690" y="508">PromotionCase = evaluated evidence</text>
-  <text class="body" x="690" y="530">Lesson = reusable recommendation + confidence</text>
+  <text class="body" x="690" y="508">PromotionCase = immutable evaluated evidence</text>
+  <text class="body" x="690" y="530">Lesson = recomputed recommendation + confidence</text>
 
   <path class="arrow" d="M170 243 H185"/>
   <path class="arrow" d="M365 243 H380"/>
@@ -55,7 +58,7 @@
   <path class="arrow" d="M1565 243 H1580"/>
 
   <path class="arrowReplay" d="M1478 296 V360 H1078 V306"/>
-  <text class="replayLabel" x="1160" y="380">replay 0 / 10 / 20 / 30 through simulator</text>
+  <text class="replayLabel" x="1160" y="380">replay 0 / 10 / 20 / 30 through same SimulationEngine</text>
 
   <path class="arrowMemory" d="M775 445 V350 H675 V306"/>
   <text class="memoryLabel" x="662" y="400">Past Lessons</text>
@@ -64,5 +67,5 @@
   <text class="memoryLabel" x="1190" y="408">write PromotionCase</text>
 
   <path class="arrowMemory" d="M1695 296 V505 H1105"/>
-  <text class="memoryLabel" x="1310" y="490">upsert Lesson</text>
+  <text class="memoryLabel" x="1310" y="490">recompute + upsert Lesson</text>
 </svg>
