@@ -1,0 +1,32 @@
+sequenceDiagram
+    participant O as Completed Promotion
+    participant E as Evaluator
+    participant S as Simulator Capability
+    participant X as xmemory
+    participant L as Learner
+
+    O->>E: scenario + chosen discount + chosen outcome
+
+    E->>S: replay 0%
+    S-->>E: profit_0
+    E->>S: replay 10%
+    S-->>E: profit_10
+    E->>S: replay 20%
+    S-->>E: profit_20
+    E->>S: replay 30%
+    S-->>E: profit_30
+
+    Note over E: find best discount<br/>calculate regret
+
+    E->>X: save PromotionCase
+
+    E->>L: case + 2 lesson keys
+    L->>X: read linked cases for SKU Lesson
+    X-->>L: evidence
+    L->>X: update SKU Lesson
+
+    L->>X: read linked cases for category Lesson
+    X-->>L: evidence
+    L->>X: update category Lesson
+
+    Note over E,L: one experience is now reusable memory
