@@ -1,0 +1,123 @@
+@startuml
+title Promotion Agent - Runtime Decision Flow
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EFF6FF
+  BorderColor #3B82F6
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #64748B
+  StartColor #0EA5E9
+  EndColor #0EA5E9
+  FontColor #0F172A
+}
+skinparam note {
+  BackgroundColor #F8FAFC
+  BorderColor #CBD5E1
+  FontColor #334155
+}
+
+start
+
+partition "Kafka input" {
+  :Consume from\npromotion.scenarios.v1;
+  :Deserialize + validate\nPromotionScenario v1;
+}
+
+if (Scenario valid?) then (yes)
+else (no)
+  :Log scenario_rejected;
+  :Acknowledge source offset;
+  stop
+endif
+
+partition "DecisionJournal (H2)" {
+  :Lookup scenario_id;
+}
+
+if (Already COMPLETED?) then (yes)
+  :Skip memory + model calls;
+  :Acknowledge source offset;
+  stop
+else (no)
+endif
+
+if (Already DECIDED?) then (yes)
+  :Load previously persisted\nPromotionDecision payload;
+  :Republish same decision;
+  if (Publish succeeds?) then (yes)
+    :Mark COMPLETED;
+    :Acknowledge source offset;
+  else (no)
+    :Keep DECIDED;
+    :Do not acknowledge offset;
+  endif
+  stop
+else (no)
+  :Create / keep STARTED row;
+endif
+
+partition "xmemory retrieval" {
+  :Build query from SKU, category\nand scenario context;
+  :Read candidate Lessons;
+}
+
+if (xmemory available?) then (yes)
+  :Validate candidates;
+  :Filter context mismatches;
+  :Rank exact SKU before category;
+  :Take top <= 3 Lessons;
+else (no)
+  :memory_status = unavailable;
+  :Use lessons = [];
+endif
+
+note right
+Only compact, eligible Lessons reach the model.
+The model never sees simulator coefficients,
+oracle answers, future outcomes, or raw xmemory dumps.
+end note
+
+partition "Decision model" {
+  :Build stable prompt from\nscenario + [0,10,20,30] + Lessons;
+  :Call DecisionModel;
+}
+
+if (Valid structured result?) then (yes)
+else (no)
+  :Retry once with same semantic input;
+  if (Retry valid?) then (yes)
+  else (no)
+    :Fallback to 0% discount;
+    :decision_source = fallback;
+  endif
+endif
+
+:Validate scenario_id and\ndiscount in {0,10,20,30};
+
+partition "Durable decision" {
+  :Build PromotionDecision event;
+  :Persist exact event + trace\nas DECIDED;
+}
+
+partition "Kafka output" {
+  :Publish to\npromotion.decisions.v1;
+}
+
+if (Publish succeeds?) then (yes)
+  :Mark journal COMPLETED;
+  :Acknowledge source offset;
+  :Log lesson_keys + discount + trace;
+else (no)
+  :Keep journal DECIDED;
+  :Do not acknowledge source offset;
+  note right
+  On Kafka redelivery/restart, the agent republishes
+  the stored decision instead of calling xmemory
+  or the model again.
+  end note
+endif
+
+stop
+@enduml
