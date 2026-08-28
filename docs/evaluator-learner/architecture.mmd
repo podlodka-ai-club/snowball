@@ -8,10 +8,11 @@ flowchart LR
         E["Evaluator\nreplay 0/10/20/30\noracle · regret"]
         C["PromotionCase\nimmutable evaluated evidence"]
         L["Learner\n2 deterministic buckets\nrecompute from evidence"]
+        V["EvaluationObserver\nmetrics + causal trace"]
     end
 
     X[("xmemory\nSKU · PromotionCase · Lesson")]
-    B["Benchmark mode\nLEARNING_ENABLED=false"]
+    B["Benchmark Runner\nLEARNING_ENABLED=false"]
 
     K --> M
     M --> S
@@ -19,12 +20,13 @@ flowchart LR
     O --> E
     E -. "counterfactual replay" .-> S
     E --> C
-    C -->|"structured write"| X
+    E -->|"EvaluationSummary"| V
+    V -->|"benchmark metrics"| B
+    C -->|"structured write when learning enabled"| X
     C --> L
     X -->|"existing Lesson + evidence"| L
     L -->|"upsert Lesson + relation"| X
-    B -. "skip memory writes" .-> E
-    B -. "skip learner writes" .-> L
+    B -. "disable xmemory writes" .-> E
 
     classDef kafka fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
     classDef sim fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#0f172a;
@@ -36,7 +38,7 @@ flowchart LR
 
     class K kafka;
     class M,S,O sim;
-    class E eval;
+    class E,V eval;
     class C case;
     class L learn;
     class X memory;
