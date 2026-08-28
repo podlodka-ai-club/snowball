@@ -11,26 +11,15 @@ XMD v1 schema: [`schema.xmd.yaml`](schema.xmd.yaml)
 
 Close one visible and reproducible loop:
 
-`scenario -> agent decision -> simulator outcome -> counterfactual oracle -> case -> lesson -> later retrieval -> changed decision`
+`scenario -> agent decision -> simulator outcome -> counterfactual oracle -> PromotionCase -> Lesson -> later retrieval -> changed decision`
 
 The memory schema deliberately contains only three objects:
 
 1. **SKU** — stable product identity and basic economics.
 2. **PromotionCase** — immutable evaluated evidence from one autonomous decision.
-3. **Lesson** — compact reusable knowledge retrieved before future decisions.
+3. **Lesson** — compact reusable knowledge recomputed from linked cases and retrieved before future decisions.
 
-There is no separate Store, SimulatorResult, Counterfactual, Feedback, or RuleVersion object in the MVP. Those concepts either fit naturally inside a PromotionCase or are implementation details outside durable product memory.
-
-## Why this shape
-
-The earlier design had `Product`, `StoreCluster`, `PromotionCase`, and `PromotionRule`. The current design keeps the useful evidence-versus-knowledge split but removes structure that does not earn its implementation cost yet.
-
-- `StoreCluster` becomes the scalar `store` field on PromotionCase. We do not currently need store metadata or store-to-store relations.
-- `PromotionRule` becomes **Lesson**, matching the learning loop terminology.
-- The Promotion Agent has one action: `0%`, `10%`, `20%`, or `30%` discount. That chosen action is applied directly to the simulator.
-- Context is stored as explicit scalar buckets instead of generic tag arrays, which makes retrieval and debugging predictable.
-- Lessons update in place by deterministic `lesson_key`; revision history can wait until there is evidence that it is useful.
-- The four counterfactual gross profits are stored as scalar fields on PromotionCase, not as four new objects. This preserves enough evaluated evidence to rebuild action rankings after restart without polluting the domain model.
+There is no separate Store, SimulatorResult, Counterfactual, Feedback, RuleVersion, or operational-retry object in xmemory. Those concepts either fit naturally inside PromotionCase or belong outside product memory.
 
 ## Objects
 
@@ -40,59 +29,50 @@ Stable product identity shared by many promotion cases.
 
 Important fields:
 
-- `sku_id` — stable primary key.
-- `name` — demo-friendly product name.
-- `category` — normalised category used for lesson generalisation.
-- `base_price` — baseline shelf price.
-- `cost` — unit cost used for gross-profit simulation.
+- `sku_id` — stable primary key;
+- `name` — demo-friendly product name;
+- `category` — normalized category used for generalization;
+- `base_price` — baseline shelf price;
+- `cost` — unit cost used by the simulator.
 
-For the demo, six understandable categories are enough: ice cream, beer, soft drinks, chips, meat, and yogurt. There is no prize for reproducing a supermarket master-data system by Friday night.
+For the demo, six understandable categories are enough: ice cream, beer, soft drinks, chips, meat, and yogurt. There is no prize for reproducing a supermarket master-data system before the demo.
 
 ### PromotionCase
 
-One completed scenario after the Promotion Agent acts, the simulator returns an outcome, and the evaluator replays all four actions.
+One completed scenario after the Promotion Agent acts and the Evaluator replays all four allowed actions.
 
-A case contains four groups of facts.
+A case contains:
 
-#### Scenario
+#### Scenario context
 
-- `scenario_date`
-- `store`
-- `price`
-- `baseline_sales`
-- `stock`
-- `stock_level`: `normal | high`
-- `day_type`: `weekday | weekend`
-- `weather`: `normal | hot | rain`
-- `temperature_c`
-- `event_type`: `none | local_event`
-- `event_note`, for example `concert_nearby`
+- `scenario_date`;
+- `store`;
+- `price`;
+- `baseline_sales`;
+- `stock`;
+- `stock_level`: `normal | high`;
+- `day_type`: `weekday | weekend`;
+- `weather`: `normal | hot | rain`;
+- `temperature_c`;
+- `event_type`: `none | local_event`;
+- `event_note`.
 
-The raw scenario can still contain richer fields in application code. Only memory-relevant context belongs here.
+#### Decision and chosen outcome
 
-#### Decision
-
-- `chosen_discount`: `0 | 10 | 20 | 30`
-
-There is exactly one applied action. The Promotion Agent chooses it and the simulator evaluates it.
-
-#### Outcome
-
-- `units_sold`
-- `gross_profit`
-
-Gross profit is the primary KPI for the MVP.
+- `chosen_discount`: `0 | 10 | 20 | 30`;
+- `units_sold`;
+- `gross_profit`.
 
 #### Counterfactual evaluation
 
-- `profit_0`
-- `profit_10`
-- `profit_20`
-- `profit_30`
-- `best_discount`
-- `best_gross_profit`
-- `regret = best_gross_profit - gross_profit`
-- `regret_pct`
+- `profit_0`;
+- `profit_10`;
+- `profit_20`;
+- `profit_30`;
+- `best_discount`;
+- `best_gross_profit`;
+- `regret`;
+- `regret_pct`.
 
 Example:
 
@@ -104,15 +84,19 @@ Oracle best:     20% / £281
 Regret:          £29
 ```
 
-The four replay-profit fields are intentionally redundant with `best_discount` and `best_gross_profit`. That redundancy is useful: after a process restart, the learner can reconstruct the full action ranking and recompute lesson strength without rerunning the hidden simulator.
+The four replay-profit fields deliberately preserve the full feedback vector. After restart, the learner can rebuild action rankings and Lesson strength without rerunning the hidden simulator.
 
-This is still one PromotionCase object, not four Counterfactual records.
+`case_id` is deterministic:
 
-This evaluated vector is the feedback signal that drives learning. The simulator, not another model, provides the objective comparison.
+```text
+CASE-<scenario_id>
+```
+
+PromotionCase is immutable factual evidence. A duplicate case ID with different business values is an integrity failure, not an update.
 
 ### Lesson
 
-A Lesson is compact reusable knowledge derived from multiple evaluated cases and retrieved before the next decision.
+A Lesson is compact reusable knowledge derived from multiple evaluated cases and read by the Promotion Agent.
 
 Example:
 
@@ -127,46 +111,54 @@ Example:
   "confidence": 0.82,
   "evidence_count": 7,
   "avg_profit_advantage_pct": 9.3,
-  "rationale": "On hot weekends with high stock, 20% produced better gross profit than lighter discounts; 30% usually lost too much margin."
+  "rationale": "For category:ice_cream on hot weekends with high stock, 20% has the highest mean gross profit across 7 evaluated cases, beating the next-best action by 9.3%."
 }
 ```
 
 Important fields:
 
-- `lesson_key` — deterministic identity for one scope/context bucket.
-- `scope` — `sku:<id>` or `category:<category>`.
-- optional `store_scope` — only when evidence is deliberately store-specific.
-- optional conditions: `day_type`, `weather`, `event_type`, `stock_level`.
-- `recommended_discount` — one of the four allowed actions.
-- `rationale` — short evidence-grounded explanation.
-- `evidence_count` — linked cases used by the lesson.
-- `confidence` — agreement/strength of evidence, computed or validated in code.
-- `avg_profit_advantage_pct` — business-readable strength of the recommendation versus the best alternative.
+- `lesson_key` — deterministic identity for one scope/context bucket;
+- `scope` — `sku:<id>` or `category:<category>`;
+- optional `store_scope`;
+- optional conditions: `day_type`, `weather`, `event_type`, `stock_level`;
+- `recommended_discount` — one of the four allowed actions;
+- `rationale` — short evidence-grounded explanation;
+- `evidence_count` — unique linked cases used by the Lesson;
+- `confidence` — deterministic strength score from `0.0` to `1.0`;
+- `avg_profit_advantage_pct` — strength versus the best alternative action.
 
-## Lesson identity
+## Lesson identity and candidate policy
 
-Do not let the LLM invent a fresh lesson every time it discovers the same thing using slightly different English.
+Do not let prose generation invent a new Lesson whenever the same evidence can be described with different English.
 
-Build `lesson_key` deterministically in application code:
+For v1, every PromotionCase contributes to exactly two buckets:
 
 ```text
-<scope>|store:<store-or-any>|<day-or-any>|<weather-or-any>|event:<event-or-any>|stock:<stock-or-any>
+sku:<sku_id>|store:any|<day_type>|<weather>|event:any|stock:<stock_level>
+category:<category>|store:any|<day_type>|<weather>|event:any|stock:<stock_level>
 ```
 
-Examples:
+Example:
 
 ```text
+sku:ICE500|store:any|weekend|hot|event:any|stock:high
 category:ice_cream|store:any|weekend|hot|event:any|stock:high
-sku:ICE500|store:London Central|weekend|hot|event:local_event|stock:any
 ```
 
-Repeated evidence updates the same Lesson.
+This policy deliberately uses only:
 
-For the MVP, a Lesson represents current aggregated knowledge. We intentionally do not create `active/superseded` versions. If revision history becomes useful later, add it as a separate observability feature.
+- scope;
+- day type;
+- weather;
+- stock level.
+
+The hackathon has one store, so `store:any` avoids fake store specificity. `event_type` remains on PromotionCase but is `event:any` for v1 Lessons. Event-aware or store-specific buckets are future extensions, not extra combinations created from every case.
+
+Two buckets per case are enough to demonstrate both exact-SKU learning and category transfer without flooding memory.
 
 ## Relations
 
-The schema has only three relations.
+The schema has three relations.
 
 ### `case_sku`
 
@@ -176,7 +168,7 @@ Each PromotionCase belongs to exactly one SKU. One SKU can have many cases.
 
 Many-to-many relation between Lesson and PromotionCase.
 
-This is the most important relation in the project: every lesson can show exactly which evaluated cases produced or reinforced it.
+This is the authoritative provenance trace. `evidence_count` is recomputed from unique linked cases; it is never incremented blindly.
 
 ```text
 Lesson #17
@@ -188,30 +180,137 @@ Lesson #17
 
 ### `lesson_sku_scope`
 
-Optional direct link for SKU-specific lessons. Category-level lessons can rely on `scope=category:<name>` and do not need to be linked to every SKU in the category.
+Optional direct link for SKU-specific Lessons. Category-level Lessons use `scope=category:<name>` and do not need to link to every SKU in the category.
+
+## Deterministic Lesson aggregation
+
+For a Lesson with `N` linked PromotionCases, sum the stored replay profits for each action:
+
+```text
+sum_0  = Σ profit_0
+sum_10 = Σ profit_10
+sum_20 = Σ profit_20
+sum_30 = Σ profit_30
+```
+
+`recommended_discount` is the action with the highest sum. Since every action has the same number of cases, this is equivalent to highest mean gross profit. Exact ties prefer the lower discount.
+
+No LLM chooses the action.
+
+### Average profit advantage
+
+```text
+mean_recommended = sum_recommended / N
+mean_best_alternative = max(mean of other actions)
+
+avg_profit_advantage_pct =
+  (mean_recommended - mean_best_alternative)
+  / max(abs(mean_best_alternative), 0.01)
+  * 100
+```
+
+Round the persisted percentage to two decimals with `HALF_UP`.
+
+### Confidence
+
+```text
+evidence_score  = min(N / 5, 1)
+
+agreement_score =
+  count(case.best_discount == recommended_discount) / N
+
+advantage_score =
+  clamp(avg_profit_advantage_pct / 10, 0, 1)
+
+confidence = round2(
+    0.60 * evidence_score
+  + 0.25 * agreement_score
+  + 0.15 * advantage_score
+)
+```
+
+Evidence quantity has the largest weight. Repeated agreement matters next. Profit separation helps, but cannot make one anecdote look like certainty.
+
+Lessons are persisted after the first case; there is no hard minimum-evidence suppression in v1. The Promotion Agent already treats Lessons as evidence rather than commands and ranks stronger evidence first.
+
+### Rationale
+
+For the MVP, generate rationale deterministically from the calculated facts:
+
+```text
+For <scope> on <weather> <day_type> with <stock_level> stock,
+<discount>% has the highest mean gross profit across <N> evaluated cases,
+beating the next-best action by <advantage>%.
+```
+
+An optional LLM may polish this sentence later, but it must not modify recommendation, evidence count, advantage, or confidence.
+
+## Contradiction handling
+
+Lessons update in place by deterministic `lesson_key`.
+
+When a new case contributes:
+
+```text
+add missing lesson_evidence relation
+-> read all linked PromotionCases
+-> recompute all four action totals
+-> recompute recommendation + advantage + confidence
+-> update the same Lesson
+```
+
+If accumulated evidence changes the best action, `recommended_discount` changes on the same Lesson.
+
+```text
+old recommendation: 20%
+new evidence makes 10% highest aggregate profit
+-> same lesson_key
+-> recommendation becomes 10%
+-> confidence is recalculated
+```
+
+That is the MVP contradiction mechanism. No version trees, no prose-merging ritual, no pretending conflicting experience is impossible.
 
 ## Write path
 
-The Evaluator / Learner writes memory only after all four actions have been replayed by the deterministic simulator.
+The Evaluator / Learner writes memory only after all four actions have been replayed successfully and the chosen-action replay matches `PromotionOutcomeV1`.
 
-1. Upsert the SKU.
-2. Write one PromotionCase containing scenario, chosen action, realised outcome, `profit_0`, `profit_10`, `profit_20`, `profit_30`, oracle optimum, and regret.
-3. Select the coarse lesson scope/context bucket.
-4. Read the existing Lesson for the deterministic `lesson_key`, if any.
-5. Recalculate supporting evidence using linked PromotionCases and their stored replay-profit vectors.
-6. Create or update the Lesson.
-7. Link every case actually used as evidence through `lesson_evidence`.
+Use xmemory REST:
 
-For the first implementation, code should calculate:
+```text
+POST /instances/{instance_id}/read
+POST /instances/{instance_id}/write
+```
 
-- regret and regret percentage;
-- all four replay profits from simulator results;
-- evidence count;
-- action ranking and profit advantage from stored case vectors;
-- lesson key;
-- and preferably validate the recommended discount against supporting simulator outcomes.
+Known application objects are written using deterministic `structured_mutations`, not free-form extraction.
 
-The LLM is useful for deciding whether evidence deserves a more general scope and for writing the concise rationale. Arithmetic and action comparison should stay deterministic in code, because giving prose models custody of accounting is how legends begin.
+### PromotionCase checkpoint
+
+1. Read existing SKU and `PromotionCase` by deterministic keys.
+2. If the case exists, verify it is identical and continue as retry/repair.
+3. If the case is new, write one structured mutation batch containing, as needed:
+   - create/update SKU;
+   - create PromotionCase;
+   - create `case_sku`.
+
+### Lesson update
+
+For each of the two deterministic Lesson keys:
+
+1. Read the current Lesson with `relations_scope=all_relations`.
+2. Load its unique linked PromotionCases.
+3. Add the current case locally when it is not yet linked.
+4. Recompute all Lesson fields in application code.
+5. Write one structured mutation batch that:
+   - creates or updates Lesson;
+   - creates the missing `lesson_evidence` relation;
+   - creates `lesson_sku_scope` when required and missing.
+
+The Lesson fields and the new evidence relation are changed in the same xmemory write call.
+
+If case write succeeds but Lesson update fails, Kafka redelivery finds the same immutable case and resumes recomputation. No operational retry state is stored in xmemory.
+
+Detailed arithmetic, idempotency, and failure handling live in [`../evaluator-learner/`](../evaluator-learner/).
 
 ## Read path
 
@@ -219,16 +318,41 @@ Before choosing a discount, the Promotion Agent asks xmemory for a very small am
 
 Recommended order:
 
-1. exact SKU lessons matching context;
-2. category lessons matching context;
-3. store-specific lessons when relevant;
-4. at most a few strongest supporting cases when explanation is needed.
+1. exact SKU Lessons matching context;
+2. category Lessons matching context;
+3. store-specific Lessons only if they are introduced later;
+4. optionally a few supporting cases for explanation mode.
 
 For the MVP, retrieve at most `3` Lessons and optionally `2` supporting PromotionCases per Lesson.
 
-The Promotion Agent performs this through xmemory's REST `/instances/{instance_id}/read` API, asks for structured `xresponse` candidates, then applies deterministic local eligibility/ranking before putting Lessons into the model prompt. The exact runtime request and ranking rules live in [`../promotion-agent/README.md`](../promotion-agent/README.md).
+The Promotion Agent uses xmemory `/instances/{instance_id}/read`, requests structured `xresponse` candidates, then applies deterministic local eligibility/ranking before putting Lessons into the model prompt. Exact runtime rules live in [`../promotion-agent/README.md`](../promotion-agent/README.md).
 
-The retrieved lesson is evidence, not a mandatory instruction. The Promotion Agent can still choose another action when the current scenario differs materially.
+The retrieved Lesson is evidence, not a mandatory instruction.
+
+## Forgetting
+
+No deletion or time decay in v1. The benchmark simulator is stationary, so forgetting mostly manufactures complexity.
+
+A later version can recompute from the most recent `N` evidence cases or a scenario-date window without changing the object model.
+
+## Benchmark isolation
+
+Training:
+
+```text
+LEARNING_ENABLED=true
+XMEM_INSTANCE_ID=trained-memory
+```
+
+Benchmark measurement:
+
+```text
+LEARNING_ENABLED=false
+```
+
+Use separate `clean-memory` and `trained-memory` instances. The Promotion Agent reads the selected instance; Evaluator still calculates oracle/regret but writes nothing during benchmark runs.
+
+See [`../benchmark/README.md`](../benchmark/README.md).
 
 ## What stays outside xmemory
 
@@ -240,27 +364,26 @@ Do not store:
 - counterfactual actions as separate memory objects;
 - random noise values;
 - embeddings or hand-maintained vector indexes;
-- raw source-dataset rows after they have been converted into scenarios;
+- raw source-dataset rows after scenario creation;
 - Kafka offsets, duplicate markers, or Promotion Agent operational journal state;
-- dozens of product/store attributes that the simulator does not use.
+- evaluator retry state;
+- dozens of product/store attributes the system does not use.
 
-The four evaluated gross-profit numbers do belong on PromotionCase because they are observed training evidence. The hidden coefficients that generated them do not. Otherwise the agent is not learning from experience; it is reading the answer key, which rather ruins the point of the experiment.
+The four evaluated gross-profit numbers do belong on PromotionCase because they are observed training evidence. Hidden coefficients that generated them do not. Otherwise the agent is not learning from experience; it is reading the answer key, which somewhat cheapens the scientific triumph.
 
 ## Minimal implementation for two developers
 
 1. Create the xmemory instance from [`schema.xmd.yaml`](schema.xmd.yaml).
-2. Implement `write_promotion_case()` including all four replay-profit fields.
-3. Implement deterministic `build_lesson_key()`.
-4. Implement `update_lesson_from_cases()` using stored replay-profit vectors.
-5. Implement `read_relevant_lessons()` in the Promotion Agent.
-6. Log retrieved Lesson IDs with every recommendation.
-7. Run the same fixed benchmark scenarios with clean and trained memory.
-
-Only after that consider richer scope generalisation, lesson decay, conflicting evidence, or revision history.
+2. Implement immutable structured `PromotionCase` write.
+3. Implement the two deterministic `lesson_key` builders.
+4. Implement pure Lesson aggregation/confidence tests.
+5. Implement structured Lesson + evidence relation writes.
+6. Implement `read_relevant_lessons()` in the Promotion Agent.
+7. Log Lesson IDs read and changed with every decision/evaluation.
+8. Train on 200-300 scenarios.
+9. Run the same fixed benchmark scenarios with clean and trained memory and learning disabled.
 
 ## Demo trace
-
-The final demo should make the entire write -> read -> changed behaviour chain visible:
 
 ```text
 CASE-0018
@@ -286,4 +409,4 @@ Oracle chooses: 20%
 Regret: £0
 ```
 
-That is the hackathon story in one screen: the case was written, evidence became a Lesson, the Lesson was read later, and the same agent changed its behaviour because persistent memory existed.
+That is the hackathon story in one screen: evaluated experience was written, aggregated knowledge survived restart, the Lesson was read later, and the same agent changed its behavior because persistent memory existed.
