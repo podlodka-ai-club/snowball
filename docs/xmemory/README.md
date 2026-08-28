@@ -86,13 +86,19 @@ Regret:          £29
 
 The four replay-profit fields deliberately preserve the full feedback vector. After restart, the learner can rebuild action rankings and Lesson strength without rerunning the hidden simulator.
 
-`case_id` is deterministic:
+`case_id` is deterministic and includes simulator version:
 
 ```text
-CASE-<scenario_id>
+CASE-<simulator_version>-<scenario_id>
 ```
 
-PromotionCase is immutable factual evidence. A duplicate case ID with different business values is an integrity failure, not an update.
+Example:
+
+```text
+CASE-v1-SCN-20260718-LONDON_CENTRAL-ICE500
+```
+
+PromotionCase is immutable factual evidence. Encoding simulator version in the ID prevents evidence from different future simulator models from colliding under the same scenario ID. A duplicate case ID with different business values is an integrity failure, not an update.
 
 ### Lesson
 
@@ -172,10 +178,10 @@ This is the authoritative provenance trace. `evidence_count` is recomputed from 
 
 ```text
 Lesson #17
-  <- CASE-0004
-  <- CASE-0011
-  <- CASE-0018
-  <- CASE-0023
+  <- CASE-v1-SCN-0004
+  <- CASE-v1-SCN-0011
+  <- CASE-v1-SCN-0018
+  <- CASE-v1-SCN-0023
 ```
 
 ### `lesson_sku_scope`
@@ -386,7 +392,7 @@ The four evaluated gross-profit numbers do belong on PromotionCase because they 
 ## Demo trace
 
 ```text
-CASE-0018
+CASE-v1-SCN-0018
 Ice Cream 500ml · hot weekend · high stock
 Agent chose: 10%
 Gross profit: £252
@@ -403,7 +409,7 @@ confidence: 0.82
 avg advantage: +9.3%
         |
         v
-CASE-0051 retrieves this Lesson
+CASE-v1-SCN-0051 retrieves this Lesson
 Agent chooses: 20%
 Oracle chooses: 20%
 Regret: £0
