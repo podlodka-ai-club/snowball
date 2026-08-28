@@ -59,29 +59,32 @@ For the hackathon the market is fixed to **London Central** (`LONDON_CENTRAL`, `
 
 ### Promotion Agent
 
-![Promotion Agent architecture](assets/promotion-agent-architecture.svg)
+![Promotion Agent runtime flow](assets/promotion-agent-flow.svg)
 
-The Promotion Agent is also a Kotlin/Spring Boot service for the MVP. Its runtime path is deliberately narrow:
+The Promotion Agent is also a Kotlin/Spring Boot service for the MVP. The runtime flow above makes its job explicit:
 
-- consume `promotion.scenarios.v1` using consumer group `promotion-agent-v1`;
-- validate the event before business logic;
-- use `scenario_id` as the idempotency key in a file-backed H2 `DecisionJournal`;
-- query xmemory through its REST `/read` API for candidate Lessons;
-- deterministically filter/rank candidates and pass at most `3` Lessons to the model;
-- keep the model prompt identical between clean-memory and trained-memory benchmark runs;
-- validate the model result against allowed discounts `0 | 10 | 20 | 30`;
-- retry an invalid/failed model call once, then use deterministic `0%` fallback;
-- persist the exact decision payload before publishing it;
-- publish a versioned `promotion.decisions.v1` event for the Market Simulator.
+- consume and validate `promotion.scenarios.v1`;
+- use `scenario_id` as the durable idempotency key in the H2 `DecisionJournal`;
+- retrieve candidate Lessons from xmemory and deterministically keep at most `3` relevant Lessons;
+- build the same decision prompt for clean-memory and trained-memory runs;
+- ask the model for exactly one action from `0 | 10 | 20 | 30`;
+- validate the model result, retry once, then fall back to deterministic `0%` if necessary;
+- persist the exact decision payload as `DECIDED` before publishing it;
+- publish `promotion.decisions.v1`;
+- mark the journal `COMPLETED` and acknowledge the source offset only after publish succeeds.
+
+On restart, a `DECIDED` scenario republishes the already persisted decision instead of calling xmemory or the model again. A `COMPLETED` scenario is simply acknowledged as a duplicate. That keeps Kafka at-least-once delivery from quietly turning into repeated LLM decisions, because apparently one source of nondeterminism was enough.
 
 The decision event carries the validated scenario snapshot forward. The Market Simulator therefore consumes one event and does not need to join the scenario and decision topics.
 
 Operational idempotency/trace data stays in the agent's H2 journal, not in xmemory. xmemory remains product learning memory containing only SKU, PromotionCase, and Lesson.
 
+- Runtime flow explanation: [`docs/promotion-agent/FLOW.md`](docs/promotion-agent/FLOW.md)
+- PlantUML runtime flow source: [`docs/promotion-agent/flow.puml`](docs/promotion-agent/flow.puml)
 - Detailed design: [`docs/promotion-agent/README.md`](docs/promotion-agent/README.md)
+- Component/topology source: [`docs/promotion-agent/architecture.mmd`](docs/promotion-agent/architecture.mmd)
 - Kafka JSON Schema: [`docs/promotion-agent/promotion-decision-v1.schema.json`](docs/promotion-agent/promotion-decision-v1.schema.json)
 - Example event: [`docs/promotion-agent/promotion-decision-v1.example.json`](docs/promotion-agent/promotion-decision-v1.example.json)
-- Editable diagram source: [`docs/promotion-agent/architecture.mmd`](docs/promotion-agent/architecture.mmd)
 
 ### xmemory
 
