@@ -1,0 +1,43 @@
+flowchart LR
+    K[("promotion.decisions.v1")]
+
+    subgraph R["Simulation + Learning Runtime · one Kotlin/Spring Boot deployable"]
+        M["Market Simulator\nchosen action only"]
+        S["SimulationEngine\npure deterministic capability"]
+        O["PromotionOutcomeV1"]
+        E["Evaluator\nreplay 0/10/20/30\noracle · regret"]
+        C["PromotionCase\nimmutable evaluated evidence"]
+        L["Learner\n2 deterministic buckets\nrecompute from evidence"]
+    end
+
+    X[("xmemory\nSKU · PromotionCase · Lesson")]
+    B["Benchmark mode\nLEARNING_ENABLED=false"]
+
+    K --> M
+    M --> S
+    M --> O
+    O --> E
+    E -. "counterfactual replay" .-> S
+    E --> C
+    C -->|"structured write"| X
+    C --> L
+    X -->|"existing Lesson + evidence"| L
+    L -->|"upsert Lesson + relation"| X
+    B -. "skip memory writes" .-> E
+    B -. "skip learner writes" .-> L
+
+    classDef kafka fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
+    classDef sim fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#0f172a;
+    classDef eval fill:#fff7ed,stroke:#f59e0b,stroke-width:2px,color:#0f172a;
+    classDef learn fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#0f172a;
+    classDef memory fill:#f5f3ff,stroke:#7c3aed,stroke-width:2px,color:#0f172a;
+    classDef case fill:#f8fafc,stroke:#64748b,stroke-width:2px,color:#0f172a;
+    classDef mode fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#0f172a;
+
+    class K kafka;
+    class M,S,O sim;
+    class E eval;
+    class C case;
+    class L learn;
+    class X memory;
+    class B mode;
