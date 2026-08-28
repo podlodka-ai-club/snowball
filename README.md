@@ -118,7 +118,7 @@ The Evaluator / Learner closes the autonomous write → read learning loop:
 - replay `0`, `10`, `20`, and `30` through the same deterministic simulator capability;
 - verify the chosen-action replay matches the original outcome;
 - choose oracle action with exact-cent comparison and lower-discount tie breaking;
-- calculate regret and create deterministic `CASE-<scenario_id>`;
+- calculate regret and create deterministic `CASE-<simulator_version>-<scenario_id>`;
 - write the immutable PromotionCase to xmemory;
 - update exactly two Lesson buckets per case: exact SKU and category, both keyed by `day_type + weather + stock_level`;
 - recompute recommended discount from aggregate counterfactual gross profit across linked cases;
@@ -127,7 +127,7 @@ The Evaluator / Learner closes the autonomous write → read learning loop:
 
 No LLM performs accounting or chooses the Lesson recommendation. `lesson_evidence` is the authoritative provenance relation, so retries cannot silently increment evidence twice.
 
-For benchmarks, `LEARNING_ENABLED=false` keeps evaluation/oracle metrics active while disabling all xmemory writes.
+For benchmarks, `LEARNING_ENABLED=false` keeps evaluation/oracle metrics active while disabling all xmemory writes. An in-process evaluation observer lets Benchmark Runner aggregate the exact same evaluation results without adding another Kafka topic.
 
 - Detailed design: [`docs/evaluator-learner/README.md`](docs/evaluator-learner/README.md)
 - Editable diagram source: [`docs/evaluator-learner/architecture.mmd`](docs/evaluator-learner/architecture.mmd)
