@@ -13,28 +13,71 @@ Editable source: [`high-level-architecture.mmd`](high-level-architecture.mmd)
 - **Kafka** topic `promotion.scenarios.v1` is the contract boundary between data acquisition and decision logic.
 - **Promotion Agent** consumes scenarios, reads a few relevant past Lessons from **xmemory**, chooses one discount action, and durably journals the decision for idempotency/traceability.
 - **Kafka** topic `promotion.decisions.v1` is the contract boundary between agent/model execution and the hidden market world.
-- **Market Simulator** consumes the decision, applies immutable hidden `SIMULATOR_VERSION=v1` logic, and produces a deterministic chosen-action `PromotionOutcomeV1`.
-- **Evaluator / Learner** shares the same Kotlin/Spring Boot runtime as the simulator, replays all four discounts through the exact same `SimulationEngine`, measures regret, and turns evaluated evidence into reusable experience.
-- **xmemory** persists evaluated PromotionCases and Lessons across runs.
+- **Market Simulator** consumes one decision and produces exactly one deterministic `PromotionOutcomeV1`: chosen discount, units sold, and gross profit under `SIMULATOR_VERSION=v1`.
+- **Evaluator** consumes that outcome, asks the simulator to replay the same scenario under `0`, `10`, `20`, and `30`, selects the oracle-best action, calculates regret, and produces one immutable **PromotionCase**.
+- **Learner** uses evaluated PromotionCases as evidence and creates or updates a reusable **Lesson**.
+- **xmemory** persists PromotionCases and Lessons across runs. Later Promotion Agent decisions retrieve Lessons, not simulator internals.
 
 The core feedback loop is:
 
-`Market data -> Scenario event -> Memory-backed decision -> Decision event -> Outcome -> Learning -> Memory -> Better next decision`
+`Market data -> Scenario -> Decision -> Outcome -> PromotionCase -> Lesson -> Memory-backed next decision`
+
+## Explicit component outputs
+
+The important contracts are deliberately different:
+
+```text
+Market Simulator output
+  PromotionOutcomeV1
+  - chosen discount
+  - units sold
+  - gross profit
+  - simulator version
+
+Evaluator output
+  PromotionCase
+  - scenario + chosen action + realised outcome
+  - profit_0 / profit_10 / profit_20 / profit_30
+  - best_discount + best_gross_profit
+  - regret + regret_pct
+
+Learner output
+  Lesson
+  - scope + context conditions
+  - recommended discount
+  - confidence + evidence count
+  - short evidence-grounded rationale
+```
+
+This separation matters for the hackathon story. The simulator provides ground truth, the Evaluator turns ground truth into evaluated evidence, and the Learner turns accumulated evidence into reusable memory. Combining those three concepts into one rectangle makes the diagram shorter and the system considerably harder to explain, a classic engineering bargain.
+
+## Transport boundaries
 
 Kafka is deliberately used only at two meaningful runtime boundaries:
 
 ```text
 Scenario Generator -> promotion.scenarios.v1 -> Promotion Agent
-Promotion Agent     -> promotion.decisions.v1 -> Simulation + Learning Runtime
+Promotion Agent     -> promotion.decisions.v1 -> Market Simulator
 ```
 
-The second topic is justified because it makes decisions replayable and prevents the hidden market world from being coupled to model latency or xmemory availability. The decision event carries the normalized scenario snapshot forward, so the simulator consumes one topic and does not need to join scenario and decision streams.
+There is deliberately no `promotion.outcomes.v1` Kafka topic in the MVP. `PromotionOutcomeV1` can be handed to the Evaluator through an in-process port.
 
-There is deliberately **no `promotion.outcomes.v1` Kafka topic in the MVP**. Market Simulator and Evaluator / Learner are separate modules inside one process. The chosen-action result is handed over as versioned `PromotionOutcomeV1`, while evaluator replay calls the same pure simulation engine directly for `0`, `10`, `20`, and `30`.
+Likewise, counterfactual replay is a direct call to the simulator's pure `SimulationEngine` capability rather than four additional Kafka messages. This does **not** make Evaluator part of Market Simulator. It only means two logical components can share a deployment for the MVP without confusing deployment topology with responsibility boundaries.
 
-This keeps the hidden ground-truth boundary explicit without inventing another service and four replay messages per case. Kafka has two useful jobs here; it does not need a third for morale.
+## Boundaries
 
-The Promotion Agent never receives simulator coefficients, deterministic noise, or current counterfactual results. The Evaluator sees only simulation results and uses them to create PromotionCases and Lessons. The hidden simulator configuration is not written to xmemory.
+Market Simulator scope ends at `PromotionOutcomeV1`.
+
+Evaluator / Learner scope begins after that outcome and owns:
+
+- replay orchestration;
+- oracle selection;
+- regret;
+- PromotionCase creation;
+- Lesson creation/update;
+- xmemory writes.
+
+The Promotion Agent never receives simulator coefficients, deterministic noise, oracle results, or current-scenario counterfactual profits. The hidden simulator configuration is never written to xmemory.
 
 Detailed components:
 
@@ -43,4 +86,4 @@ Detailed components:
 - Market Simulator: [`../market-simulator/`](../market-simulator/)
 - xmemory: [`../xmemory/`](../xmemory/)
 
-Counterfactual replay arithmetic, regret calculation, lesson aggregation, and benchmark orchestration remain owned by Evaluator / Learner and Benchmark Runner rather than Market Simulator.
+The detailed Evaluator / Learner design remains a separate task; this page only fixes its input/output boundary so the overall loop is unambiguous.

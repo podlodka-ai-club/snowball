@@ -1,6 +1,6 @@
 # Market Simulator
 
-The Market Simulator is the hidden market world of the hackathon. It consumes one validated promotion decision, simulates the chosen action, and exposes the exact same deterministic engine to the Evaluator for counterfactual replay.
+The Market Simulator is the hidden market world of the hackathon. Its responsibility is deliberately narrow: consume one validated promotion decision and produce one deterministic business outcome for that exact `(scenario, discount)` pair.
 
 ![Market Simulator architecture](../../assets/market-simulator-architecture.svg)
 
@@ -8,32 +8,41 @@ Editable diagram source: [`architecture.mmd`](architecture.mmd)
 Outcome contract: [`promotion-outcome-v1.schema.json`](promotion-outcome-v1.schema.json)  
 Example outcome: [`promotion-outcome-v1.example.json`](promotion-outcome-v1.example.json)
 
-## Design goal
+## Scope
 
-Keep this boundary strict:
+The Market Simulator owns:
 
-```text
-Promotion Agent: scenario + Lessons + allowed discounts
-Market Simulator: hidden coefficients + deterministic market formula
-Evaluator: observed outcome + four replay results
-```
+- hidden market coefficients;
+- deterministic simulation of one `(scenario, discount)` pair;
+- stock-constrained units sold;
+- gross-profit calculation;
+- deterministic scenario noise;
+- simulator versioning;
+- creation of `PromotionOutcomeV1`.
 
-Simulator coefficients, noise, oracle action, and current counterfactual results must never enter the Promotion Agent prompt or xmemory.
+The Market Simulator does **not** own:
 
-## Runtime boundary
+- replay orchestration across all four actions;
+- oracle-best discount selection;
+- regret calculation;
+- `PromotionCase` creation;
+- `Lesson` creation or update;
+- xmemory reads or writes;
+- benchmark metrics.
 
-For the MVP, **do not deploy Market Simulator as a separate service**. Market Simulator and Evaluator / Learner are separate modules inside one Kotlin/Spring Boot process.
+Those responsibilities belong to the separate Evaluator / Learner scope. Deployment may still place the components in one Spring Boot process for the MVP, but that is only a deployment convenience. The architectural boundary of this document ends at `PromotionOutcomeV1`.
 
 ```text
 promotion.decisions.v1
         |
         v
-DecisionListener -> SimulationEngine -> PromotionOutcomeV1 -> Evaluator
-                         ^                         |
-                         +---- replay 0/10/20/30 --+
+Market Simulator
+        |
+        v
+PromotionOutcomeV1
+        |
+        +---- Market Simulator scope ends here
 ```
-
-This keeps the hidden market model encapsulated without adding a third service, a third Kafka topic, or four replay messages per case. `SimulationEngine` must remain a pure module with no Kafka, xmemory, HTTP, model, or clock dependency.
 
 ## Kafka consumer
 
@@ -50,8 +59,18 @@ Flow:
 2. validate simulator invariants;
 3. call `SimulationEngine`;
 4. build `PromotionOutcomeV1`;
-5. hand it to Evaluator in-process;
-6. acknowledge the Kafka offset only after Evaluator accepts it successfully.
+5. hand the outcome to a downstream `OutcomeSink` port;
+6. acknowledge the Kafka offset only after the downstream handoff succeeds.
+
+Conceptual boundary:
+
+```kotlin
+interface OutcomeSink {
+    fun accept(outcome: PromotionOutcomeV1)
+}
+```
+
+The Evaluator may implement this port in the MVP, but its behavior is intentionally outside this document.
 
 Simulator-specific validation:
 
@@ -65,7 +84,7 @@ Simulator-specific validation:
 
 `temperature_c`, `stock_level`, and `event_note` remain in the scenario snapshot. In v1, `temperature_c` and `event_note` do not directly change arithmetic because `weather` and `event_type` are already normalized upstream. `stock_level` is a learnable coarse feature; exact `stock` is the simulator constraint.
 
-Invalid events are permanent failures: do not simulate or acknowledge them; log the reason, stop the listener, and fail health checks. For transient Evaluator failures retry with short bounded backoff (`250 ms`, `1 s`, `3 s`), then stop unhealthy without acknowledging the input.
+Invalid events are permanent failures: do not simulate or acknowledge them; log the reason, stop the listener, and fail health checks. For transient downstream handoff failures, retry with short bounded backoff (`250 ms`, `1 s`, `3 s`), then stop unhealthy without acknowledging the input.
 
 ## Idempotency
 
@@ -78,7 +97,7 @@ outcome_id  = OUT-<decision_id>
 
 The simulator needs no database in the MVP. Reprocessing the same decision under the same `SIMULATOR_VERSION` recomputes identical business values and the same `outcome_id`.
 
-Evaluator / Learner should later use `outcome_id` or `decision_id` as its persistence idempotency key. If the same ID ever appears with different business values or simulator version, fail loudly instead of overwriting evidence.
+The downstream consumer should use `outcome_id` or `decision_id` as its own idempotency key. If the same ID ever appears with different business values or simulator version, fail loudly instead of silently replacing evidence.
 
 ## Pure engine contract
 
@@ -98,6 +117,8 @@ data class SimulationResult(
 ```
 
 The result depends only on `scenarioId`, scenario fields, discount, and immutable simulator configuration.
+
+The same pure function can be called later by another component for counterfactual replay. The simulator exposes the capability; deciding which actions to replay and what to learn from them is outside Market Simulator scope.
 
 ## Simulator v1 formula
 
@@ -188,7 +209,7 @@ Local-event demand / promo factors; none is `1.00 / 1.00`:
 | `meat` | 1.05 | 1.05 |
 | `yogurt` | 1.00 | 1.00 |
 
-Margin, elasticity, context affinity, and stock should make different actions win. 0% can win with weak lift/thin margin; 10% can win when stock caps deeper discounts; 20% can win in promotion-responsive contexts; 30% may win for high-margin elastic SKUs but often increases units while destroying profit.
+Margin, elasticity, context affinity, and stock should make different actions win. 0% can win with weak lift or thin margin; 10% can win when stock caps deeper discounts; 20% can win in promotion-responsive contexts; 30% may win for high-margin elastic SKUs but often increases units while destroying profit.
 
 Calibrate these values against the prepared fixture before the first official benchmark and then freeze them. After training evidence exists, changing formula, coefficients, noise, or rounding requires a new simulator version.
 
@@ -198,7 +219,7 @@ Calibrate these values against the prepared fixture before the first official be
 units_sold = min(stock, demand_units)
 ```
 
-This is intentionally important. A deeper discount may generate more demand without selling more units once stock is exhausted, leaving only lower margin. In the committed example, 20% already reaches the `320`-unit stock cap; 30% creates more demand but still sells `320`, so profit drops sharply.
+A deeper discount may generate more demand without selling more units once stock is exhausted, leaving only lower margin. This creates a useful learnable interaction instead of a global discount lookup table.
 
 ## Deterministic noise
 
@@ -208,7 +229,7 @@ Simulator v1 uses one small scenario shock:
 noise range = [0.98, 1.02]
 ```
 
-The same scenario uses the same noise for all four actions.
+The same scenario uses the same noise regardless of discount.
 
 Exact algorithm:
 
@@ -222,15 +243,13 @@ unit = u / 18446744073709551615
 noise = round6(0.98 + 0.04 * unit)
 ```
 
-Discount is not in the key.
+Discount is not in the key. This ensures any later counterfactual caller compares actions under the same market shock.
 
-For `SCN-20260718-LONDON_CENTRAL-ICE500`, digest prefix is `a0756941c651c1c0` and noise is `1.005072`.
-
-The noise key/factor may be logged internally for reproducibility, but must not be written to xmemory, the decision prompt, or the outcome contract.
+The noise key/factor may be logged internally for reproducibility, but must not be written to xmemory, the Promotion Agent prompt, or the outcome contract.
 
 ## Outcome contract
 
-`PromotionOutcomeV1` is a versioned **in-process** contract for the MVP, defined by [`promotion-outcome-v1.schema.json`](promotion-outcome-v1.schema.json).
+`PromotionOutcomeV1` is the complete business output of Market Simulator.
 
 It carries:
 
@@ -242,34 +261,13 @@ It carries:
 - `units_sold`;
 - `gross_profit`.
 
-It does not carry coefficients, affinity, noise, raw demand, oracle action, or counterfactual profits.
+It does not carry coefficients, promotion affinity, noise, raw demand, oracle action, regret, counterfactual profits, `PromotionCase`, or `Lesson`.
 
-There is deliberately no `promotion.outcomes.v1` Kafka topic yet. If the runtime is split later, this contract can become that topic payload; publish must then succeed before acknowledging `promotion.decisions.v1`.
-
-## Replay for Evaluator
-
-Evaluator calls the same engine directly:
-
-```kotlin
-val results = listOf(0, 10, 20, 30)
-    .associateWith { d ->
-        simulationEngine.simulate(
-            outcome.scenarioId,
-            outcome.scenario,
-            d
-        )
-    }
-```
-
-No replay HTTP endpoint and no replay Kafka flow.
-
-Market Simulator owns deterministic simulation of one `(scenario, discount)` pair and chosen-action outcome generation.
-
-Evaluator / Learner owns all-four-action replay, oracle selection, regret, PromotionCase persistence, and Lesson creation/update.
+There is deliberately no `promotion.outcomes.v1` Kafka topic yet. For the MVP the outcome can cross an in-process `OutcomeSink` boundary. If the components are split into separate processes later, this exact versioned contract can become the Kafka payload without changing the Market Simulator domain.
 
 ## Failure and observability
 
-Fail application startup if simulator configuration is incomplete or invalid. A replay failure aborts evaluation; never write a partial PromotionCase. Outcome-publication failure is not applicable until an outcome Kafka topic exists.
+Fail application startup if simulator configuration is incomplete or invalid. A simulation failure produces no outcome. A downstream handoff failure must not acknowledge the source Kafka message.
 
 Structured logs for chosen-action simulation should contain:
 
@@ -279,7 +277,7 @@ Structured logs for chosen-action simulation should contain:
 - SHA-256 noise-key prefix and noise factor;
 - timestamp.
 
-Replay logs should include the same `scenario_id` and `simulator_version` plus replay discount. Simulator logs must not be available to the Promotion Agent.
+Simulator logs must not be available to the Promotion Agent or xmemory retrieval path.
 
 ## Versioning
 
@@ -302,24 +300,24 @@ simulator configuration
 ## Suggested Kotlin structure
 
 ```text
-simulation-learning-runtime/
+market-simulator/
   src/main/kotlin/.../
-    simulator/
-      domain/
-        SimulationResult.kt
-        PromotionOutcomeV1.kt
-      application/
-        SimulationEngine.kt
-      config/
-        SimulatorV1Config.kt
-        SimulatorConfigValidator.kt
-      adapter/kafka/
-        DecisionListener.kt
-    evaluator/
-      ...
+    domain/
+      SimulationResult.kt
+      PromotionOutcomeV1.kt
+    application/
+      SimulationEngine.kt
+      SimulationService.kt
+    port/
+      OutcomeSink.kt
+    config/
+      SimulatorV1Config.kt
+      SimulatorConfigValidator.kt
+    adapter/kafka/
+      DecisionListener.kt
 ```
 
-Keep `SimulatorV1Config` inside the simulator module; never place it in a shared module imported by Promotion Agent.
+Do not put Evaluator, Learner, `PromotionCase`, Lesson logic, or xmemory adapters in this package. If the MVP uses one deployable runtime, keep them in sibling modules/packages with explicit interfaces.
 
 ## MVP implementation order
 
@@ -327,9 +325,9 @@ Keep `SimulatorV1Config` inside the simulator module; never place it in a shared
 2. Implement and test deterministic SHA-256 noise.
 3. Implement pure `SimulationEngine`.
 4. Add table-driven category/discount tests and stock-cap tests.
-5. Add replay tests proving one scenario gets the same noise across all actions.
-6. Snapshot-test the committed example outcome.
-7. Consume `promotion.decisions.v1` and hand outcomes to an Evaluator port.
-8. Only after the full learning loop works, consider extracting a simulator service or adding an outcome Kafka topic.
+5. Snapshot-test the committed example outcome.
+6. Consume `promotion.decisions.v1` and hand `PromotionOutcomeV1` to an `OutcomeSink`.
+7. Test that the same `(scenario, discount, simulator version)` reproduces exactly after restart.
+8. Only then connect a separate Evaluator / Learner implementation to the output port.
 
-The proof is simple: the same scenario/action reproduces the same result after restart, all four replays use the same hidden market, and Promotion Agent cannot access the answer key.
+The Market Simulator proof is deliberately modest: **same scenario + same action + same simulator version = same outcome, with hidden ground truth staying hidden.**

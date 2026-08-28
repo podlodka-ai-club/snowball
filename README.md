@@ -6,11 +6,11 @@ An autonomous promotion agent that improves its discount decisions from outcomes
 
 ![Self-learning promotion agent](assets/self-learning-loop.svg)
 
-The demo is intentionally small: the agent chooses one of `0%`, `10%`, `20%`, or `30%` discount levels. A simulator produces sales and gross profit. An evaluator replays all allowed actions, calculates regret, and writes reusable lessons to xmemory. Future decisions retrieve those lessons.
+The demo is intentionally small: the agent chooses one of `0%`, `10%`, `20%`, or `30%` discount levels. A simulator produces sales and gross profit. An evaluator replays all allowed actions, calculates regret, and writes evaluated evidence. A learner turns that evidence into reusable lessons in xmemory. Future decisions retrieve those lessons.
 
 The core behavior is:
 
-**scenario → decision → simulated outcome → counterfactual evaluation → lesson write → lesson read → changed next decision**
+**scenario → decision → simulated outcome → PromotionCase → Lesson → lesson read → changed next decision**
 
 ## MVP architecture
 
@@ -22,15 +22,16 @@ The architecture is intentionally small:
 - **Kafka** topic `promotion.scenarios.v1` decouples data collection/scheduling from decision logic.
 - **Promotion Agent** consumes scenarios, reads a few relevant lessons from **xmemory**, chooses one discount, and journals the exact decision durably for idempotency and traceability.
 - **Kafka** topic `promotion.decisions.v1` carries the validated decision plus scenario snapshot to the simulator.
-- **Market Simulator** applies a hidden deterministic market model and produces a versioned chosen-action outcome.
-- **Evaluator / Learner** shares the same Kotlin/Spring Boot runtime as the simulator, replays all four discounts through the same pure engine, measures regret, and writes new experience back to **xmemory**.
-- **xmemory** persists evaluated PromotionCases and Lessons across restarts.
+- **Market Simulator** applies a hidden deterministic market model and produces one versioned `PromotionOutcomeV1` containing the chosen-action business result.
+- **Evaluator** replays all four discounts through the same simulator capability, chooses the oracle-best action, calculates regret, and produces one immutable **PromotionCase**.
+- **Learner** uses evaluated PromotionCases as evidence and creates or updates a reusable **Lesson**.
+- **xmemory** persists PromotionCases and Lessons across restarts.
 
 The important property is:
 
-**market data → scenario event → memory-backed decision → decision event → outcome → learning → memory → better next decision**
+**market data → scenario → memory-backed decision → outcome → evaluated case → reusable lesson → better next decision**
 
-Kafka remains limited to two meaningful runtime boundaries. The simulator-to-evaluator handoff and all four counterfactual replays are in-process calls, because adding another topic to move six fields across one JVM would mostly demonstrate that Kafka has excellent marketing.
+Kafka remains limited to two meaningful runtime boundaries. Simulator output, evaluation, and learning may share one deployable Spring Boot process for the MVP, but they remain separate logical components. Apparently putting classes in one JVM does not require pretending they have the same job.
 
 - Architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
 - Editable diagram source: [`docs/architecture/high-level-architecture.mmd`](docs/architecture/high-level-architecture.mmd)
@@ -93,17 +94,18 @@ Operational idempotency/trace data stays in the agent's H2 journal, not in xmemo
 
 ![Market Simulator architecture](assets/market-simulator-architecture.svg)
 
-The Market Simulator is the hidden market world used for both the chosen action and evaluator replay:
+The Market Simulator is only the hidden market world:
 
 - consume and validate `promotion.decisions.v1` using consumer group `market-simulator-v1`;
 - run a pure deterministic `SimulationEngine`;
 - apply category/context demand factors plus context-sensitive promotion elasticity;
 - cap units by exact stock and calculate gross profit with fixed rounding rules;
-- use a small deterministic SHA-256 scenario shock shared by all four actions;
-- return a versioned `PromotionOutcomeV1` directly to the Evaluator / Learner;
-- expose the same engine in-process for replay of `0 | 10 | 20 | 30`.
+- use a small deterministic SHA-256 scenario shock;
+- produce one versioned `PromotionOutcomeV1` containing `units_sold` and `gross_profit`.
 
-For the MVP, Market Simulator and Evaluator / Learner are separate modules in one Kotlin/Spring Boot runtime. There is deliberately no `promotion.outcomes.v1` Kafka topic yet. Stable `outcome_id`, deterministic replay, and evaluator idempotency are enough without adding another database or transport boundary.
+**Its scope ends at `PromotionOutcomeV1`.** It does not calculate oracle actions or regret, create PromotionCases, update Lessons, or write xmemory.
+
+The same pure simulation capability can later be called by the Evaluator for counterfactual actions, but replay orchestration belongs to the Evaluator, not to Market Simulator. The two may still share one deployable runtime for the hackathon without sharing responsibility boundaries.
 
 The hidden coefficients, noise factor, and formula internals never enter the Promotion Agent prompt or xmemory. `SIMULATOR_VERSION=v1` pins formula, coefficients, noise, and rounding for both training and benchmark runs.
 
@@ -111,6 +113,34 @@ The hidden coefficients, noise factor, and formula internals never enter the Pro
 - Editable diagram source: [`docs/market-simulator/architecture.mmd`](docs/market-simulator/architecture.mmd)
 - Outcome JSON Schema: [`docs/market-simulator/promotion-outcome-v1.schema.json`](docs/market-simulator/promotion-outcome-v1.schema.json)
 - Example outcome: [`docs/market-simulator/promotion-outcome-v1.example.json`](docs/market-simulator/promotion-outcome-v1.example.json)
+
+### Evaluator / Learner
+
+This is a separate logical scope from Market Simulator. The detailed implementation design is intentionally deferred, but its input and outputs are already fixed by the learning loop.
+
+**Evaluator input:**
+
+- chosen-action `PromotionOutcomeV1`;
+- access to the same deterministic simulator capability for counterfactual replay.
+
+**Evaluator output: `PromotionCase`**
+
+- original scenario and chosen discount;
+- realised units sold and gross profit;
+- `profit_0`, `profit_10`, `profit_20`, `profit_30`;
+- `best_discount` and `best_gross_profit`;
+- `regret` and `regret_pct`.
+
+**Learner output: `Lesson`**
+
+- deterministic scope/context key;
+- recommended discount;
+- confidence;
+- evidence count;
+- average profit advantage;
+- concise evidence-grounded rationale.
+
+The Evaluator therefore converts simulator results into **evaluated evidence**. The Learner converts accumulated evaluated evidence into **reusable knowledge**. Both objects are written to xmemory; only Lessons are retrieved by the Promotion Agent during future decisions.
 
 ### xmemory
 

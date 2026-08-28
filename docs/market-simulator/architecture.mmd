@@ -1,11 +1,10 @@
 flowchart LR
     K[("promotion.decisions.v1")]
 
-    subgraph R["Simulation + Learning Runtime · one Kotlin/Spring Boot process"]
+    subgraph M["Market Simulator boundary"]
         L["DecisionListener\nvalidate · manual ack"]
         E["SimulationEngine\npure deterministic function"]
-        O["PromotionOutcomeV1\nstable outcome_id"]
-        V["Evaluator / Learner"]
+        O["PromotionOutcomeV1\nunits_sold · gross_profit"]
     end
 
     C["SimulatorV1Config\nhidden coefficients · SIMULATOR_VERSION=v1"]
@@ -16,8 +15,6 @@ flowchart LR
     C --> E
     N --> E
     E --> O
-    O --> V
-    V -. "replay 0 / 10 / 20 / 30" .-> E
 
     classDef kafka fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
     classDef service fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
@@ -26,7 +23,7 @@ flowchart LR
     classDef outcome fill:#f8fafc,stroke:#64748b,stroke-width:2px,color:#0f172a;
 
     class K kafka;
-    class L,V service;
+    class L service;
     class E engine;
     class C,N config;
     class O outcome;

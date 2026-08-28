@@ -2,15 +2,12 @@ flowchart LR
     D[Market data / fixture] --> S[Scenario Generator]
     S --> K1[(promotion.scenarios.v1)]
     K1 --> A[Promotion Agent]
-    X[(xmemory)] -->|Past lessons| A
+    X[(xmemory\nPromotionCases + Lessons)] -->|Past Lessons| A
     A --> K2[(promotion.decisions.v1)]
-
-    subgraph R["Simulation + Learning Runtime"]
-        M["Market Simulator\nSIMULATOR_VERSION=v1"]
-        E[Evaluator / Learner]
-        M -->|PromotionOutcomeV1| E
-        E -. "replay 0 / 10 / 20 / 30" .-> M
-    end
-
-    K2 --> M
-    E -->|Cases + lessons| X
+    K2 --> M["Market Simulator\nhidden deterministic world"]
+    M --> O["PromotionOutcomeV1\nchosen outcome"]
+    O --> E["Evaluator\nreplay · oracle · regret"]
+    E -->|"PromotionCase"| L["Learner\naggregate evidence"]
+    E -->|"write PromotionCase"| X
+    L -->|"upsert Lesson"| X
+    E -. "replay 0 / 10 / 20 / 30" .-> M
