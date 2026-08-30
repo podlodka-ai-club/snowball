@@ -14,6 +14,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 /**
  * The ports must be usable in process today and must stay transport-neutral, so that whichever
@@ -30,7 +31,7 @@ class PortsTest {
 
     @Test
     fun `simulation port returns only the committed outcome payload`() {
-        val expected = PromotionOutcome(unitsSold = 320, grossProfit = 320.0)
+        val expected = PromotionOutcome(unitsSold = 320, grossProfit = BigDecimal("320.0"))
         val simulation = FixedSimulation(expected)
         val event = scenarioEvent()
 

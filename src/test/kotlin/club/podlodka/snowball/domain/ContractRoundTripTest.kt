@@ -57,7 +57,7 @@ class ContractRoundTripTest {
         assertThat(event.simulatorVersion).isEqualTo(SimulatorVersion.V1)
         assertThat(event.outcomeId).isEqualTo("OUT-DEC-SCN-20260718-LONDON_CENTRAL-ICE500")
         assertThat(event.outcome.unitsSold).isEqualTo(320)
-        assertThat(event.outcome.grossProfit).isEqualTo(320.0)
+        assertThat(event.outcome.grossProfit).isEqualByComparingTo(java.math.BigDecimal("320.0"))
     }
 
     @Test
@@ -87,6 +87,37 @@ class ContractRoundTripTest {
             )
 
         assertThat(rebuilt).isEqualTo(source)
+    }
+
+    @Test
+    fun `a non-UTC offset survives the round trip`() {
+        // Every committed example uses Z, so nothing else would notice Jackson normalising the
+        // offset away. The schema says date-time, which permits any offset.
+        val original =
+            mapper
+                .readTree(CommittedDocs.read(CommittedDocs.SCENARIO_EXAMPLE))
+                .deepCopy<com.fasterxml.jackson.databind.node.ObjectNode>()
+                .put("generated_at", "2026-07-18T07:00:00+01:00")
+
+        val event: PromotionScenarioEvent = mapper.readValue(mapper.writeValueAsString(original))
+        val serialized = mapper.readTree(mapper.writeValueAsString(event))
+
+        assertThat(serialized.get("generated_at").asText()).isEqualTo("2026-07-18T07:00:00+01:00")
+    }
+
+    @Test
+    fun `high precision numbers survive the round trip`() {
+        val original =
+            mapper
+                .readTree(CommittedDocs.read(CommittedDocs.OUTCOME_EXAMPLE))
+                .deepCopy<com.fasterxml.jackson.databind.node.ObjectNode>()
+        (original.get("outcome") as com.fasterxml.jackson.databind.node.ObjectNode)
+            .put("gross_profit", java.math.BigDecimal("12345678901234567890.12"))
+
+        val event: PromotionOutcomeEvent = mapper.readValue(mapper.writeValueAsString(original))
+        val serialized = mapper.readTree(mapper.writeValueAsString(event))
+
+        assertThat(serialized).isEqualTo(mapper.readTree(mapper.writeValueAsString(original)))
     }
 
     @Test

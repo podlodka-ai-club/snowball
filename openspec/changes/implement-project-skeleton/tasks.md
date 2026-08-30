@@ -21,6 +21,7 @@
 - [x] 3.4 Add negative tests proving that a missing required field, an unknown property, and an out-of-enumeration value are all rejected at parse time.
 - [x] 3.5 Add a test proving the constant envelope fields round-trip unchanged and that a conflicting constant is rejected.
 - [x] 3.6 Add negative tests for the constraints Jackson's defaults would otherwise accept: a wrong JSON type, an explicit null in an optional field, an empty `minLength: 1` string, and a number outside its schema bounds.
+- [x] 3.7 Probe the mapper with mutated examples rather than trusting its configuration, and add tests for every gap found: a number or boolean in a string field, an enum given as an ordinal, a temporal value given as a number or array, an explicit null in a required numeric field, a non-UTC offset surviving the round trip, and a number too precise for a 64-bit float.
 
 ## 4. Internal ports
 

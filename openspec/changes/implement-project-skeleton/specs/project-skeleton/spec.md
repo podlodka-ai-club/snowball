@@ -33,6 +33,10 @@ The module SHALL expose Kotlin models for `promotion-scenario-v1`, `promotion-de
 - **WHEN** the decision and outcome schemas reference the scenario payload defined by the scenario schema
 - **THEN** the models SHALL reuse one scenario payload type rather than redeclaring the same fields
 
+#### Scenario: The model is narrower than the schema
+- **WHEN** the Kotlin type cannot represent every value the schema permits - an `integer` beyond 32 bits, or an integer written in the non-canonical form `320.0`
+- **THEN** the input SHALL be rejected loudly rather than silently truncated, and the narrowing SHALL be recorded in the design as a deliberate deviation
+
 ### Requirement: Lossless round trip against the committed examples
 Each of the three contracts SHALL support a lossless round trip: parsing a committed example and serializing it back SHALL produce a semantically identical JSON document.
 
@@ -51,6 +55,14 @@ Each of the three contracts SHALL support a lossless round trip: parsing a commi
 #### Scenario: Optional fields are absent
 - **WHEN** a document omits fields the schema marks as optional
 - **THEN** parsing SHALL succeed and serialization SHALL NOT emit those fields as explicit nulls
+
+#### Scenario: A timestamp carries an offset other than UTC
+- **WHEN** a `date-time` field is written with an offset such as `+01:00`
+- **THEN** the round trip SHALL preserve that offset rather than normalising it to `Z`
+
+#### Scenario: A number carries more precision than a binary float holds
+- **WHEN** a JSON number in the document exceeds the precision or range of a 64-bit float
+- **THEN** the round trip SHALL preserve its value exactly
 
 ### Requirement: Contract violations fail at the boundary
 Deserialization SHALL reject a document that the committed schema would reject on required fields, closed enumerations, constant envelope values, unknown properties, JSON types, string lengths, and numeric bounds. Construction of a model directly in Kotlin SHALL enforce the same invariants.
@@ -72,8 +84,16 @@ Deserialization SHALL reject a document that the committed schema would reject o
 - **THEN** deserialization SHALL fail, and for a valid document those constants SHALL survive the round trip unchanged
 
 #### Scenario: A value has the wrong JSON type
-- **WHEN** a `number` field carries a string, or an `integer` field carries a fractional number
+- **WHEN** a `number` field carries a string, an `integer` field carries a fractional number, a `string` field carries a number or a boolean, or a `date`/`date-time` field carries a number or an array
 - **THEN** deserialization SHALL fail rather than coerce the value, since the schema constrains the JSON type
+
+#### Scenario: An enumeration is given as a number
+- **WHEN** a closed enumeration receives a JSON number
+- **THEN** deserialization SHALL fail rather than interpret it as the ordinal of a constant
+
+#### Scenario: A required numeric field is null
+- **WHEN** a required `integer` or `number` field is present with an explicit `null`
+- **THEN** deserialization SHALL fail rather than substitute zero
 
 #### Scenario: An optional field is present and null
 - **WHEN** a field the schema declares optional is present with an explicit `null`

@@ -159,6 +159,75 @@ class ContractViolationTest {
     }
 
     @Test
+    fun `a non-string value in a string field is rejected`() {
+        val numericStoreId = scenarioTree()
+        (numericStoreId.get("scenario") as ObjectNode).put("store_id", 12)
+        assertRejects<PromotionScenarioEvent>(numericStoreId)
+
+        assertRejects<PromotionScenarioEvent>(scenarioTree().apply { put("scenario_id", true) })
+    }
+
+    @Test
+    fun `an enumeration given as a number is rejected`() {
+        // Jackson would otherwise read 1 as the ordinal of the second constant, silently turning
+        // an invalid document into StockLevel.HIGH.
+        val ordinalStockLevel = scenarioTree()
+        (ordinalStockLevel.get("scenario") as ObjectNode).put("stock_level", 1)
+
+        assertRejects<PromotionScenarioEvent>(ordinalStockLevel)
+    }
+
+    @Test
+    fun `a null in a required numeric field is rejected`() {
+        val nullStock = scenarioTree()
+        (nullStock.get("scenario") as ObjectNode).putNull("stock")
+        assertRejects<PromotionScenarioEvent>(nullStock)
+
+        val nullCost = scenarioTree()
+        (nullCost.get("scenario") as ObjectNode).putNull("cost")
+        assertRejects<PromotionScenarioEvent>(nullCost)
+
+        val nullUnits = outcomeTree()
+        (nullUnits.get("outcome") as ObjectNode).putNull("units_sold")
+        assertRejects<PromotionOutcomeEvent>(nullUnits)
+
+        val nullProfit = outcomeTree()
+        (nullProfit.get("outcome") as ObjectNode).putNull("gross_profit")
+        assertRejects<PromotionOutcomeEvent>(nullProfit)
+    }
+
+    @Test
+    fun `a temporal value that is not a JSON string is rejected`() {
+        assertRejects<PromotionScenarioEvent>(scenarioTree().apply { put("generated_at", 0) })
+
+        val arrayDate = scenarioTree()
+        (arrayDate.get("scenario") as ObjectNode)
+            .set<ObjectNode>(
+                "date",
+                mapper
+                    .createArrayNode()
+                    .add(2026)
+                    .add(7)
+                    .add(18),
+            )
+        assertRejects<PromotionScenarioEvent>(arrayDate)
+
+        val arrayTimestamp = scenarioTree()
+        arrayTimestamp.set<ObjectNode>(
+            "generated_at",
+            mapper
+                .createArrayNode()
+                .add(2026)
+                .add(7)
+                .add(18)
+                .add(6)
+                .add(0)
+                .add(0),
+        )
+        assertRejects<PromotionScenarioEvent>(arrayTimestamp)
+    }
+
+    @Test
     fun `the committed examples themselves parse`() {
         assertThatCode {
             mapper.readValue<PromotionScenarioEvent>(CommittedDocs.read(CommittedDocs.SCENARIO_EXAMPLE))

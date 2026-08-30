@@ -3,6 +3,7 @@ package club.podlodka.snowball.domain
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonValue
+import java.math.BigDecimal
 import java.time.LocalDate
 
 /**
@@ -97,9 +98,9 @@ data class PromotionScenario(
     @JsonProperty("category", required = true)
     val category: String,
     @JsonProperty("price", required = true)
-    val price: Double,
+    val price: BigDecimal,
     @JsonProperty("cost", required = true)
-    val cost: Double,
+    val cost: BigDecimal,
     @JsonProperty("stock", required = true)
     val stock: Int,
     @JsonProperty("baseline_sales", required = true)
@@ -117,7 +118,7 @@ data class PromotionScenario(
     @JsonProperty("sku_name")
     val skuName: String? = null,
     @JsonProperty("temperature_c")
-    val temperatureC: Double? = null,
+    val temperatureC: BigDecimal? = null,
     @JsonProperty("event_note")
     val eventNote: String? = null,
 ) {
@@ -125,8 +126,8 @@ data class PromotionScenario(
         require(storeId.isNotEmpty()) { "scenario.store_id must not be empty" }
         require(skuId.isNotEmpty()) { "scenario.sku_id must not be empty" }
         require(category.isNotEmpty()) { "scenario.category must not be empty" }
-        require(price > 0) { "scenario.price must be greater than 0, was $price" }
-        require(cost >= 0) { "scenario.cost must not be negative, was $cost" }
+        require(price > BigDecimal.ZERO) { "scenario.price must be greater than 0, was $price" }
+        require(cost >= BigDecimal.ZERO) { "scenario.cost must not be negative, was $cost" }
         require(stock >= 0) { "scenario.stock must not be negative, was $stock" }
         require(baselineSales >= 0) { "scenario.baseline_sales must not be negative, was $baselineSales" }
         require(storeName == null || storeName.isNotEmpty()) { "scenario.store_name must not be empty" }
