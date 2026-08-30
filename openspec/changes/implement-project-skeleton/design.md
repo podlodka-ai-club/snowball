@@ -32,6 +32,15 @@ The transport question is deliberately left open. The architecture documents des
 8. **Three ports, no more.** `SimulationPort` maps a scenario plus an allowed discount to an outcome; `OutcomeSink` accepts a completed outcome; `ScenarioPublisher` accepts a generated scenario. Each gets a trivial in-process implementation - a recording sink, a recording publisher, a fixed-answer simulation - used by tests and by nothing else. Naming follows the component specs so no rename is needed when they land.
 9. **CI runs exactly the acceptance command.** One workflow, one job, `spotlessCheck` before `build`, so a formatting failure is reported as such instead of as a compile error.
 
+## Team build and style guideline
+
+The team has a drafted build and style guideline covering the stack, the code style, the lint setup, and the test layout. This change takes it as the source of truth for everything it specifies rather than re-deciding any of it: Gradle 9.7.1 through a committed wrapper, Kotlin 2.4.10, `jvmToolchain(21)`, Kotlin DSL, the version catalog, `application`, the Spotless/ktlint block, `gradle.properties`, the `.editorconfig` file verbatim, the JUnit/MockK/AssertJ test stack, backtick test names written as full sentences, and the CI workflow. The guideline also says explicitly that the project adds no code-style rules of its own on top of the official Kotlin style, so `.editorconfig` is copied exactly and not extended.
+
+Two deliberate deviations, both additive:
+
+- **Jackson is added as a dependency.** The guideline lists the test stack but no JSON codec, and a round-trip test against the committed examples needs one. `openspec/config.yaml` already names Jackson in the primary stack, and the guideline's own exclusion list rules out heavyweight frameworks rather than libraries pulled in for a concrete need. `jackson-datatype-jsr310` comes with it so `date` and `date-time` fields are `LocalDate`/`OffsetDateTime` rather than strings.
+- **The `src/evals/kotlin/` source set is not created.** The guideline reserves it, and it matters a great deal that evals stay separate from tests, but this change produces no eval and an empty source set would only be a place for one to be misfiled. It belongs to the change that writes the first eval.
+
 ## Ground-truth leakage
 
 `SimulationPort` is the one port that touches simulator territory, so its shape is a boundary decision, not a convenience. Its return type is the committed `PromotionOutcomeV1` payload: units sold and gross profit. It exposes no coefficient table, no noise factor, no counterfactual set, and no oracle answer, and the contract models contain no field for any of them because the committed schemas contain none. The in-process implementation shipped here returns a caller-supplied fixed value and computes nothing, so it cannot become an accidental source of ground truth. Anything richer that the Evaluator needs - replaying all four discounts, comparing them - is orchestration on top of this port and stays outside the Promotion Agent's reachable surface, as `docs/market-simulator/README.md` requires.

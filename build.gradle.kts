@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.spotless)
+    application
 }
 
 group = "club.podlodka.snowball"
@@ -21,11 +22,10 @@ dependencies {
     implementation(libs.jackson.datatype.jsr310)
 
     testImplementation(platform(libs.junit.bom))
-    testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter)
+    testImplementation(kotlin("test"))
     testImplementation(libs.mockk)
     testImplementation(libs.assertj.core)
-    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 spotless {
@@ -40,6 +40,7 @@ spotless {
 
 tasks.test {
     useJUnitPlatform()
+    testLogging { events("failed", "skipped") }
     // Contract tests read the committed schemas and examples from docs/ instead of copying them.
     systemProperty(
         "snowball.docs.dir",
