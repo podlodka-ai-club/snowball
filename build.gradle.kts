@@ -26,6 +26,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.mockk)
     testImplementation(libs.assertj.core)
+    testImplementation(libs.json.schema.validator)
 }
 
 spotless {

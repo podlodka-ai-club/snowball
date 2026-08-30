@@ -23,6 +23,9 @@
 - [x] 3.6 Add negative tests for the constraints Jackson's defaults would otherwise accept: a wrong JSON type, an explicit null in an optional field, an empty `minLength: 1` string, and a number outside its schema bounds.
 - [x] 3.7 Probe the mapper with mutated examples rather than trusting its configuration, and add tests for every gap found: a number or boolean in a string field, an enum given as an ordinal, a temporal value given as a number or array, an explicit null in a required numeric field, a non-UTC offset surviving the round trip, and a number too precise for a 64-bit float.
 
+- [x] 3.8 Compile the committed schemas into real validators in the tests, validate every example and every serialized model against them, and assert schema and model reject the same document in every negative case. Verify by loosening a committed enum and confirming the suite goes red.
+- [x] 3.9 Add construction-side tests: a date year beyond four digits, an offset carrying seconds, the upstream-copying constructors, and the scale-sensitivity of `BigDecimal` equality.
+
 ## 4. Internal ports
 
 - [x] 4.1 Add `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher` as plain Kotlin interfaces over the contract models, with no transport, framework, or configuration types in their signatures. `SimulationPort` takes the scenario identity alongside the payload, as the documented simulator engine does.

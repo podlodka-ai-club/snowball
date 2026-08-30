@@ -1,0 +1,4 @@
+# Generated wrapper scripts keep their platform line endings.
+*.bat text eol=crlf
+gradlew text eol=lf
+*.jar binary

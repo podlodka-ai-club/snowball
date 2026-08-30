@@ -52,6 +52,7 @@ data class PromotionOutcomeEvent(
         require(outcomeId.isNotEmpty()) { "outcome_id must not be empty" }
         require(decisionId.isNotEmpty()) { "decision_id must not be empty" }
         require(scenarioId.isNotEmpty()) { "scenario_id must not be empty" }
+        requireSchemaDateTime(simulatedAt, "simulated_at")
     }
 
     constructor(
@@ -72,6 +73,26 @@ data class PromotionOutcomeEvent(
         simulatorVersion = SimulatorVersion.V1,
         scenario = scenario,
         decision = decision,
+        outcome = outcome,
+    )
+
+    /**
+     * Builds the outcome from the decision event it simulates, so all three ids and both snapshots
+     * describe one chain rather than three unrelated events. See the note on the matching
+     * constructor of [PromotionDecisionEvent].
+     */
+    constructor(
+        decisionEvent: PromotionDecisionEvent,
+        outcomeId: String,
+        simulatedAt: OffsetDateTime,
+        outcome: PromotionOutcome,
+    ) : this(
+        outcomeId = outcomeId,
+        decisionId = decisionEvent.decisionId,
+        scenarioId = decisionEvent.scenarioId,
+        simulatedAt = simulatedAt,
+        scenario = decisionEvent.scenario,
+        decision = decisionEvent.decision,
         outcome = outcome,
     )
 }

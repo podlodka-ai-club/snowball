@@ -15,6 +15,14 @@ import java.math.BigDecimal
  * the schema permits and admit `NaN` and infinities, which JSON has no way to represent. Carrying
  * the exact value here does not decide the simulator's rounding policy; it only avoids destroying
  * the result before the simulator can apply it.
+ *
+ * One consequence to know about: `BigDecimal.equals` is scale-sensitive, so this data class treats
+ * `320.0` and `320.00` as different values, and so do sets and maps built from it. That is correct
+ * for a type whose job is to mirror a document exactly - the two spellings really are different
+ * documents - but it means numeric comparisons in domain code must use `compareTo`, not `==`. The
+ * scenario snapshot arrives at scale 1 in the committed example while the simulator computes at
+ * scale 2, so the two will meet. Identity comparisons should use the ids, which is what they are
+ * for.
  */
 @JsonPropertyOrder("units_sold", "gross_profit")
 data class PromotionOutcome(

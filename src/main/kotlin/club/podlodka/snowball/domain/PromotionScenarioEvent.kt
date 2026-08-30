@@ -36,6 +36,7 @@ data class PromotionScenarioEvent(
 ) {
     init {
         require(scenarioId.isNotEmpty()) { "scenario_id must not be empty" }
+        requireSchemaDateTime(generatedAt, "generated_at")
     }
 
     constructor(

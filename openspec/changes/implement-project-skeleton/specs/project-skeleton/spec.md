@@ -103,6 +103,28 @@ Deserialization SHALL reject a document that the committed schema would reject o
 - **WHEN** a `minLength: 1` string is empty, or `price` is not greater than zero, or `cost`, `stock`, `baseline_sales`, or `units_sold` is negative
 - **THEN** the value SHALL be rejected, whether it arrives through deserialization or through direct construction
 
+### Requirement: The committed schemas are the test oracle
+The tests SHALL validate against the committed JSON Schemas themselves, not against a restatement of them.
+
+#### Scenario: A committed example is checked
+- **WHEN** the test suite runs
+- **THEN** each committed `*.example.json` SHALL be validated against its committed schema, and each model's serialized form SHALL be validated against that schema too
+
+#### Scenario: A committed schema is changed
+- **WHEN** a constraint in a committed schema is loosened or tightened without a matching change to the models
+- **THEN** a test SHALL fail, because every negative case asserts that the schema and the model reject the same document
+
+### Requirement: A constructed model cannot publish an invalid document
+Construction in Kotlin SHALL enforce the schema formats that the Kotlin types are too wide to express.
+
+#### Scenario: A temporal value outside the schema format is constructed
+- **WHEN** a `date` is built with a year beyond four digits, or a `date-time` with an offset carrying seconds
+- **THEN** construction SHALL fail, since both would serialize to a value the schema rejects
+
+#### Scenario: A downstream event is built from its upstream event
+- **WHEN** a decision is built from a scenario event, or an outcome from a decision event
+- **THEN** a constructor SHALL be available that copies the identity and the snapshot from the upstream event, so the parts of one event cannot come from unrelated events
+
 ### Requirement: Transport-neutral internal ports
 The module SHALL define `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher` as plain interfaces over the contract models, and their signatures SHALL NOT name any messaging, framework, persistence, or configuration type.
 

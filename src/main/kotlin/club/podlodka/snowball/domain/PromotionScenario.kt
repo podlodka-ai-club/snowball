@@ -123,6 +123,7 @@ data class PromotionScenario(
     val eventNote: String? = null,
 ) {
     init {
+        requireSchemaDate(date, "scenario.date")
         require(storeId.isNotEmpty()) { "scenario.store_id must not be empty" }
         require(skuId.isNotEmpty()) { "scenario.sku_id must not be empty" }
         require(category.isNotEmpty()) { "scenario.category must not be empty" }

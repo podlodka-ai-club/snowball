@@ -17,7 +17,7 @@ Non-goals, stated explicitly because this change touches files every component w
 - No business logic: no simulator formula or coefficients, no oracle selection, no regret, no Lesson derivation, no prompt or model invocation.
 - No messaging infrastructure. Whether the MVP needs Kafka at all is an open team question (see the discussion on PR #1); this change keeps the ports transport-neutral so either answer stays cheap, and decides nothing.
 - No Spring Boot, no database, no HTTP layer, no xmemory client.
-- No code generation from JSON Schema, and no runtime schema validator; both are the owning component's decision.
+- No code generation from JSON Schema, and no schema validation on the runtime path; whether a component validates an incoming document at its own boundary is that component's decision. The committed schemas are compiled and enforced in the *tests*, which is what keeps the hand-written models honest.
 - No change to any committed schema or to anything under `docs/`, `assets/`, `todo/`, or another change directory. The single exception is `openspec/README.md`, which gains this change in its implementation order.
 
 ## Capabilities

@@ -36,6 +36,7 @@ data class PromotionDecisionEvent(
     init {
         require(decisionId.isNotEmpty()) { "decision_id must not be empty" }
         require(scenarioId.isNotEmpty()) { "scenario_id must not be empty" }
+        requireSchemaDateTime(decidedAt, "decided_at")
     }
 
     constructor(
@@ -51,6 +52,25 @@ data class PromotionDecisionEvent(
         scenarioId = scenarioId,
         decidedAt = decidedAt,
         scenario = scenario,
+        decision = decision,
+    )
+
+    /**
+     * Builds the decision from the scenario event it answers, so the id and the snapshot cannot
+     * come from different scenarios. The schemas cannot express that agreement - both are just
+     * non-empty strings and an object - so the only way to keep the chain honest is to make the
+     * correct construction the convenient one.
+     */
+    constructor(
+        scenarioEvent: PromotionScenarioEvent,
+        decisionId: String,
+        decidedAt: OffsetDateTime,
+        decision: PromotionDecision,
+    ) : this(
+        decisionId = decisionId,
+        scenarioId = scenarioEvent.scenarioId,
+        decidedAt = decidedAt,
+        scenario = scenarioEvent.scenario,
         decision = decision,
     )
 }
