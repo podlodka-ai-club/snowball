@@ -1,14 +1,14 @@
-package club.podlodka.snowball.ports
+package club.podlodka.snowball.port
 
-import club.podlodka.snowball.contracts.CommittedDocs
-import club.podlodka.snowball.contracts.ContractJson
-import club.podlodka.snowball.contracts.Discount
-import club.podlodka.snowball.contracts.PromotionOutcome
-import club.podlodka.snowball.contracts.PromotionOutcomeEvent
-import club.podlodka.snowball.contracts.PromotionScenarioEvent
-import club.podlodka.snowball.ports.inprocess.FixedSimulation
-import club.podlodka.snowball.ports.inprocess.RecordingOutcomeSink
-import club.podlodka.snowball.ports.inprocess.RecordingScenarioPublisher
+import club.podlodka.snowball.adapter.inprocess.FixedSimulation
+import club.podlodka.snowball.adapter.inprocess.RecordingOutcomeSink
+import club.podlodka.snowball.adapter.inprocess.RecordingScenarioPublisher
+import club.podlodka.snowball.domain.CommittedDocs
+import club.podlodka.snowball.domain.ContractJson
+import club.podlodka.snowball.domain.Discount
+import club.podlodka.snowball.domain.PromotionOutcome
+import club.podlodka.snowball.domain.PromotionOutcomeEvent
+import club.podlodka.snowball.domain.PromotionScenarioEvent
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.mockk
 import io.mockk.verify
@@ -86,7 +86,7 @@ class PortsTest {
                 types.filterNot { it.isPrimitive }.forEach { type ->
                     assertThat(type.packageName)
                         .describedAs("%s.%s uses %s", port.simpleName, method.name, type.name)
-                        .isEqualTo("club.podlodka.snowball.contracts")
+                        .isEqualTo("club.podlodka.snowball.domain")
                 }
             }
         }

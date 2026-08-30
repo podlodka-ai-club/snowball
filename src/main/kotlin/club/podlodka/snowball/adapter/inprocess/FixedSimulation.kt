@@ -1,9 +1,9 @@
-package club.podlodka.snowball.ports.inprocess
+package club.podlodka.snowball.adapter.inprocess
 
-import club.podlodka.snowball.contracts.Discount
-import club.podlodka.snowball.contracts.PromotionOutcome
-import club.podlodka.snowball.contracts.PromotionScenario
-import club.podlodka.snowball.ports.SimulationPort
+import club.podlodka.snowball.domain.Discount
+import club.podlodka.snowball.domain.PromotionOutcome
+import club.podlodka.snowball.domain.PromotionScenario
+import club.podlodka.snowball.port.SimulationPort
 
 /**
  * A [SimulationPort] that returns the outcome it was given and calculates nothing.

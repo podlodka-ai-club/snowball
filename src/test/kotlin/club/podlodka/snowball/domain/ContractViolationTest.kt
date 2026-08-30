@@ -1,4 +1,4 @@
-package club.podlodka.snowball.contracts
+package club.podlodka.snowball.domain
 
 import com.fasterxml.jackson.core.JacksonException
 import com.fasterxml.jackson.databind.JsonNode

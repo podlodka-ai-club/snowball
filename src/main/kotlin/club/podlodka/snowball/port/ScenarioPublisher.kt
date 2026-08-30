@@ -1,6 +1,6 @@
-package club.podlodka.snowball.ports
+package club.podlodka.snowball.port
 
-import club.podlodka.snowball.contracts.PromotionScenarioEvent
+import club.podlodka.snowball.domain.PromotionScenarioEvent
 
 /**
  * Accepts a generated scenario from the Scenario Generator.

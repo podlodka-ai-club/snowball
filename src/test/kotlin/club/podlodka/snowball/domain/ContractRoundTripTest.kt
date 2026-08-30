@@ -1,4 +1,4 @@
-package club.podlodka.snowball.contracts
+package club.podlodka.snowball.domain
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat

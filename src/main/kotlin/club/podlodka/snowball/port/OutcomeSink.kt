@@ -1,6 +1,6 @@
-package club.podlodka.snowball.ports
+package club.podlodka.snowball.port
 
-import club.podlodka.snowball.contracts.PromotionOutcomeEvent
+import club.podlodka.snowball.domain.PromotionOutcomeEvent
 
 /**
  * Accepts a completed outcome from the Market Simulator.

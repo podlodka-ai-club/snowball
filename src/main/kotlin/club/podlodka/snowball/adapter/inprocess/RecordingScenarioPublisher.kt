@@ -1,7 +1,7 @@
-package club.podlodka.snowball.ports.inprocess
+package club.podlodka.snowball.adapter.inprocess
 
-import club.podlodka.snowball.contracts.PromotionScenarioEvent
-import club.podlodka.snowball.ports.ScenarioPublisher
+import club.podlodka.snowball.domain.PromotionScenarioEvent
+import club.podlodka.snowball.port.ScenarioPublisher
 
 /**
  * A [ScenarioPublisher] that keeps everything it publishes in memory, in publication order.

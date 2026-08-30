@@ -1,4 +1,4 @@
-package club.podlodka.snowball.contracts
+package club.podlodka.snowball.domain
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper

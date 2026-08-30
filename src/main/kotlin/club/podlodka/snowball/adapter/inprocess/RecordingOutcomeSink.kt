@@ -1,7 +1,7 @@
-package club.podlodka.snowball.ports.inprocess
+package club.podlodka.snowball.adapter.inprocess
 
-import club.podlodka.snowball.contracts.PromotionOutcomeEvent
-import club.podlodka.snowball.ports.OutcomeSink
+import club.podlodka.snowball.domain.PromotionOutcomeEvent
+import club.podlodka.snowball.port.OutcomeSink
 
 /**
  * An [OutcomeSink] that keeps everything it accepts in memory, in acceptance order.

@@ -1,8 +1,8 @@
-package club.podlodka.snowball.ports
+package club.podlodka.snowball.port
 
-import club.podlodka.snowball.contracts.Discount
-import club.podlodka.snowball.contracts.PromotionOutcome
-import club.podlodka.snowball.contracts.PromotionScenario
+import club.podlodka.snowball.domain.Discount
+import club.podlodka.snowball.domain.PromotionOutcome
+import club.podlodka.snowball.domain.PromotionScenario
 
 /**
  * Maps one scenario and one allowed discount to the business outcome of that action.

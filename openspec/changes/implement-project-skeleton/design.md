@@ -22,7 +22,7 @@ The transport question is deliberately left open. The architecture documents des
 
 ## Decisions
 
-1. **Single Gradle module, packages as component boundaries.** Source lives under `contracts` and `ports` packages; component changes add sibling packages. Splitting into Gradle modules later is mechanical, splitting too early is not.
+1. **Single Gradle module, packages laid out as the component docs prescribe.** `docs/scenario-generator/README.md`, `docs/promotion-agent/README.md`, and `docs/market-simulator/README.md` all sketch the same tree - `domain/`, `application/`, `port/`, `adapter/`, `config/` - so the skeleton uses it rather than inventing its own: the contract models go in `domain`, the port interfaces in `port`, and their in-process implementations in `adapter/inprocess` because an implementation of a port is an adapter. `application` and `config` stay empty until a component needs them. Component changes add packages inside this same tree. Splitting into Gradle modules later is mechanical, splitting too early is not.
 2. **Hand-written models, not generated ones.** Three small schemas do not repay a generator plugin in the build, and generated names would not match the ports the components already reference by name in their specs. The binding is pinned by the round-trip tests instead.
 3. **Jackson as the JSON codec.** `openspec/config.yaml` names Jackson in the primary stack, and a round-trip test needs some codec. `jackson-module-kotlin` is added as a library only; no Spring, no auto-configuration. Serialization is configured to omit nothing that the schema requires and to emit no property the schema does not allow.
 4. **Optional schema fields are nullable Kotlin properties with a `null` default, required fields are non-nullable without a default.** Kotlin's type system then carries the schema's `required` list, and a missing required field fails at parse time rather than downstream.
@@ -39,6 +39,7 @@ The team has a drafted build and style guideline covering the stack, the code st
 Two deliberate deviations, both additive:
 
 - **Jackson is added as a dependency.** The guideline lists the test stack but no JSON codec, and a round-trip test against the committed examples needs one. `openspec/config.yaml` already names Jackson in the primary stack, and the guideline's own exclusion list rules out heavyweight frameworks rather than libraries pulled in for a concrete need. `jackson-datatype-jsr310` comes with it so `date` and `date-time` fields are `LocalDate`/`OffsetDateTime` rather than strings.
+- **`PromotionOutcomeEvent` keeps its name.** The Market Simulator package sketch calls the file `PromotionOutcomeV1.kt`, but the other two contracts are sketched as `PromotionScenarioEvent` and `PromotionDecisionEvent`. One naming scheme across three sibling event types is worth more here than matching each sketch letter by letter; the version is already carried by `schema_version` and `simulator_version` inside the type.
 - **The `src/evals/kotlin/` source set is not created.** The guideline reserves it, and it matters a great deal that evals stay separate from tests, but this change produces no eval and an empty source set would only be a place for one to be misfiled. It belongs to the change that writes the first eval.
 
 ## Ground-truth leakage

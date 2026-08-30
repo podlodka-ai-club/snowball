@@ -1,4 +1,4 @@
-package club.podlodka.snowball.contracts
+package club.podlodka.snowball.domain
 
 import java.nio.file.Path
 import kotlin.io.path.readText
