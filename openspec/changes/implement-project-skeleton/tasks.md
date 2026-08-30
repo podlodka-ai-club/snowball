@@ -34,6 +34,6 @@
 
 ## 5. Repository hygiene and acceptance
 
-- [x] 5.1 Add `.gitignore` for Gradle, JVM, and IDE artifacts, and `.env.example` with an empty `XMEMORY_API_KEY` and no other secret-bearing key.
+- [x] 5.1 Add `.gitignore` for Gradle, JVM, and IDE artifacts, and `.env.example` with an empty `XMEM_API_KEY` and no other secret-bearing key.
 - [x] 5.2 Add a CI workflow on push and pull request that checks out the repository, provisions Temurin JDK 21, sets up Gradle, and runs `./gradlew spotlessCheck build`.
 - [x] 5.3 Acceptance: from a clean clone on JDK 21, `./gradlew spotlessCheck build` succeeds, all three round-trip tests pass, and the diff contains no secret value and no modification to any committed schema or to `docs/`, `assets/`, `todo/`, or another change directory.

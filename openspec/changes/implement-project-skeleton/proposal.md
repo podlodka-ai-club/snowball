@@ -10,7 +10,7 @@ The repository holds architecture, versioned JSON contracts, and five component 
 - Add round-trip tests binding each model to its committed `*.example.json`.
 - Add the transport-neutral internal ports `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher` with trivial in-process implementations usable as test doubles.
 - Add one CI workflow running `./gradlew spotlessCheck build` on push and pull request.
-- Add `.gitignore` and `.env.example` with an empty `XMEMORY_API_KEY`.
+- Add `.gitignore` and `.env.example` with an empty `XMEM_API_KEY`, named as `docs/promotion-agent/README.md` names it.
 
 Non-goals, stated explicitly because this change touches files every component will later own:
 

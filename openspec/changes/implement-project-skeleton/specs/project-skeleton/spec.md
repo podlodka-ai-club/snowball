@@ -160,7 +160,7 @@ The repository SHALL commit a secret-free example environment file and SHALL ign
 
 #### Scenario: A contributor configures xmemory access
 - **WHEN** an API key is needed locally
-- **THEN** `.env.example` SHALL declare `XMEMORY_API_KEY` with an empty value, the real file SHALL be ignored by version control, and no key value SHALL appear in any tracked file
+- **THEN** `.env.example` SHALL declare `XMEM_API_KEY` with an empty value, using the name the component documentation uses, the real file SHALL be ignored by version control, and no key value SHALL appear in any tracked file
 
 ### Requirement: Continuous verification of the same command
 Continuous integration SHALL run the same verification command as a local contributor, on every push and pull request.
