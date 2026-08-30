@@ -1,0 +1,7 @@
+schema: spec-driven
+created: 2026-08-28
+goal: Establish durable xmemory schema and read/write integration contracts for PromotionCase and Lesson based learning.
+affected_areas:
+  - xmemory
+  - memory
+  - contracts

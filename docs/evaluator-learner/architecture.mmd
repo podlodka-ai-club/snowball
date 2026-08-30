@@ -1,0 +1,25 @@
+flowchart LR
+    I["Completed promotion\nscenario + chosen discount + outcome"]
+    E["Evaluator\nreplay 0 / 10 / 20 / 30\nfind best + regret"]
+    C["PromotionCase\nimmutable evaluated experience"]
+    L["Learner\nrecompute 2 Lessons\nSKU + category"]
+    X[("xmemory\nPromotionCase + Lessons")]
+
+    I --> E
+    E --> C
+    C --> L
+    C -->|"save evidence"| X
+    X -->|"read existing lesson evidence"| L
+    L -->|"update Lessons"| X
+
+    classDef input fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
+    classDef eval fill:#fff7ed,stroke:#f59e0b,stroke-width:2px,color:#0f172a;
+    classDef case fill:#f8fafc,stroke:#64748b,stroke-width:2px,color:#0f172a;
+    classDef learn fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#0f172a;
+    classDef memory fill:#f5f3ff,stroke:#7c3aed,stroke-width:2px,color:#0f172a;
+
+    class I input;
+    class E eval;
+    class C case;
+    class L learn;
+    class X memory;

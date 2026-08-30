@@ -1,0 +1,28 @@
+{
+  "event_type": "promotion.scenario.created",
+  "schema_version": 1,
+  "scenario_id": "SCN-20260718-LONDON_CENTRAL-ICE500",
+  "generated_at": "2026-07-18T06:00:00Z",
+  "source": {
+    "type": "dataset",
+    "reference": "dunnhumby-batf:fixture-0018"
+  },
+  "scenario": {
+    "date": "2026-07-18",
+    "store_id": "LONDON_CENTRAL",
+    "store_name": "London Central",
+    "sku_id": "ICE500",
+    "sku_name": "Ice Cream 500ml",
+    "category": "ice_cream",
+    "price": 5.0,
+    "cost": 3.0,
+    "stock": 320,
+    "baseline_sales": 100,
+    "stock_level": "high",
+    "day_type": "weekend",
+    "weather": "hot",
+    "temperature_c": 31.0,
+    "event_type": "local_event",
+    "event_note": "concert_nearby"
+  }
+}

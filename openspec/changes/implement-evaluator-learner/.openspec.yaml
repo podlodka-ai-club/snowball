@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-08-28
+goal: Implement deterministic counterfactual evaluation and Lesson learning from completed promotion outcomes.
+affected_areas:
+  - evaluator-learner
+  - simulation
+  - xmemory
+  - learning

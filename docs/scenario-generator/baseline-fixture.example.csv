@@ -1,0 +1,4 @@
+source_reference,sku_id,sku_name,category,price,cost,baseline_sales,stock
+dunnhumby-batf:store-<donor>:upc-<a>:week-001,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,100,250
+dunnhumby-batf:store-<donor>:upc-<b>:week-001,BEER6,Beer 6 Pack,beer,6.50,4.00,85,128
+dunnhumby-batf:store-<donor>:upc-<c>:week-001,COLA15,Soft Drink 1.5L,soft_drinks,2.20,1.25,140,350

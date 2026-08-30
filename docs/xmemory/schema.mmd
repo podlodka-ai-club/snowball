@@ -1,0 +1,21 @@
+flowchart LR
+    S["SKU\ncategory · base_price · cost"]
+    C["PromotionCase\nscenario · chosen action\noutcome · oracle · regret"]
+    L["Lesson\nscope · conditions · recommendation\nevidence · confidence · profit advantage"]
+
+    S -->|case_sku| C
+    C -->|lesson_evidence| L
+    L -.->|lesson_sku_scope\noptional| S
+
+    E["Evaluator / Learner"] -->|writes evaluated case| C
+    E -->|creates / updates lesson| L
+    L -->|top relevant lessons| A["Promotion Agent"]
+    A -->|chosen discount| C
+
+    classDef entity fill:#ffffff,stroke:#cbd5e1,stroke-width:2px,color:#0f172a;
+    classDef memory fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
+    classDef actor fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
+
+    class S entity;
+    class C,L memory;
+    class E,A actor;

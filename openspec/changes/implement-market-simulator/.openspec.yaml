@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-08-28
+goal: Implement the deterministic hidden Market Simulator that maps one promotion decision to one versioned business outcome.
+affected_areas:
+  - market-simulator
+  - kafka
+  - simulation
+  - contracts

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="920" viewBox="0 0 1500 920" role="img" aria-labelledby="title desc">
+  <title id="title">Evaluator Learner sequence</title>
+  <desc id="desc">Sequence from one completed promotion through four counterfactual replays, PromotionCase creation, and two Lesson updates in xmemory.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#64748b"/></marker>
+    <style>
+      .bg{fill:#f8fafc}.head{fill:#fff;stroke:#cbd5e1;stroke-width:2}.title{font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.sub{font:400 15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}.h{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#0f172a}.b{font:400 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}.step{font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#fff}.badge{fill:#475569}.life{stroke:#cbd5e1;stroke-width:2;stroke-dasharray:7 6}.msg{stroke:#64748b;stroke-width:2.5;marker-end:url(#a)}.note{fill:#fff7ed;stroke:#f59e0b;stroke-width:2}.done{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2}
+    </style>
+  </defs>
+  <rect class="bg" width="1500" height="920" rx="24"/>
+  <text class="title" x="48" y="58">Evaluator / Learner sequence</text>
+  <text class="sub" x="48" y="88">one completed promotion goes in; durable evaluated experience and two improved Lessons come out</text>
+
+  <rect class="head" x="55" y="125" width="210" height="64" rx="14"/><text class="h" x="92" y="164">Completed Promotion</text>
+  <rect class="head" x="325" y="125" width="190" height="64" rx="14"/><text class="h" x="385" y="164">Evaluator</text>
+  <rect class="head" x="575" y="125" width="220" height="64" rx="14"/><text class="h" x="613" y="164">Simulator Capability</text>
+  <rect class="head" x="855" y="125" width="180" height="64" rx="14"/><text class="h" x="918" y="164">Learner</text>
+  <rect class="head" x="1095" y="125" width="190" height="64" rx="14"/><text class="h" x="1160" y="164">xmemory</text>
+
+  <line class="life" x1="160" y1="189" x2="160" y2="845"/>
+  <line class="life" x1="420" y1="189" x2="420" y2="845"/>
+  <line class="life" x1="685" y1="189" x2="685" y2="845"/>
+  <line class="life" x1="945" y1="189" x2="945" y2="845"/>
+  <line class="life" x1="1190" y1="189" x2="1190" y2="845"/>
+
+  <circle class="badge" cx="310" cy="230" r="14"/><text class="step" x="306" y="234">1</text>
+  <line class="msg" x1="160" y1="230" x2="410" y2="230"/><text class="b" x="190" y="218">scenario + 10% + £252</text>
+
+  <circle class="badge" cx="555" cy="285" r="14"/><text class="step" x="551" y="289">2</text>
+  <line class="msg" x1="420" y1="285" x2="675" y2="285"/><text class="b" x="462" y="273">replay 0%</text>
+  <line class="msg" x1="685" y1="320" x2="430" y2="320"/><text class="b" x="530" y="309">£240</text>
+
+  <line class="msg" x1="420" y1="360" x2="675" y2="360"/><text class="b" x="462" y="348">replay 10%</text>
+  <line class="msg" x1="685" y1="395" x2="430" y2="395"/><text class="b" x="530" y="384">£252</text>
+
+  <line class="msg" x1="420" y1="435" x2="675" y2="435"/><text class="b" x="462" y="423">replay 20%</text>
+  <line class="msg" x1="685" y1="470" x2="430" y2="470"/><text class="b" x="530" y="459">£281</text>
+
+  <line class="msg" x1="420" y1="510" x2="675" y2="510"/><text class="b" x="462" y="498">replay 30%</text>
+  <line class="msg" x1="685" y1="545" x2="430" y2="545"/><text class="b" x="530" y="534">£263</text>
+
+  <rect class="note" x="315" y="580" width="315" height="72" rx="14"/>
+  <circle class="badge" cx="340" cy="606" r="14"/><text class="step" x="336" y="610">3</text>
+  <text class="h" x="365" y="611">Evaluate</text>
+  <text class="b" x="340" y="636">best = 20% · chosen = 10% · regret = £29</text>
+
+  <circle class="badge" cx="810" cy="690" r="14"/><text class="step" x="806" y="694">4</text>
+  <line class="msg" x1="420" y1="690" x2="1180" y2="690"/><text class="b" x="650" y="678">save PromotionCase CASE-v1-SCN-18</text>
+
+  <circle class="badge" cx="810" cy="745" r="14"/><text class="step" x="806" y="749">5</text>
+  <line class="msg" x1="420" y1="745" x2="935" y2="745"/><text class="b" x="590" y="733">case + SKU key + category key</text>
+
+  <line class="msg" x1="945" y1="785" x2="1180" y2="785"/><text class="b" x="980" y="773">read linked cases</text>
+  <line class="msg" x1="1190" y1="820" x2="955" y2="820"/><text class="b" x="1025" y="808">existing evidence</text>
+
+  <rect class="done" x="825" y="850" width="610" height="48" rx="14"/>
+  <text class="h" x="850" y="879">Learner recomputes and xmemory stores: SKU Lesson + category Lesson</text>
+</svg>

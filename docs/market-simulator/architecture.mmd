@@ -1,0 +1,29 @@
+flowchart LR
+    K[("promotion.decisions.v1")]
+
+    subgraph M["Market Simulator boundary"]
+        L["DecisionListener\nvalidate · manual ack"]
+        E["SimulationEngine\npure deterministic function"]
+        O["PromotionOutcomeV1\nunits_sold · gross_profit"]
+    end
+
+    C["SimulatorV1Config\nhidden coefficients · SIMULATOR_VERSION=v1"]
+    N["Deterministic scenario noise\nSHA-256(v1|scenario_id)"]
+
+    K --> L
+    L --> E
+    C --> E
+    N --> E
+    E --> O
+
+    classDef kafka fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
+    classDef service fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
+    classDef engine fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#0f172a;
+    classDef config fill:#fff7ed,stroke:#f59e0b,stroke-width:2px,color:#0f172a;
+    classDef outcome fill:#f8fafc,stroke:#64748b,stroke-width:2px,color:#0f172a;
+
+    class K kafka;
+    class L service;
+    class E engine;
+    class C,N config;
+    class O outcome;

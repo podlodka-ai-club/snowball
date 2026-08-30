@@ -1,0 +1,34 @@
+flowchart LR
+    K1[("promotion.scenarios.v1")]
+    C["ScenarioListener\nconsumer group: promotion-agent-v1"]
+    V["Validate + map\nPromotionScenario"]
+    J[("DecisionJournal\nfile-backed H2")]
+    M["XmemoryPromotionMemory\nread candidates"]
+    X[("xmemory\nSKU · PromotionCase · Lesson")]
+    R["Filter + rank\nmax 3 Lessons"]
+    P["PromptBuilder\nstable prompt"]
+    D["DecisionModel\n0 · 10 · 20 · 30"]
+    O["Validate output\nretry once · fallback 0"]
+    Pub["KafkaDecisionPublisher"]
+    K2[("promotion.decisions.v1")]
+    S["Market Simulator"]
+
+    K1 --> C --> V --> J
+    J -->|new / STARTED| M
+    X -->|candidate Lessons| M
+    M --> R --> P --> D --> O
+    O -->|persist DECIDED payload + trace| J
+    J -->|DECIDED payload| Pub
+    Pub --> K2 --> S
+    Pub -->|publish confirmed| J
+    J -->|COMPLETED → ack source offset| C
+
+    classDef kafka fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
+    classDef service fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
+    classDef memory fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#0f172a;
+    classDef journal fill:#fff7ed,stroke:#f59e0b,stroke-width:2px,color:#0f172a;
+
+    class K1,K2 kafka;
+    class C,V,M,R,P,D,O,Pub,S service;
+    class X memory;
+    class J journal;

@@ -1,0 +1,236 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860" role="img" aria-labelledby="title desc">
+  <title id="title">Animated self-learning FMCG promotion agent</title>
+  <desc id="desc">A slow 36-second loop showing a cold-memory promotion decision, market outcome, counterfactual evaluation, memory write, then a similar scenario where the same agent reads the lesson and improves its decision.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+    <style>
+      .bg { fill:#f8fafc; }
+      .title { font:700 32px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#0f172a; }
+      .subtitle { font:400 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#64748b; }
+      .round { font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; letter-spacing:1.3px; fill:#475569; }
+      .card { fill:#ffffff; stroke:#cbd5e1; stroke-width:2; }
+      .cardAgent { fill:#eff6ff; stroke:#3b82f6; stroke-width:2.5; }
+      .cardEval { fill:#fff7ed; stroke:#f59e0b; stroke-width:2.5; }
+      .cardMem { fill:#f5f3ff; stroke:#7c3aed; stroke-width:2.5; }
+      .cardGood { fill:#ecfdf5; stroke:#10b981; stroke-width:2.5; }
+      .h { font:700 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#0f172a; }
+      .body { font:400 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#475569; }
+      .metric { font:700 18px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#0f172a; }
+      .bad { fill:#c2410c; }
+      .good { fill:#047857; }
+      .purple { fill:#6d28d9; }
+      .arrow { fill:none; stroke:#64748b; stroke-width:3; marker-end:url(#arrow); }
+      .arrowMem { fill:none; stroke:#7c3aed; stroke-width:3; marker-end:url(#arrowPurple); }
+      .label { font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; letter-spacing:.8px; fill:#6d28d9; }
+      .footer { font:700 20px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#0f172a; }
+      .footer2 { font:400 15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#64748b; }
+      .step { font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#0f172a; }
+      .stepSub { font:400 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill:#64748b; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="860" rx="24"/>
+
+  <text class="title" x="54" y="58">How one bad discount becomes a better next decision</text>
+  <text class="subtitle" x="54" y="88">A slow 36-second loop: act → evaluate → write memory → read memory → change behavior.</text>
+
+  <text class="round" x="54" y="142">ROUND 1 · COLD MEMORY</text>
+
+  <g id="r1-scenario">
+    <rect class="card" x="54" y="165" width="220" height="150" rx="16"/>
+    <text class="h" x="76" y="198">1 · Scenario</text>
+    <text class="body" x="76" y="227">Ice cream</text>
+    <text class="body" x="76" y="250">31°C · Saturday</text>
+    <text class="body" x="76" y="273">High stock</text>
+  </g>
+
+  <g id="r1-agent">
+    <rect class="cardAgent" x="322" y="165" width="220" height="150" rx="16"/>
+    <text class="h" x="344" y="198">2 · Promotion Agent</text>
+    <text class="body" x="344" y="227">No useful lesson yet</text>
+    <text class="metric bad" x="344" y="263">Chooses 10%</text>
+  </g>
+
+  <g id="r1-sim">
+    <rect class="card" x="590" y="165" width="220" height="150" rx="16"/>
+    <text class="h" x="612" y="198">3 · Market Simulator</text>
+    <text class="body" x="612" y="227">Hidden demand model</text>
+    <text class="body" x="612" y="250">Sales + margin</text>
+    <text class="metric" x="612" y="283">Profit £248</text>
+  </g>
+
+  <g id="r1-eval">
+    <rect class="cardEval" x="858" y="165" width="220" height="150" rx="16"/>
+    <text class="h" x="880" y="198">4 · Evaluator</text>
+    <text class="body" x="880" y="227">Replay 0 / 10 / 20 / 30%</text>
+    <text class="metric good" x="880" y="260">Best = 20%</text>
+    <text class="metric bad" x="880" y="289">Regret = £43</text>
+  </g>
+
+  <g id="r1-memory">
+    <rect class="cardMem" x="1126" y="165" width="220" height="150" rx="16"/>
+    <text class="h" x="1148" y="198">5 · xmemory WRITE</text>
+    <text class="body" x="1148" y="227">hot + weekend</text>
+    <text class="body" x="1148" y="250">ice cream + high stock</text>
+    <text class="metric purple" x="1148" y="283">Prefer 20%</text>
+  </g>
+
+  <path class="arrow" d="M274 240 H312"/>
+  <path class="arrow" d="M542 240 H580"/>
+  <path class="arrow" d="M810 240 H848"/>
+  <path class="arrow" d="M1078 240 H1116"/>
+
+  <path class="arrowMem" d="M1236 315 V382 H310 V452"/>
+  <text class="label" x="690" y="374">PERSISTENT LESSON SURVIVES INTO THE NEXT TASK</text>
+
+  <text class="round" x="54" y="440">ROUND 2 · MEMORY READ</text>
+
+  <g id="r2-scenario">
+    <rect class="card" x="54" y="463" width="220" height="150" rx="16"/>
+    <text class="h" x="76" y="496">6 · Similar Scenario</text>
+    <text class="body" x="76" y="525">Ice cream</text>
+    <text class="body" x="76" y="548">30°C · Sunday</text>
+    <text class="body" x="76" y="571">High stock</text>
+  </g>
+
+  <g id="r2-memory">
+    <rect class="cardMem" x="322" y="463" width="220" height="150" rx="16"/>
+    <text class="h" x="344" y="496">7 · xmemory READ</text>
+    <text class="body" x="344" y="525">Relevant lesson found</text>
+    <text class="body" x="344" y="548">hot + weekend + ice cream</text>
+    <text class="metric purple" x="344" y="581">Prefer 20%</text>
+  </g>
+
+  <g id="r2-agent">
+    <rect class="cardGood" x="590" y="463" width="220" height="150" rx="16"/>
+    <text class="h" x="612" y="496">8 · Same Agent</text>
+    <text class="body" x="612" y="525">Uses retrieved experience</text>
+    <text class="metric good" x="612" y="561">Chooses 20%</text>
+  </g>
+
+  <g id="r2-sim">
+    <rect class="card" x="858" y="463" width="220" height="150" rx="16"/>
+    <text class="h" x="880" y="496">9 · Market Simulator</text>
+    <text class="body" x="880" y="525">Same hidden rules</text>
+    <text class="body" x="880" y="548">New scenario outcome</text>
+    <text class="metric" x="880" y="581">Profit £286</text>
+  </g>
+
+  <g id="r2-eval">
+    <rect class="cardGood" x="1126" y="463" width="220" height="150" rx="16"/>
+    <text class="h" x="1148" y="496">10 · Evaluator</text>
+    <text class="metric good" x="1148" y="535">Best = 20%</text>
+    <text class="metric good" x="1148" y="570">Regret = £0</text>
+  </g>
+
+  <path class="arrowMem" d="M274 538 H312"/>
+  <path class="arrowMem" d="M542 538 H580"/>
+  <path class="arrow" d="M810 538 H848"/>
+  <path class="arrow" d="M1078 538 H1116"/>
+
+  <g fill="none" stroke-width="6">
+    <rect x="49" y="160" width="230" height="160" rx="20" stroke="#3b82f6" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;1;1;0;0" keyTimes="0;0.01;0.105;0.12;1"/>
+    </rect>
+    <rect x="317" y="160" width="230" height="160" rx="20" stroke="#3b82f6" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.10;0.12;0.215;0.23;1"/>
+    </rect>
+    <rect x="585" y="160" width="230" height="160" rx="20" stroke="#3b82f6" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.215;0.23;0.325;0.34;1"/>
+    </rect>
+    <rect x="853" y="160" width="230" height="160" rx="20" stroke="#f59e0b" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.325;0.34;0.435;0.45;1"/>
+    </rect>
+    <rect x="1121" y="160" width="230" height="160" rx="20" stroke="#7c3aed" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.435;0.45;0.545;0.56;1"/>
+    </rect>
+
+    <rect x="49" y="458" width="230" height="160" rx="20" stroke="#3b82f6" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.545;0.56;0.655;0.67;1"/>
+    </rect>
+    <rect x="317" y="458" width="230" height="160" rx="20" stroke="#7c3aed" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.655;0.67;0.765;0.78;1"/>
+    </rect>
+    <rect x="585" y="458" width="230" height="160" rx="20" stroke="#10b981" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.765;0.78;0.875;0.89;1"/>
+    </rect>
+    <rect x="1121" y="458" width="230" height="160" rx="20" stroke="#10b981" opacity="0">
+      <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.875;0.89;0.985;1"/>
+    </rect>
+  </g>
+
+  <circle r="10" cy="240" fill="#3b82f6" stroke="#ffffff" stroke-width="3" opacity="0">
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.44;0.45;1"/>
+    <animate attributeName="cx" dur="36s" repeatCount="indefinite" values="164;164;432;432;700;700;968;968;1236;1236" keyTimes="0;0.10;0.12;0.215;0.23;0.325;0.34;0.435;0.45;1"/>
+  </circle>
+
+  <circle r="10" fill="#7c3aed" stroke="#ffffff" stroke-width="3" opacity="0">
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.44;0.45;0.66;0.67;1"/>
+    <animate attributeName="cx" dur="36s" repeatCount="indefinite" values="1236;1236;1236;310;310;310" keyTimes="0;0.44;0.48;0.62;0.67;1"/>
+    <animate attributeName="cy" dur="36s" repeatCount="indefinite" values="315;315;382;382;452;452" keyTimes="0;0.44;0.48;0.62;0.67;1"/>
+  </circle>
+
+  <circle r="10" cy="538" fill="#10b981" stroke="#ffffff" stroke-width="3" opacity="0">
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.66;0.67;0.99;1"/>
+    <animate attributeName="cx" dur="36s" repeatCount="indefinite" values="432;432;700;700;968;968;1236;1236" keyTimes="0;0.66;0.78;0.80;0.89;0.91;0.99;1"/>
+  </circle>
+
+  <rect x="54" y="654" width="1292" height="82" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <g>
+    <text class="step" x="82" y="688">01 · New scenario: the agent has no relevant memory yet.</text>
+    <text class="stepSub" x="82" y="714">Ice cream · hot Saturday · high stock.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.105;0.12;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step" x="82" y="688">02 · With no useful lesson, the agent chooses 10%.</text>
+    <text class="stepSub" x="82" y="714">This is the action that will be evaluated.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.10;0.12;0.215;0.23;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step" x="82" y="688">03 · The simulator returns sales and gross profit.</text>
+    <text class="stepSub" x="82" y="714">Its hidden demand rules are unknown to the agent.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.215;0.23;0.325;0.34;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step" x="82" y="688">04 · Counterfactual evaluation finds the mistake.</text>
+    <text class="stepSub" x="82" y="714">20% was optimal. The 10% action left £43 on the table.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.325;0.34;0.435;0.45;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step" x="82" y="688">05 · xmemory writes a durable lesson.</text>
+    <text class="stepSub" x="82" y="714">Hot weekend + ice cream + high stock → prefer 20% over 10%.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.435;0.45;0.545;0.56;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step" x="82" y="688">06 · A new but similar scenario arrives.</text>
+    <text class="stepSub" x="82" y="714">Same product family and conditions, different day.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.545;0.56;0.655;0.67;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step" x="82" y="688">07 · Before acting, the agent reads the relevant lesson.</text>
+    <text class="stepSub" x="82" y="714">The model and prompt are unchanged. The available experience is not.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.655;0.67;0.765;0.78;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step" x="82" y="688">08 · Memory changes behavior: the same agent now chooses 20%.</text>
+    <text class="stepSub" x="82" y="714">This is the self-improvement we want to measure.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.765;0.78;0.875;0.89;1"/>
+  </g>
+  <g opacity="0">
+    <text class="step good" x="82" y="688">09 · Evaluator confirms 20% is optimal. Regret falls to £0.</text>
+    <text class="stepSub" x="82" y="714">The lesson gains another piece of evidence and can become more confident.</text>
+    <animate attributeName="opacity" dur="36s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.875;0.89;0.985;1"/>
+  </g>
+
+  <rect x="54" y="758" width="1292" height="72" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="footer" x="82" y="790">Cold memory: 10% → £43 regret</text>
+  <text class="footer" x="570" y="790">→</text>
+  <text class="footer good" x="618" y="790">Trained memory: 20% → £0 regret</text>
+  <text class="footer2" x="82" y="815">Same model · Same prompt · Same simulator · Better decision because accumulated memory changed behavior</text>
+</svg>
