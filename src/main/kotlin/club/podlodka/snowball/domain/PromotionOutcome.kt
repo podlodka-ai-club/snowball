@@ -15,4 +15,8 @@ data class PromotionOutcome(
     val unitsSold: Int,
     @JsonProperty("gross_profit", required = true)
     val grossProfit: Double,
-)
+) {
+    init {
+        require(unitsSold >= 0) { "outcome.units_sold must not be negative, was $unitsSold" }
+    }
+}

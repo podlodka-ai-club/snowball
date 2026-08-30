@@ -34,6 +34,10 @@ data class PromotionScenarioEvent(
     @JsonProperty("scenario", required = true)
     val scenario: PromotionScenario,
 ) {
+    init {
+        require(scenarioId.isNotEmpty()) { "scenario_id must not be empty" }
+    }
+
     constructor(
         scenarioId: String,
         generatedAt: OffsetDateTime,

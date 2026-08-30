@@ -48,6 +48,12 @@ data class PromotionOutcomeEvent(
     @JsonProperty("outcome", required = true)
     val outcome: PromotionOutcome,
 ) {
+    init {
+        require(outcomeId.isNotEmpty()) { "outcome_id must not be empty" }
+        require(decisionId.isNotEmpty()) { "decision_id must not be empty" }
+        require(scenarioId.isNotEmpty()) { "scenario_id must not be empty" }
+    }
+
     constructor(
         outcomeId: String,
         decisionId: String,

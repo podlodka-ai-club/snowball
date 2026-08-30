@@ -56,7 +56,12 @@ data class ScenarioSource(
     val type: String,
     @JsonProperty("reference", required = true)
     val reference: String,
-)
+) {
+    init {
+        require(type.isNotEmpty()) { "source.type must not be empty" }
+        require(reference.isNotEmpty()) { "source.reference must not be empty" }
+    }
+}
 
 /**
  * The `scenario` object of `promotion-scenario-v1.schema.json`.
@@ -115,4 +120,17 @@ data class PromotionScenario(
     val temperatureC: Double? = null,
     @JsonProperty("event_note")
     val eventNote: String? = null,
-)
+) {
+    init {
+        require(storeId.isNotEmpty()) { "scenario.store_id must not be empty" }
+        require(skuId.isNotEmpty()) { "scenario.sku_id must not be empty" }
+        require(category.isNotEmpty()) { "scenario.category must not be empty" }
+        require(price > 0) { "scenario.price must be greater than 0, was $price" }
+        require(cost >= 0) { "scenario.cost must not be negative, was $cost" }
+        require(stock >= 0) { "scenario.stock must not be negative, was $stock" }
+        require(baselineSales >= 0) { "scenario.baseline_sales must not be negative, was $baselineSales" }
+        require(storeName == null || storeName.isNotEmpty()) { "scenario.store_name must not be empty" }
+        require(skuName == null || skuName.isNotEmpty()) { "scenario.sku_name must not be empty" }
+        require(eventNote == null || eventNote.isNotEmpty()) { "scenario.event_note must not be empty" }
+    }
+}

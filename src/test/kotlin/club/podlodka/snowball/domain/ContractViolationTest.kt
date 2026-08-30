@@ -95,6 +95,70 @@ class ContractViolationTest {
     }
 
     @Test
+    fun `a value of the wrong JSON type is rejected`() {
+        val stringPrice = scenarioTree()
+        (stringPrice.get("scenario") as ObjectNode).put("price", "5.0")
+        assertRejects<PromotionScenarioEvent>(stringPrice)
+
+        val fractionalStock = scenarioTree()
+        (fractionalStock.get("scenario") as ObjectNode).put("stock", 1.5)
+        assertRejects<PromotionScenarioEvent>(fractionalStock)
+
+        val stringDiscount = decisionTree()
+        (stringDiscount.get("decision") as ObjectNode).put("discount", "20")
+        assertRejects<PromotionDecisionEvent>(stringDiscount)
+
+        val fractionalUnits = outcomeTree()
+        (fractionalUnits.get("outcome") as ObjectNode).put("units_sold", 3.7)
+        assertRejects<PromotionOutcomeEvent>(fractionalUnits)
+    }
+
+    @Test
+    fun `an explicit null in an optional field is rejected`() {
+        // The schema allows these fields to be absent, but never to be present and null.
+        val document = scenarioTree()
+        (document.get("scenario") as ObjectNode).putNull("store_name")
+
+        assertRejects<PromotionScenarioEvent>(document)
+    }
+
+    @Test
+    fun `a string shorter than the schema minimum is rejected`() {
+        assertRejects<PromotionScenarioEvent>(scenarioTree().apply { put("scenario_id", "") })
+
+        val emptyReference = scenarioTree()
+        (emptyReference.get("source") as ObjectNode).put("reference", "")
+        assertRejects<PromotionScenarioEvent>(emptyReference)
+
+        val emptySkuName = scenarioTree()
+        (emptySkuName.get("scenario") as ObjectNode).put("sku_name", "")
+        assertRejects<PromotionScenarioEvent>(emptySkuName)
+    }
+
+    @Test
+    fun `a number outside the schema bounds is rejected`() {
+        val zeroPrice = scenarioTree()
+        (zeroPrice.get("scenario") as ObjectNode).put("price", 0.0)
+        assertRejects<PromotionScenarioEvent>(zeroPrice)
+
+        val negativeCost = scenarioTree()
+        (negativeCost.get("scenario") as ObjectNode).put("cost", -1.0)
+        assertRejects<PromotionScenarioEvent>(negativeCost)
+
+        val negativeStock = scenarioTree()
+        (negativeStock.get("scenario") as ObjectNode).put("stock", -1)
+        assertRejects<PromotionScenarioEvent>(negativeStock)
+
+        val negativeBaseline = scenarioTree()
+        (negativeBaseline.get("scenario") as ObjectNode).put("baseline_sales", -1)
+        assertRejects<PromotionScenarioEvent>(negativeBaseline)
+
+        val negativeUnits = outcomeTree()
+        (negativeUnits.get("outcome") as ObjectNode).put("units_sold", -1)
+        assertRejects<PromotionOutcomeEvent>(negativeUnits)
+    }
+
+    @Test
     fun `the committed examples themselves parse`() {
         assertThatCode {
             mapper.readValue<PromotionScenarioEvent>(CommittedDocs.read(CommittedDocs.SCENARIO_EXAMPLE))

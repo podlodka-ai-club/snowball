@@ -20,10 +20,11 @@
 - [x] 3.3 Add the same round-trip test for `promotion-outcome-v1.example.json`.
 - [x] 3.4 Add negative tests proving that a missing required field, an unknown property, and an out-of-enumeration value are all rejected at parse time.
 - [x] 3.5 Add a test proving the constant envelope fields round-trip unchanged and that a conflicting constant is rejected.
+- [x] 3.6 Add negative tests for the constraints Jackson's defaults would otherwise accept: a wrong JSON type, an explicit null in an optional field, an empty `minLength: 1` string, and a number outside its schema bounds.
 
 ## 4. Internal ports
 
-- [x] 4.1 Add `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher` as plain Kotlin interfaces over the contract models, with no transport, framework, or configuration types in their signatures.
+- [x] 4.1 Add `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher` as plain Kotlin interfaces over the contract models, with no transport, framework, or configuration types in their signatures. `SimulationPort` takes the scenario identity alongside the payload, as the documented simulator engine does.
 - [x] 4.2 Add trivial in-process implementations - a fixed-answer simulation and recording sink/publisher - suitable as test doubles and containing no domain arithmetic.
 - [x] 4.3 Add tests showing each port can be exercised in-process and that `SimulationPort` returns only the committed outcome payload, exposing no coefficients, noise, counterfactuals, or oracle result.
 

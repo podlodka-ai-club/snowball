@@ -15,16 +15,17 @@ import club.podlodka.snowball.port.SimulationPort
 class FixedSimulation(
     private val outcome: PromotionOutcome,
 ) : SimulationPort {
-    private val invocations = mutableListOf<Pair<PromotionScenario, Discount>>()
+    private val invocations = mutableListOf<Triple<String, PromotionScenario, Discount>>()
 
-    /** Scenario/discount pairs this port was called with, in call order. */
-    val calls: List<Pair<PromotionScenario, Discount>> get() = invocations.toList()
+    /** Scenario id, scenario, and discount this port was called with, in call order. */
+    val calls: List<Triple<String, PromotionScenario, Discount>> get() = invocations.toList()
 
     override fun simulate(
+        scenarioId: String,
         scenario: PromotionScenario,
         discount: Discount,
     ): PromotionOutcome {
-        invocations += scenario to discount
+        invocations += Triple(scenarioId, scenario, discount)
         return outcome
     }
 }

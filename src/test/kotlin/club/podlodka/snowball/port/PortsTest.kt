@@ -32,12 +32,12 @@ class PortsTest {
     fun `simulation port returns only the committed outcome payload`() {
         val expected = PromotionOutcome(unitsSold = 320, grossProfit = 320.0)
         val simulation = FixedSimulation(expected)
-        val scenario = scenarioEvent().scenario
+        val event = scenarioEvent()
 
-        val result = simulation.simulate(scenario, Discount.TWENTY)
+        val result = simulation.simulate(event.scenarioId, event.scenario, Discount.TWENTY)
 
         assertThat(result).isEqualTo(expected)
-        assertThat(simulation.calls).containsExactly(scenario to Discount.TWENTY)
+        assertThat(simulation.calls).containsExactly(Triple(event.scenarioId, event.scenario, Discount.TWENTY))
 
         // The outcome payload has exactly the two properties the schema allows, so there is nowhere
         // for coefficients, noise, counterfactuals, or an oracle answer to leak through this port.
@@ -77,7 +77,8 @@ class PortsTest {
     }
 
     @Test
-    fun `port signatures name only contract types`() {
+    fun `port signatures name only contract types and JDK basics`() {
+        val allowedPackages = setOf("club.podlodka.snowball.domain", "java.lang")
         val ports = listOf(SimulationPort::class.java, OutcomeSink::class.java, ScenarioPublisher::class.java)
 
         ports.forEach { port ->
@@ -86,7 +87,7 @@ class PortsTest {
                 types.filterNot { it.isPrimitive }.forEach { type ->
                     assertThat(type.packageName)
                         .describedAs("%s.%s uses %s", port.simpleName, method.name, type.name)
-                        .isEqualTo("club.podlodka.snowball.domain")
+                        .isIn(allowedPackages)
                 }
             }
         }

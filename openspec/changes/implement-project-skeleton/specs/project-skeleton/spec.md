@@ -53,7 +53,7 @@ Each of the three contracts SHALL support a lossless round trip: parsing a commi
 - **THEN** parsing SHALL succeed and serialization SHALL NOT emit those fields as explicit nulls
 
 ### Requirement: Contract violations fail at the boundary
-Deserialization SHALL reject a document that the committed schema would reject on required fields, closed enumerations, constant envelope values, and unknown properties.
+Deserialization SHALL reject a document that the committed schema would reject on required fields, closed enumerations, constant envelope values, unknown properties, JSON types, string lengths, and numeric bounds. Construction of a model directly in Kotlin SHALL enforce the same invariants.
 
 #### Scenario: A required field is missing
 - **WHEN** a document omits a field listed as required by its schema
@@ -71,6 +71,18 @@ Deserialization SHALL reject a document that the committed schema would reject o
 - **WHEN** `event_type`, `schema_version`, or `simulator_version` does not equal the constant fixed by the schema
 - **THEN** deserialization SHALL fail, and for a valid document those constants SHALL survive the round trip unchanged
 
+#### Scenario: A value has the wrong JSON type
+- **WHEN** a `number` field carries a string, or an `integer` field carries a fractional number
+- **THEN** deserialization SHALL fail rather than coerce the value, since the schema constrains the JSON type
+
+#### Scenario: An optional field is present and null
+- **WHEN** a field the schema declares optional is present with an explicit `null`
+- **THEN** deserialization SHALL fail, because the schema permits the field to be absent but never to be null
+
+#### Scenario: A string or number falls outside its schema bounds
+- **WHEN** a `minLength: 1` string is empty, or `price` is not greater than zero, or `cost`, `stock`, `baseline_sales`, or `units_sold` is negative
+- **THEN** the value SHALL be rejected, whether it arrives through deserialization or through direct construction
+
 ### Requirement: Transport-neutral internal ports
 The module SHALL define `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher` as plain interfaces over the contract models, and their signatures SHALL NOT name any messaging, framework, persistence, or configuration type.
 
@@ -82,12 +94,20 @@ The module SHALL define `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher`
 - **WHEN** a test requires a working port
 - **THEN** a trivial in-process implementation SHALL be available that records or returns fixed values and contains no domain arithmetic
 
+#### Scenario: The simulator needs the scenario identity
+- **WHEN** `SimulationPort` is called
+- **THEN** it SHALL receive `scenario_id` as well as the scenario payload and the discount, because the documented deterministic noise is derived from `v1|<scenario_id>` and the committed `scenario` object does not carry the id
+
 ### Requirement: The skeleton carries no domain behavior
 The module SHALL NOT contain simulator coefficients or formulas, oracle selection, regret calculation, Lesson derivation, prompt construction, model invocation, or xmemory access.
 
 #### Scenario: The simulation port is exercised
 - **WHEN** `SimulationPort` is called through the implementation shipped by this change
 - **THEN** it SHALL return only the committed outcome payload and SHALL expose no coefficient, noise factor, counterfactual set, or oracle-best action
+
+#### Scenario: A component is wired to a real simulation
+- **WHEN** a later change supplies a real `SimulationPort` implementation
+- **THEN** it SHALL NOT be reachable from the Promotion Agent, since any holder can call it once per allowed discount and reconstruct the counterfactual profits for the current scenario, which the narrow return type alone does not prevent
 
 #### Scenario: A component change begins
 - **WHEN** the Market Simulator, Promotion Agent, Scenario Generator, Evaluator/Learner, or xmemory change is implemented
