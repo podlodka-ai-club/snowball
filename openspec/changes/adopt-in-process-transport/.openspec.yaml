@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-08-30
+goal: Replace the two Kafka topics with in-process handoff behind ports plus a durable run ledger, keeping the committed event contracts unchanged.
+affected_areas:
+  - transport
+  - run-orchestration
+  - contracts
+  - benchmark

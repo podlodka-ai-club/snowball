@@ -13,6 +13,8 @@ Recommended implementation order:
 
 `implement-project-skeleton` comes first because every component change starts by asking for typed models of the same committed JSON contracts, so building them once removes the merge conflict that parallel work would otherwise create.
 
+`adopt-in-process-transport` is a cross-cutting decision rather than a component, so it is not a numbered step. It defers the two Kafka topics to in-process handoff behind ports and amends the transport requirements of `implement-scenario-generator`, `implement-promotion-agent`, and `implement-market-simulator`. Read it after the skeleton and before any of the three, because their committed transport tasks predate it.
+
 Promotion Agent and Market Simulator can be developed in parallel once the committed scenario/decision contracts are treated as fixed. Evaluator/Learner depends on the pure simulation capability and xmemory schema.
 
 Each change follows the OpenSpec `spec-driven` workflow: `proposal.md -> specs + design.md -> tasks.md -> apply`.
