@@ -4,7 +4,7 @@
 - [ ] 1.2 Add fixture invariant checks: `date` and `split` present, `split` is `training` or `benchmark`, every benchmark date strictly later than every training date, `baseline_sales` non-zero, prices and costs within the schema bounds.
 - [ ] 1.3 Add tests for each rejection above, using a small hand-written fixture rather than the real dataset.
 
-- [ ] 1.4 Prepare the real fixture from dunnhumby with `tools/prepare_dunnhumby.py`. The dataset must be downloaded manually from the dunnhumby source-files page and extracted outside this repository; the raw data is never committed.
+- [x] 1.4 Prepare the real fixture from dunnhumby with `tools/prepare_dunnhumby.py`. The dataset must be downloaded manually from the dunnhumby source-files page and extracted outside this repository; the raw data is never committed.
 
 ## 2. Generation logic
 

@@ -51,6 +51,33 @@ For the MVP this is accepted. The dataset supplies `price`, `baseline_sales`, `c
 
 **Revisit trigger.** Move the context onto real dates if the first training runs show any of: a trained agent that does not beat the best constant action; lessons whose recommendation is constant across every context bucket; or a clean-versus-trained delta that survives shuffling the context labels. Any of those means the learned signal is an artifact of our own rules rather than of the data, and the reserve option becomes the cheaper fix.
 
+## What the real fixture turned out to require
+
+The fixture was built from the real dataset and then checked by replaying all four actions over
+every row. Two things the plan did not anticipate came out of that, and both are recorded here
+because they are calibration decisions, not implementation details.
+
+**Donor series must be chosen by volume, not by history length.** Selecting the longest clean
+series gave a daily baseline of 1-9 units. At that volume the simulator's discount lifts vanish
+into integer rounding, every action sells the same number of units, and the scenario teaches
+nothing. Selecting by median non-promotional units instead gives 7-28, which is the smallest
+range in which the four actions separate. The dataset does not offer more: nothing in it exceeds
+156 units a week, so a daily baseline above ~22 is unavailable at any selection.
+
+**The synthetic cost ratios are calibration and had to be fitted.** With realistic grocery
+margins of 30-45 percent the oracle chose 0 percent in 250 of 300 scenarios, and the best action
+beat "always 0 percent" by 0.09 on average - an agent answering 0 percent every time would have
+been near-optimal, and the before/after delta would have been noise. The fitted ratios spread the
+oracle across 0/10/20 percent roughly evenly and, more importantly, make the best action differ
+per SKU: meat almost always wants 0 percent, ice cream and chips want 20 percent. That is what
+gives a Lesson keyed on SKU something to carry.
+
+The resulting margins of 44-68 percent are higher than real grocery retail. This is a property of
+the synthetic world chosen to make the action space discriminable, and it must be presented that
+way rather than as a finding about the data. `docs/market-simulator/README.md` anticipates exactly
+this step - calibrate against the prepared fixture, then freeze - and the coefficients must not
+move again once training evidence exists.
+
 ## Risks / Trade-offs
 
 - **Deterministic synthetic context is less realistic** than real weather and events, but it keeps training and benchmark behavior reproducible, which is the whole point of the exercise.
