@@ -78,6 +78,34 @@ way rather than as a finding about the data. `docs/market-simulator/README.md` a
 this step - calibrate against the prepared fixture, then freeze - and the coefficients must not
 move again once training evidence exists.
 
+## How to run it
+
+Preparing the fixture is offline and manual, because the dataset needs terms accepted on the
+dunnhumby site:
+
+```bash
+python3 tools/prepare_dunnhumby.py \
+    --raw ~/datasets/dunnhumby-breakfast-at-the-frat \
+    --out src/test/resources/fixtures/baseline.csv
+```
+
+Generation itself takes no configuration beyond its defaults - the market is `LONDON_CENTRAL`, the
+source type is `dataset`, and the fixture path is a constructor argument:
+
+```kotlin
+val service = ScenarioGenerationService(
+    baselineSource = DatasetBaselineSource { Path.of("...baseline.csv").reader() },
+    contextEnricher = DeterministicContextEnricher(),
+    publisher = publisher,
+)
+val report = ScenarioGenerationTrigger(service).runNow(DatasetSplit.TRAINING)
+```
+
+`generate()` returns what it published and what it refused, with a reason per row, so a rejected
+fixture is visible rather than silent. The end-to-end path is covered by
+`ScenarioGenerationServiceTest`, which runs all 300 committed rows through the service and
+validates every emitted event against the committed schema.
+
 ## Risks / Trade-offs
 
 - **Deterministic synthetic context is less realistic** than real weather and events, but it keeps training and benchmark behavior reproducible, which is the whole point of the exercise.
