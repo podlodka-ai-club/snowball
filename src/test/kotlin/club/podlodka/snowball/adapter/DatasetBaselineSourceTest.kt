@@ -13,9 +13,7 @@ class DatasetBaselineSourceTest {
     private val header = DatasetBaselineSource.REQUIRED_COLUMNS.joinToString(",")
 
     private fun source(vararg rows: String) =
-        DatasetBaselineSource {
-            StringReader((listOf(header) + rows).joinToString("\n"))
-        }
+        DatasetBaselineSource { StringReader((listOf(header) + rows).joinToString("\n")) }
 
     private fun row(
         date: String = "2026-06-03",
@@ -27,25 +25,29 @@ class DatasetBaselineSourceTest {
         sku: String = "ICE500",
     ) = "ref-$sku-$date,$date,$split,$sku,Ice Cream 500ml,ice_cream,$price,$cost,$baseline,$stock"
 
+    private fun committed() =
+        DatasetBaselineSource { javaClass.getResourceAsStream("/fixtures/baseline.csv")!!.reader() }
+
     @Test
     fun `a well formed fixture is read`() {
-        val records = source(row(), row(date = "2026-07-07", split = "benchmark")).load()
+        val load = source(row(), row(date = "2026-07-07", split = "benchmark")).load()
 
-        assertThat(records).hasSize(2)
-        assertThat(records[0].split).isEqualTo(DatasetSplit.TRAINING)
-        assertThat(records[1].split).isEqualTo(DatasetSplit.BENCHMARK)
+        assertThat(load.records).hasSize(2)
+        assertThat(load.rejections).isEmpty()
+        assertThat(load.records[0].split).isEqualTo(DatasetSplit.TRAINING)
+        assertThat(load.records[1].split).isEqualTo(DatasetSplit.BENCHMARK)
     }
 
     @Test
     fun `stock level is derived at twice the baseline`() {
-        val records = source(row(baseline = "100", stock = "199"), row(baseline = "100", stock = "200")).load()
+        val load = source(row(baseline = "100", stock = "199"), row(baseline = "100", stock = "200")).load()
 
-        assertThat(records[0].stockLevel).isEqualTo(StockLevel.NORMAL)
-        assertThat(records[1].stockLevel).isEqualTo(StockLevel.HIGH)
+        assertThat(load.records[0].stockLevel).isEqualTo(StockLevel.NORMAL)
+        assertThat(load.records[1].stockLevel).isEqualTo(StockLevel.HIGH)
     }
 
     @Test
-    fun `a missing column is rejected`() {
+    fun `a missing column fails the whole file`() {
         val truncated = DatasetBaselineSource { StringReader("source_reference,sku_id\nref,ICE500") }
 
         assertThatExceptionOfType(FixtureRejection::class.java)
@@ -54,21 +56,56 @@ class DatasetBaselineSourceTest {
     }
 
     @Test
-    fun `an unknown split value is rejected`() {
-        assertThatExceptionOfType(FixtureRejection::class.java)
-            .isThrownBy { source(row(split = "validation")).load() }
-            .withMessageContaining("training or benchmark")
+    fun `a bad row is reported but the rest of the batch survives`() {
+        val load =
+            source(
+                row(sku = "GOOD1"),
+                row(sku = "BAD1", split = "validation"),
+                row(sku = "GOOD2"),
+            ).load()
+
+        assertThat(load.records.map { it.skuId }).containsExactly("GOOD1", "GOOD2")
+        assertThat(load.rejections).hasSize(1)
+        assertThat(load.rejections.single().reason).contains("training or benchmark")
+        assertThat(load.rejections.single().sourceReference).contains("BAD1")
     }
 
     @Test
-    fun `a row without demand is rejected`() {
-        assertThatExceptionOfType(FixtureRejection::class.java)
-            .isThrownBy { source(row(baseline = "0")).load() }
-            .withMessageContaining("baseline_sales")
+    fun `a row without demand is reported and skipped`() {
+        val load = source(row(baseline = "0")).load()
+
+        assertThat(load.records).isEmpty()
+        assertThat(load.rejections.single().reason).contains("baseline_sales")
     }
 
     @Test
-    fun `a split that is not by time is rejected`() {
+    fun `a non-positive price is reported and skipped`() {
+        val load = source(row(price = "0.00"), row(price = "-1.00", sku = "NEG1")).load()
+
+        assertThat(load.records).isEmpty()
+        assertThat(load.rejections).hasSize(2)
+        assertThat(load.rejections).allMatch { it.reason.contains("price") }
+    }
+
+    @Test
+    fun `a negative cost is reported and skipped`() {
+        val load = source(row(cost = "-0.01")).load()
+
+        assertThat(load.records).isEmpty()
+        assertThat(load.rejections.single().reason).contains("cost")
+    }
+
+    @Test
+    fun `a structured rejection carries the source identity`() {
+        val rejection = source(row(baseline = "0", sku = "ICE500")).load().rejections.single()
+
+        assertThat(rejection.sourceType).isEqualTo("dataset")
+        assertThat(rejection.sourceReference).isEqualTo("ref-ICE500-2026-06-03")
+        assertThat(rejection.toString()).contains("source_type=dataset", "source_reference=ref-ICE500")
+    }
+
+    @Test
+    fun `a split that is not by time fails the whole file`() {
         assertThatExceptionOfType(FixtureRejection::class.java)
             .isThrownBy {
                 source(
@@ -79,21 +116,16 @@ class DatasetBaselineSourceTest {
     }
 
     @Test
-    fun `the committed fixture loads and is split by time`() {
-        val records =
-            DatasetBaselineSource {
-                javaClass
-                    .getResourceAsStream(
-                        "/fixtures/baseline.csv",
-                    )!!
-                    .reader()
-            }.load()
+    fun `the committed fixture loads clean and is split by time`() {
+        val load = committed().load()
 
-        val training = records.filter { it.split == DatasetSplit.TRAINING }
-        val benchmark = records.filter { it.split == DatasetSplit.BENCHMARK }
+        assertThat(load.rejections).isEmpty()
+        val training = load.records.filter { it.split == DatasetSplit.TRAINING }
+        val benchmark = load.records.filter { it.split == DatasetSplit.BENCHMARK }
         assertThat(training).hasSize(250)
         assertThat(benchmark).hasSize(50)
         assertThat(training.maxOf { it.date }).isBefore(benchmark.minOf { it.date })
-        assertThat(records.map { it.stockLevel }.toSet()).containsExactlyInAnyOrder(StockLevel.NORMAL, StockLevel.HIGH)
+        assertThat(load.records.map { it.stockLevel }.toSet())
+            .containsExactlyInAnyOrder(StockLevel.NORMAL, StockLevel.HIGH)
     }
 }

@@ -15,6 +15,11 @@ import java.time.LocalDate
 class DeterministicContextEnricherTest {
     private val enricher = DeterministicContextEnricher()
 
+    private fun fixture() =
+        DatasetBaselineSource { javaClass.getResourceAsStream("/fixtures/baseline.csv")!!.reader() }
+            .load()
+            .records
+
     private fun record(
         date: String,
         sku: String = "ICE500",
@@ -31,6 +36,11 @@ class DeterministicContextEnricherTest {
         stock = 150,
     )
 
+    private fun describe(date: String): String {
+        val context = enricher.enrich(record(date))
+        return "${context.dayType}|${context.weather}|${context.temperatureC}|${context.eventType}"
+    }
+
     @Test
     fun `day type follows the calendar`() {
         assertThat(enricher.enrich(record("2026-06-05")).dayType).isEqualTo(DayType.WEEKDAY)
@@ -39,25 +49,26 @@ class DeterministicContextEnricherTest {
     }
 
     @Test
-    fun `the same row always enriches identically`() {
-        val first = DeterministicContextEnricher().enrich(record("2026-06-10"))
-        val second = DeterministicContextEnricher().enrich(record("2026-06-10"))
+    fun `enrichment is pinned to exact values, not merely self-consistent`() {
+        // Two calls inside one JVM cannot tell a pure function from one keyed on an identity hash
+        // or the clock - both are stable within a single run. These values come from the committed
+        // derivation and change the moment it does, which is what makes the cross-process promise
+        // checkable in a single process.
+        val golden =
+            mapOf(
+                "2026-06-10" to "WEEKDAY|HOT|27|NONE",
+                "2026-06-13" to "WEEKEND|RAIN|7|LOCAL_EVENT",
+                "2026-06-20" to "WEEKEND|NORMAL|16|NONE",
+            )
 
-        assertThat(first).isEqualTo(second)
+        golden.forEach { (date, expected) ->
+            assertThat(describe(date)).describedAs("enrichment of %s", date).isEqualTo(expected)
+        }
     }
 
     @Test
     fun `temperature agrees with the weather`() {
-        val fixture =
-            DatasetBaselineSource {
-                javaClass
-                    .getResourceAsStream(
-                        "/fixtures/baseline.csv",
-                    )!!
-                    .reader()
-            }.load()
-
-        fixture.map { enricher.enrich(it) }.forEach { context ->
+        fixture().map { enricher.enrich(it) }.forEach { context ->
             val degrees = context.temperatureC.toInt()
             when (context.weather) {
                 Weather.HOT -> assertThat(degrees).isGreaterThanOrEqualTo(24)
@@ -69,16 +80,7 @@ class DeterministicContextEnricherTest {
 
     @Test
     fun `an event note accompanies a local event and nothing else`() {
-        val fixture =
-            DatasetBaselineSource {
-                javaClass
-                    .getResourceAsStream(
-                        "/fixtures/baseline.csv",
-                    )!!
-                    .reader()
-            }.load()
-
-        fixture.map { enricher.enrich(it) }.forEach { context ->
+        fixture().map { enricher.enrich(it) }.forEach { context ->
             if (context.eventType == MarketEvent.LOCAL_EVENT) {
                 assertThat(context.eventNote).isNotNull()
             } else {
@@ -89,17 +91,10 @@ class DeterministicContextEnricherTest {
 
     @Test
     fun `both halves of the committed fixture cover the Lesson key space`() {
-        val fixture =
-            DatasetBaselineSource {
-                javaClass
-                    .getResourceAsStream(
-                        "/fixtures/baseline.csv",
-                    )!!
-                    .reader()
-            }.load()
+        val records = fixture()
 
         DatasetSplit.entries.forEach { split ->
-            val contexts = fixture.filter { it.split == split }.map { enricher.enrich(it) }
+            val contexts = records.filter { it.split == split }.map { enricher.enrich(it) }
             assertThat(contexts.map { it.weather }.toSet())
                 .describedAs("weather values in %s", split)
                 .containsExactlyInAnyOrderElementsOf(Weather.entries)

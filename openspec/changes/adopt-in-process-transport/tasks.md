@@ -1,6 +1,6 @@
 ## 1. Record the decision in the affected specs
 
-- [x] 1.1 Amend `implement-scenario-generator`: replace the Kafka publisher tasks and the `promotion.scenarios.v1` requirements with transport-neutral publication through `ScenarioPublisher`, keeping the committed contract and the one-event-per-scenario rule.
+- [ ] 1.1 Amend `implement-scenario-generator`: replace the Kafka publisher tasks and the `promotion.scenarios.v1` requirements with transport-neutral publication through `ScenarioPublisher`, keeping the committed contract and the one-event-per-scenario rule.
 - [ ] 1.2 Amend `implement-promotion-agent`: replace the Kafka listener and offset-acknowledgement requirements with consumption through a port and handoff through `DecisionSink`, and state that journal completion means the decision was accepted downstream rather than acknowledged to a broker.
 - [ ] 1.3 Amend `implement-market-simulator`: replace the `DecisionListener` and consumer-group tasks with reception through a port, keeping the rule that the source scenario is not marked complete until `OutcomeSink` has accepted the outcome.
 - [ ] 1.4 In each of the three, keep an explicit note that the transport was deferred rather than ruled out, so the next reader does not restore Kafka by accident or treat its absence as an oversight.

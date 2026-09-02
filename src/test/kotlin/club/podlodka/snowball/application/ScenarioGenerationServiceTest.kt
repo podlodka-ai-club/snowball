@@ -8,6 +8,7 @@ import club.podlodka.snowball.domain.ContractJson
 import club.podlodka.snowball.domain.ContractViolation
 import club.podlodka.snowball.domain.DatasetSplit
 import club.podlodka.snowball.port.BaselineSource
+import club.podlodka.snowball.port.SimulationPort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.io.StringReader
@@ -24,12 +25,12 @@ class ScenarioGenerationServiceTest {
     private fun service(
         source: BaselineSource,
         publisher: RecordingScenarioPublisher,
-    ) = ScenarioGenerationService(
-        baselineSource = source,
-        contextEnricher = DeterministicContextEnricher(),
-        publisher = publisher,
-        clock = clock,
-    )
+        validate: ((club.podlodka.snowball.domain.PromotionScenarioEvent) -> Unit)? = null,
+    ) = if (validate == null) {
+        ScenarioGenerationService(source, DeterministicContextEnricher(), publisher, clock = clock)
+    } else {
+        ScenarioGenerationService(source, DeterministicContextEnricher(), publisher, clock = clock, validate = validate)
+    }
 
     @Test
     fun `every generated scenario satisfies the committed contract`() {
@@ -72,19 +73,47 @@ class ScenarioGenerationServiceTest {
     }
 
     @Test
-    fun `scenario identity is built from the fixture date`() {
+    fun `the same service run twice hands off again rather than deduplicating`() {
+        // At-least-once is the downstream's problem, handled there by scenario_id. A generator
+        // that silently swallowed the second handoff would look correct in a rerun test that
+        // builds a fresh service each time, and would quietly halve a repeated training run.
+        val publisher = RecordingScenarioPublisher()
+        val service = service(committedFixture(), publisher)
+
+        service.generate(DatasetSplit.BENCHMARK)
+        service.generate(DatasetSplit.BENCHMARK)
+
+        assertThat(publisher.published).hasSize(100)
+    }
+
+    @Test
+    fun `scenario identity is built from the fixture date and is unique`() {
         val publisher = RecordingScenarioPublisher()
 
         service(committedFixture(), publisher).generate()
 
         publisher.published.forEach { event ->
-            val expected = "SCN-${event.scenario.date.toString().replace(
-                "-",
-                "",
-            )}-LONDON_CENTRAL-${event.scenario.skuId}"
+            val expected =
+                "SCN-${event.scenario.date.toString().replace("-", "")}-LONDON_CENTRAL-${event.scenario.skuId}"
             assertThat(event.scenarioId).isEqualTo(expected)
         }
         assertThat(publisher.published.map { it.scenarioId }.toSet()).hasSize(publisher.published.size)
+    }
+
+    @Test
+    fun `two rows that would share an identity are refused, not silently merged`() {
+        val header = DatasetBaselineSource.REQUIRED_COLUMNS.joinToString(",")
+        val a = "ref-A,2026-06-03,training,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,100,150"
+        val b = "ref-B,2026-06-03,training,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,110,160"
+        val publisher = RecordingScenarioPublisher()
+        val source = DatasetBaselineSource { StringReader("$header\n$a\n$b") }
+
+        val report = service(source, publisher).generate()
+
+        assertThat(report.published).isEqualTo(1)
+        assertThat(report.rejected).hasSize(1)
+        assertThat(report.rejected.single().reason).contains("collides")
+        assertThat(report.rejected.single().scenarioId).isEqualTo("SCN-20260603-LONDON_CENTRAL-ICE500")
     }
 
     @Test
@@ -97,7 +126,7 @@ class ScenarioGenerationServiceTest {
     }
 
     @Test
-    fun `an unreadable source is reported and publishes nothing`() {
+    fun `an unusable fixture is reported and publishes nothing`() {
         val publisher = RecordingScenarioPublisher()
         val broken = DatasetBaselineSource { StringReader("source_reference,sku_id\nref,ICE500") }
 
@@ -112,30 +141,47 @@ class ScenarioGenerationServiceTest {
     fun `an event failing its contract is not published and the reason is reported`() {
         val publisher = RecordingScenarioPublisher()
         val service =
-            ScenarioGenerationService(
-                baselineSource = committedFixture(),
-                contextEnricher = DeterministicContextEnricher(),
-                publisher = publisher,
-                clock = clock,
-                validate = { throw ContractViolation("contract check failed for ${'$'}{it.scenarioId}") },
-            )
+            service(
+                committedFixture(),
+                publisher,
+            ) { throw ContractViolation("contract check failed for ${it.scenarioId}") }
 
         val report = service.generate(DatasetSplit.BENCHMARK)
 
         assertThat(report.published).isZero()
         assertThat(publisher.published).isEmpty()
-        assertThat(report.rejected).hasSize(50).allMatch { it.contains("contract check failed") }
+        assertThat(report.rejected).hasSize(50)
+        assertThat(report.rejected).allMatch { it.reason.contains("contract check failed") }
+        assertThat(report.rejected).allMatch { it.scenarioId != null && it.sourceReference != null }
+    }
+
+    @Test
+    fun `the generator cannot reach simulation`() {
+        // Checked on the constructor signature rather than on fields: Kotlin drops a private val
+        // that the class body never reads, so a smuggled-in dependency can be invisible in
+        // declaredFields while still being wired in by the caller.
+        val injected =
+            ScenarioGenerationService::class.java.declaredConstructors
+                .flatMap { it.parameterTypes.asIterable() }
+                .map { it.name }
+                .toSet()
+
+        assertThat(injected).doesNotContain(SimulationPort::class.java.name)
+        assertThat(injected.filter { it.startsWith("club.podlodka.snowball.port.") })
+            .containsExactlyInAnyOrder(
+                "club.podlodka.snowball.port.BaselineSource",
+                "club.podlodka.snowball.port.ContextEnricher",
+                "club.podlodka.snowball.port.ScenarioPublisher",
+            )
     }
 
     @Test
     fun `scheduled and manual triggers share one workflow`() {
         val scheduled = RecordingScenarioPublisher()
         val manual = RecordingScenarioPublisher()
-        val trigger = ScenarioGenerationTrigger(service(committedFixture(), scheduled))
-        val manualTrigger = ScenarioGenerationTrigger(service(committedFixture(), manual))
 
-        trigger.onSchedule()
-        manualTrigger.runNow()
+        ScenarioGenerationTrigger(service(committedFixture(), scheduled)).onSchedule()
+        ScenarioGenerationTrigger(service(committedFixture(), manual)).runNow()
 
         assertThat(manual.published).isEqualTo(scheduled.published)
     }

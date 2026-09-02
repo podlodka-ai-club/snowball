@@ -65,12 +65,20 @@ range in which the four actions separate. The dataset does not offer more: nothi
 156 units a week, so a daily baseline above ~22 is unavailable at any selection.
 
 **The synthetic cost ratios are calibration and had to be fitted.** With realistic grocery
-margins of 30-45 percent the oracle chose 0 percent in 250 of 300 scenarios, and the best action
-beat "always 0 percent" by 0.09 on average - an agent answering 0 percent every time would have
+margins of 30-45 percent the oracle chose 0 percent in 248 of 300 scenarios, and the best action
+beat "always 0 percent" by 0.089 on average - an agent answering 0 percent every time would have
 been near-optimal, and the before/after delta would have been noise. The fitted ratios spread the
 oracle across 0/10/20 percent roughly evenly and, more importantly, make the best action differ
 per SKU: meat almost always wants 0 percent, ice cream and chips want 20 percent. That is what
 gives a Lesson keyed on SKU something to carry.
+
+One limit of the coverage property is worth stating plainly: it requires every `weather` and
+`event_type` value to appear in each split, and that holds. It does not require every combination
+of the full Lesson key to appear, and it does not - the training set covers 65 of 72
+`sku x day_type x weather x stock_level` combinations and the benchmark 36 of 72. A benchmark
+scenario can therefore land on a key the training set never filled, which is a property of the
+experiment rather than a defect: it measures generalisation instead of recall, and the reported
+delta should be read that way.
 
 The resulting margins of 44-68 percent are higher than real grocery retail. This is a property of
 the synthetic world chosen to make the action space discriminable, and it must be presented that
