@@ -1,8 +1,10 @@
 ## 1. Fixture format
 
-- [ ] 1.1 Define the normalized fixture columns - the set in `docs/scenario-generator/dataset-preparation.md` plus `date` and `split` - and commit a small example fixture in the project's test resources. Do not edit anything under `docs/`; the divergence from the preparation guide is recorded in this change's design instead.
+- [x] 1.1 Define the normalized fixture columns - the set in `docs/scenario-generator/dataset-preparation.md` plus `date` and `split` - and commit a small example fixture in the project's test resources. Do not edit anything under `docs/`; the divergence from the preparation guide is recorded in this change's design instead.
 - [ ] 1.2 Add fixture invariant checks: `date` and `split` present, `split` is `training` or `benchmark`, every benchmark date strictly later than every training date, `baseline_sales` non-zero, prices and costs within the schema bounds.
 - [ ] 1.3 Add tests for each rejection above, using a small hand-written fixture rather than the real dataset.
+
+- [ ] 1.4 Prepare the real fixture from dunnhumby with `tools/prepare_dunnhumby.py`. The dataset must be downloaded manually from the dunnhumby source-files page and extracted outside this repository; the raw data is never committed.
 
 ## 2. Generation logic
 

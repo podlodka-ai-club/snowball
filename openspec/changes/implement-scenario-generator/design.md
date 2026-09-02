@@ -43,6 +43,14 @@ The fourth gap, the `stock_level` threshold, is unrelated but equally cheap to c
 8. Validate the schema and the domain invariants before handing a scenario off. The committed `promotion-scenario-v1.schema.json` is the contract.
 9. Exactly one scenario per handoff, with no local database. Duplicate delivery stays a downstream concern handled by deterministic `scenario_id`.
 
+## Where the context comes from, and when to revisit it
+
+The Lesson key is `sku + day_type + weather + stock_level`. Three of those four are synthetic: `weather` is not in the dataset at all, `day_type` follows from a date assigned during preparation, and `stock_level` follows from a stock figure derived by multiplier. The simulator then reacts to them through its own coefficient tables, which `docs/market-simulator/README.md` deliberately separates from promotion affinity so that context changes which discount is best. Both halves of that relationship are therefore ours, and the team recorded exactly this risk when the case was chosen: the agent may end up learning the generator rather than a market.
+
+For the MVP this is accepted. The dataset supplies `price`, `baseline_sales`, `category`, and `sku`; the context stays synthetic and deterministic. The alternative - deriving `weather` and `day_type` from the real `WEEK_END_DATE` so that the seasonal signal and the demand in those same rows come from the same real weeks - costs the same preparation effort and would make the answer to "did the agent just learn your generator" a real one rather than a deflection. It is deliberately held in reserve.
+
+**Revisit trigger.** Move the context onto real dates if the first training runs show any of: a trained agent that does not beat the best constant action; lessons whose recommendation is constant across every context bucket; or a clean-versus-trained delta that survives shuffling the context labels. Any of those means the learned signal is an artifact of our own rules rather than of the data, and the reserve option becomes the cheaper fix.
+
 ## Risks / Trade-offs
 
 - **Deterministic synthetic context is less realistic** than real weather and events, but it keeps training and benchmark behavior reproducible, which is the whole point of the exercise.
