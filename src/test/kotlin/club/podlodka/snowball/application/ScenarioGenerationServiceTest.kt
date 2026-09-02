@@ -5,6 +5,7 @@ import club.podlodka.snowball.adapter.inprocess.RecordingScenarioPublisher
 import club.podlodka.snowball.adapter.source.DatasetBaselineSource
 import club.podlodka.snowball.domain.CommittedDocs
 import club.podlodka.snowball.domain.ContractJson
+import club.podlodka.snowball.domain.ContractViolation
 import club.podlodka.snowball.domain.DatasetSplit
 import club.podlodka.snowball.port.BaselineSource
 import org.assertj.core.api.Assertions.assertThat
@@ -105,6 +106,25 @@ class ScenarioGenerationServiceTest {
         assertThat(report.published).isZero()
         assertThat(report.hasRejections).isTrue()
         assertThat(publisher.published).isEmpty()
+    }
+
+    @Test
+    fun `an event failing its contract is not published and the reason is reported`() {
+        val publisher = RecordingScenarioPublisher()
+        val service =
+            ScenarioGenerationService(
+                baselineSource = committedFixture(),
+                contextEnricher = DeterministicContextEnricher(),
+                publisher = publisher,
+                clock = clock,
+                validate = { throw ContractViolation("contract check failed for ${'$'}{it.scenarioId}") },
+            )
+
+        val report = service.generate(DatasetSplit.BENCHMARK)
+
+        assertThat(report.published).isZero()
+        assertThat(publisher.published).isEmpty()
+        assertThat(report.rejected).hasSize(50).allMatch { it.contains("contract check failed") }
     }
 
     @Test

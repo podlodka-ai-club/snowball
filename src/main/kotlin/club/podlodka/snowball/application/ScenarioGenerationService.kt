@@ -34,6 +34,13 @@ class ScenarioGenerationService(
     private val market: MarketConfig = MarketConfig.LONDON_CENTRAL,
     private val sourceType: String = "dataset",
     private val clock: Clock = Clock.systemUTC(),
+    /**
+     * The contract check applied before handoff. Injected so a test can prove the service actually
+     * consults it: the models are strict enough that a generated event is valid anyway, so a test
+     * that only inspects what was published stays green even if this check is deleted. The check
+     * exists for the case the models and the committed schemas drift apart.
+     */
+    private val validate: (PromotionScenarioEvent) -> Unit = ContractValidator::validateScenario,
 ) {
     fun generate(split: DatasetSplit? = null): GenerationReport {
         val rejected = mutableListOf<String>()
@@ -49,7 +56,7 @@ class ScenarioGenerationService(
             .forEach { record ->
                 try {
                     val event = toEvent(record)
-                    ContractValidator.validateScenario(event)
+                    validate(event)
                     publisher.publish(event)
                     published += 1
                 } catch (failure: IllegalArgumentException) {
