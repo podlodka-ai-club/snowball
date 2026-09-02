@@ -44,9 +44,10 @@ object ContractValidator {
 
     private fun load(resource: String): JsonSchema {
         val url =
-            requireNotNull(ContractValidator::class.java.getResource(resource)) {
-                "contract schema $resource is not on the classpath; check the build's schema copy step"
-            }
+            ContractValidator::class.java.getResource(resource)
+                ?: throw IllegalStateException(
+                    "contract schema $resource is not on the classpath; check the build's schema copy step",
+                )
         return factory.getSchema(SchemaLocation.of(url.toURI().toString()), config)
     }
 }

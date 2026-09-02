@@ -56,5 +56,5 @@ data class BaselineRecord(
      * survives the tuning it allows.
      */
     val stockLevel: StockLevel
-        get() = if (stock >= 2 * baselineSales) StockLevel.HIGH else StockLevel.NORMAL
+        get() = if (stock.toLong() >= 2L * baselineSales) StockLevel.HIGH else StockLevel.NORMAL
 }

@@ -116,6 +116,39 @@ class DatasetBaselineSourceTest {
     }
 
     @Test
+    fun `a training and a benchmark row on the same day fail the file`() {
+        // The requirement is strictly later, not "not earlier": sharing a boundary day would let a
+        // benchmark scenario sit in the same day the agent trained on.
+        assertThatExceptionOfType(FixtureRejection::class.java)
+            .isThrownBy {
+                source(
+                    row(date = "2026-07-01", split = "training"),
+                    row(date = "2026-07-01", split = "benchmark", sku = "BEER6"),
+                ).load()
+            }.withMessageContaining("not by time")
+    }
+
+    @Test
+    fun `an out-of-order benchmark row condemns the file even when it is otherwise invalid`() {
+        // The row is dropped as a bad row, but its date still proves the split is wrong. Judging
+        // order only on surviving rows would let a broken fixture look well ordered.
+        assertThatExceptionOfType(FixtureRejection::class.java)
+            .isThrownBy {
+                source(
+                    row(date = "2026-07-10", split = "training"),
+                    row(date = "2026-07-01", split = "benchmark", price = "0.00", sku = "BAD1"),
+                ).load()
+            }.withMessageContaining("not by time")
+    }
+
+    @Test
+    fun `a header without rows fails the file`() {
+        assertThatExceptionOfType(FixtureRejection::class.java)
+            .isThrownBy { source().load() }
+            .withMessageContaining("no rows")
+    }
+
+    @Test
     fun `the committed fixture loads clean and is split by time`() {
         val load = committed().load()
 

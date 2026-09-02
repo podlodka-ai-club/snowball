@@ -13,6 +13,7 @@ import club.podlodka.snowball.port.ContextEnricher
 import club.podlodka.snowball.port.ScenarioPublisher
 import java.time.Clock
 import java.time.OffsetDateTime
+import java.util.logging.Logger
 
 /** What one generation cycle produced, including what it refused and why. */
 data class GenerationReport(
@@ -44,16 +45,18 @@ class ScenarioGenerationService(
     private val validate: (PromotionScenarioEvent) -> Unit = ContractValidator::validateScenario,
 ) {
     fun generate(split: DatasetSplit? = null): GenerationReport {
+        log.info { "generation cycle started split=${split?.wire ?: "all"}" }
         val load =
             try {
                 baselineSource.load()
             } catch (failure: IllegalArgumentException) {
-                return GenerationReport(
-                    published = 0,
-                    rejected = listOf(SourceRejection(sourceType, null, null, "source unusable: ${failure.message}")),
-                )
+                val rejection = SourceRejection(sourceType, null, null, "source unusable: ${failure.message}")
+                log.warning { rejection.toString() }
+                log.info { "generation cycle completed published=0 rejected=1" }
+                return GenerationReport(published = 0, rejected = listOf(rejection))
             }
         val rejected = load.rejections.toMutableList()
+        load.rejections.forEach { rejection -> log.warning { rejection.toString() } }
         var published = 0
 
         // A different scenario must get a different identity. The identity is built from the
@@ -67,26 +70,41 @@ class ScenarioGenerationService(
             .forEach { record ->
                 val scenarioId = scenarioId(record)
                 val seen = identities.putIfAbsent(scenarioId, record.sourceReference)
-                if (seen != null && seen != record.sourceReference) {
+                if (seen != null) {
+                    val reason =
+                        if (seen == record.sourceReference) {
+                            "duplicate row: source_reference ${record.sourceReference} already produced this identity"
+                        } else {
+                            "identity collides with source_reference $seen"
+                        }
                     rejected +=
-                        SourceRejection(
-                            sourceType,
-                            record.sourceReference,
-                            scenarioId,
-                            "identity collides with source_reference $seen",
-                        )
+                        SourceRejection(sourceType, record.sourceReference, scenarioId, reason).also { rejection ->
+                            log.warning { rejection.toString() }
+                        }
                     return@forEach
                 }
-                try {
-                    val event = toEvent(record, scenarioId)
-                    validate(event)
-                    publisher.publish(event)
-                    published += 1
-                } catch (failure: IllegalArgumentException) {
-                    rejected +=
-                        SourceRejection(sourceType, record.sourceReference, scenarioId, failure.message ?: "invalid")
-                }
+
+                // Only a defect in the row itself is a rejection. A missing schema or a publisher
+                // that will not accept the handoff is a failure of the cycle, and the guide is
+                // explicit that a cycle with a failed publish must not be reported as successful,
+                // so those propagate instead of being filed as bad data.
+                val event =
+                    try {
+                        toEvent(record, scenarioId).also(validate)
+                    } catch (failure: IllegalArgumentException) {
+                        rejected +=
+                            SourceRejection(
+                                sourceType,
+                                record.sourceReference,
+                                scenarioId,
+                                failure.message ?: "invalid",
+                            ).also { rejection -> log.warning { rejection.toString() } }
+                        return@forEach
+                    }
+                publisher.publish(event)
+                published += 1
             }
+        log.info { "generation cycle completed published=$published rejected=${rejected.size}" }
         return GenerationReport(published, rejected)
     }
 
@@ -133,4 +151,13 @@ class ScenarioGenerationService(
      */
     private fun scenarioId(record: BaselineRecord): String =
         "SCN-${record.date.toString().replace("-", "")}-${market.storeId}-${record.skuId}"
+
+    private companion object {
+        /**
+         * `java.util.logging` rather than a logging framework: the guide asks for cycle counts and
+         * a reason per rejected record, and adding a dependency for six lines of output would be
+         * exactly the unrequested infrastructure the project rules warn about.
+         */
+        private val log: Logger = Logger.getLogger(ScenarioGenerationService::class.java.name)
+    }
 }

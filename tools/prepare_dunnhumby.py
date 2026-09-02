@@ -39,8 +39,8 @@ EXCEL_EPOCH = date(1899, 12, 30)
 # calibrating against the prepared fixture before the first benchmark.
 #
 # They were fitted by replaying all four actions over the whole fixture. At the ratios first
-# tried (0.55-0.70, i.e. a realistic FMCG margin of 30-45%) the oracle chose 0% in 250 of 300
-# scenarios and the best action beat "always 0%" by 0.09 on average: an agent that always
+# tried (0.55-0.70, i.e. a realistic FMCG margin of 30-45%) the oracle chose 0% in 248 of 300
+# scenarios and the best action beat "always 0%" by 0.089 on average: an agent that always
 # answers 0% would have been near-optimal and there would have been nothing to learn. The
 # ratios below spread the oracle across 0/10/20% roughly evenly and, more importantly, make it
 # differ per SKU - meat almost always wants 0%, ice cream and chips want 20% - so a Lesson
@@ -84,6 +84,17 @@ def stable_choice(key: str, modulo: int) -> int:
     return int.from_bytes(digest[:8], "big") % modulo
 
 
+def column_index(reference: str | None) -> int:
+    """`C7` -> 2. Column letters are base-26 with no zero, hence the offset."""
+    if not reference:
+        return 0
+    letters = "".join(ch for ch in reference if ch.isalpha()).upper()
+    index = 0
+    for ch in letters:
+        index = index * 26 + (ord(ch) - ord("A") + 1)
+    return index - 1
+
+
 def read_shared_strings(book: zipfile.ZipFile) -> list[str]:
     if "xl/sharedStrings.xml" not in book.namelist():
         return []
@@ -121,17 +132,25 @@ def read_xlsx_rows(book: zipfile.ZipFile, sheet: str, strings: list[str]) -> lis
         for _, element in ElementTree.iterparse(stream, events=("end",)):
             if element.tag != SPREADSHEET_NS + "row":
                 continue
-            values = []
+            # Cells are addressed by their column letter, not by position: a sparse row omits
+            # empty cells entirely, so reading them in document order silently shifts every
+            # column after the gap.
+            by_column = {}
             for cell in element:
                 value_node = cell.find(SPREADSHEET_NS + "v")
                 value = value_node.text if value_node is not None else None
                 if cell.get("t") == "s" and value is not None:
                     value = strings[int(value)]
-                values.append(value)
+                by_column[column_index(cell.get("r"))] = value
             element.clear()
+            width = max(by_column) + 1 if by_column else 0
+            values = [by_column.get(index) for index in range(width)]
             if header is None:
-                if values and values[0]:
-                    header = [v or "" for v in values]
+                # The workbook's first row is a title, so the header is the first row that
+                # actually carries the column names rather than the first non-empty one.
+                names = {str(v).strip().upper() for v in values if v}
+                if {"WEEK_END_DATE", "STORE_NUM", "UPC", "UNITS"} <= names:
+                    header = [str(v).strip() if v else "" for v in values]
                 continue
             if any(v is not None for v in values):
                 padded = values + [None] * (len(header) - len(values))

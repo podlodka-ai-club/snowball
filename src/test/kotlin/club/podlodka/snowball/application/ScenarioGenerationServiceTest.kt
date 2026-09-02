@@ -8,8 +8,10 @@ import club.podlodka.snowball.domain.ContractJson
 import club.podlodka.snowball.domain.ContractViolation
 import club.podlodka.snowball.domain.DatasetSplit
 import club.podlodka.snowball.port.BaselineSource
+import club.podlodka.snowball.port.ScenarioPublisher
 import club.podlodka.snowball.port.SimulationPort
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import java.io.StringReader
 import java.time.Clock
@@ -177,12 +179,79 @@ class ScenarioGenerationServiceTest {
 
     @Test
     fun `scheduled and manual triggers share one workflow`() {
+        // Comparing the two outputs is not enough on its own: if both triggers did nothing, the
+        // comparison would still hold. Each must produce the full set as well as the same set.
         val scheduled = RecordingScenarioPublisher()
         val manual = RecordingScenarioPublisher()
 
-        ScenarioGenerationTrigger(service(committedFixture(), scheduled)).onSchedule()
-        ScenarioGenerationTrigger(service(committedFixture(), manual)).runNow()
+        val fromSchedule = ScenarioGenerationTrigger(service(committedFixture(), scheduled)).onSchedule()
+        val fromManual = ScenarioGenerationTrigger(service(committedFixture(), manual)).runNow()
 
+        assertThat(fromSchedule.published).isEqualTo(300)
+        assertThat(fromManual.published).isEqualTo(300)
         assertThat(manual.published).isEqualTo(scheduled.published)
+    }
+
+    @Test
+    fun `rejections from the source reach the report`() {
+        val header = DatasetBaselineSource.REQUIRED_COLUMNS.joinToString(",")
+        val bad = "ref-BAD,2026-06-03,training,BAD1,Bad,ice_cream,5.00,3.00,0,150"
+        val good = "ref-OK,2026-06-04,training,OK1,Ok,ice_cream,5.00,3.00,100,150"
+        val publisher = RecordingScenarioPublisher()
+
+        val report = service(DatasetBaselineSource { StringReader("$header\n$bad\n$good") }, publisher).generate()
+
+        assertThat(report.published).isEqualTo(1)
+        assertThat(report.rejected).hasSize(1)
+        assertThat(report.rejected.single().sourceReference).isEqualTo("ref-BAD")
+        assertThat(report.rejected.single().reason).contains("baseline_sales")
+    }
+
+    @Test
+    fun `a duplicated row is published once and reported once`() {
+        val header = DatasetBaselineSource.REQUIRED_COLUMNS.joinToString(",")
+        val row = "ref-A,2026-06-03,training,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,100,150"
+        val publisher = RecordingScenarioPublisher()
+
+        val report = service(DatasetBaselineSource { StringReader("$header\n$row\n$row") }, publisher).generate()
+
+        assertThat(report.published).isEqualTo(1)
+        assertThat(publisher.published).hasSize(1)
+        assertThat(report.rejected.single().reason).contains("duplicate row")
+        assertThat(report.rejected.single().sourceReference).isEqualTo("ref-A")
+        assertThat(report.rejected.single().scenarioId).isEqualTo("SCN-20260603-LONDON_CENTRAL-ICE500")
+    }
+
+    @Test
+    fun `a collision names the reference it clashed with`() {
+        val header = DatasetBaselineSource.REQUIRED_COLUMNS.joinToString(",")
+        val a = "ref-A,2026-06-03,training,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,100,150"
+        val b = "ref-B,2026-06-03,training,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,110,160"
+        val publisher = RecordingScenarioPublisher()
+
+        val report = service(DatasetBaselineSource { StringReader("$header\n$a\n$b") }, publisher).generate()
+
+        val rejection = report.rejected.single()
+        assertThat(rejection.reason).contains("ref-A")
+        assertThat(rejection.sourceReference).isEqualTo("ref-B")
+    }
+
+    @Test
+    fun `a failing publisher fails the cycle instead of being filed as a bad row`() {
+        // The guide forbids reporting a cycle as successful when publication failed, so a
+        // publisher error must not be quietly recorded as if the source data were at fault.
+        val exploding =
+            ScenarioPublisher { throw IllegalArgumentException("broker refused") }
+        val service =
+            ScenarioGenerationService(
+                committedFixture(),
+                DeterministicContextEnricher(),
+                exploding,
+                clock = clock,
+            )
+
+        assertThatExceptionOfType(IllegalArgumentException::class.java)
+            .isThrownBy { service.generate(DatasetSplit.BENCHMARK) }
+            .withMessageContaining("broker refused")
     }
 }
