@@ -15,12 +15,19 @@ kotlin {
     jvmToolchain(21)
 }
 
+application {
+    mainClass.set("club.podlodka.snowball.adapter.cli.GenerateScenariosKt")
+}
+
 dependencies {
     implementation(platform(libs.jackson.bom))
     implementation(libs.jackson.databind)
     implementation(libs.jackson.module.kotlin)
     implementation(libs.jackson.datatype.jsr310)
     implementation(libs.json.schema.validator)
+    // The schema validator pulls in slf4j-api; without a provider every run starts with three
+    // lines of warning on stderr, which is noise in a tool whose stderr carries the run report.
+    runtimeOnly(libs.slf4j.nop)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
