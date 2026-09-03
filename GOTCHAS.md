@@ -4,6 +4,20 @@ One line per finding, written when it was hit rather than reconstructed later. R
 `AGENTS.md`: by the final day nobody remembers these, and the retrospective questionnaire asks
 for them.
 
+## Decision model
+
+- An empty answer usually means the token budget ran out inside the model's reasoning block, not a
+  refusal: `finish_reason=length` with no content. Measured on the real agent prompt, 400 tokens
+  yields nothing and 1200 is enough. Treating truncation as a failed decision would fall back to 0%
+  and quietly turn the clean-memory arm into a fixed policy, inflating the delta being measured.
+- Without lessons the model thinks noticeably longer - about 9 seconds against 2 with them - so a
+  cold benchmark arm is slower than a trained one, not faster.
+- `reasoning_effort` passed through `chat_template_kwargs` made no measurable difference on this
+  server: 266 tokens against 269, same answer. Do not rely on it to control depth.
+- The model follows a lesson literally: given a lesson recommending 0, 20 or 30 percent it returned
+  exactly that, and chose differently with no memory at all. Good for demonstrating that memory
+  drives behaviour - and a reminder that the lessons had better be right.
+
 ## xmemory
 
 - Quota is metered in **tokens**, not requests - so what matters is whether an operation goes

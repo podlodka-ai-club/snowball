@@ -22,6 +22,7 @@ class ContractViolation(
 object ContractValidator {
     private const val SCENARIO_SCHEMA = "/contracts/scenario-generator/promotion-scenario-v1.schema.json"
     private const val OUTCOME_SCHEMA = "/contracts/market-simulator/promotion-outcome-v1.schema.json"
+    private const val DECISION_SCHEMA = "/contracts/promotion-agent/promotion-decision-v1.schema.json"
 
     private val factory: JsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
 
@@ -35,12 +36,24 @@ object ContractValidator {
 
     private val outcomeSchema: JsonSchema by lazy { load(OUTCOME_SCHEMA) }
 
+    private val decisionSchema: JsonSchema by lazy { load(DECISION_SCHEMA) }
+
     fun validateScenario(event: PromotionScenarioEvent) {
         val document = ContractJson.mapper.valueToTree<com.fasterxml.jackson.databind.JsonNode>(event)
         val failures = scenarioSchema.validate(document).map { it.message }
         if (failures.isNotEmpty()) {
             throw ContractViolation(
                 "scenario ${event.scenarioId} violates its contract: ${failures.joinToString("; ")}",
+            )
+        }
+    }
+
+    fun validateDecision(event: PromotionDecisionEvent) {
+        val document = ContractJson.mapper.valueToTree<com.fasterxml.jackson.databind.JsonNode>(event)
+        val failures = decisionSchema.validate(document).map { it.message }
+        if (failures.isNotEmpty()) {
+            throw ContractViolation(
+                "decision ${event.decisionId} violates its contract: ${failures.joinToString("; ")}",
             )
         }
     }
