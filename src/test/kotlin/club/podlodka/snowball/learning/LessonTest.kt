@@ -1,5 +1,6 @@
 package club.podlodka.snowball.learning
 
+import club.podlodka.snowball.domain.CaseEvidence
 import club.podlodka.snowball.domain.DayType
 import club.podlodka.snowball.domain.Discount
 import club.podlodka.snowball.domain.Lesson
@@ -40,7 +41,7 @@ class LessonTest {
         id: String,
         profits: Map<Discount, String>,
         chosen: Discount = Discount.NONE,
-    ): PromotionCase {
+    ): CaseEvidence {
         val byDiscount = profits.mapValues { BigDecimal(it.value) }
         val best =
             Discount.entries
@@ -56,7 +57,7 @@ class LessonTest {
             chosenGrossProfit = byDiscount.getValue(chosen),
             profitByDiscount = byDiscount,
             bestDiscount = best,
-        )
+        ).evidence
     }
 
     private fun profits(

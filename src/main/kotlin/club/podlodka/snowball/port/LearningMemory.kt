@@ -1,5 +1,6 @@
 package club.podlodka.snowball.port
 
+import club.podlodka.snowball.domain.CaseEvidence
 import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.LessonKey
 import club.podlodka.snowball.domain.PromotionCase
@@ -16,7 +17,7 @@ import club.podlodka.snowball.domain.PromotionCase
  */
 interface LearningMemory {
     /** Every case already linked to this bucket, so a lesson can be recomputed from all evidence. */
-    fun casesFor(key: LessonKey): List<PromotionCase>
+    fun casesFor(key: LessonKey): List<CaseEvidence>
 
     fun findCase(caseId: String): PromotionCase?
 

@@ -1,5 +1,6 @@
 package club.podlodka.snowball.adapter.memory
 
+import club.podlodka.snowball.domain.CaseEvidence
 import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.LessonKey
 import club.podlodka.snowball.domain.PromotionCase
@@ -18,7 +19,7 @@ class InMemoryLearningMemory : LearningMemory {
     private val links = linkedMapOf<LessonKey, MutableSet<String>>()
     private val lessons = linkedMapOf<LessonKey, Lesson>()
 
-    override fun casesFor(key: LessonKey): List<PromotionCase> = links[key].orEmpty().mapNotNull { cases[it] }
+    override fun casesFor(key: LessonKey): List<CaseEvidence> = links[key].orEmpty().mapNotNull { cases[it]?.evidence }
 
     override fun findCase(caseId: String): PromotionCase? = cases[caseId]
 

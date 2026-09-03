@@ -46,6 +46,9 @@ data class PromotionCase(
                 .setScale(2, RoundingMode.HALF_UP)
         }
 
+    /** What a lesson aggregates: the four columns and the winner, without the scenario. */
+    val evidence: CaseEvidence get() = CaseEvidence(caseId, profitByDiscount, bestDiscount)
+
     /** The two buckets this case teaches. */
     val lessonKeys: List<LessonKey> get() = LessonKey.bucketsFor(scenario)
 }
