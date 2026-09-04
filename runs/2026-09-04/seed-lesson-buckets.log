@@ -1,0 +1,26 @@
+SLF4J(W): Class path contains multiple SLF4J providers.
+SLF4J(W): Found provider [org.slf4j.nop.NOPServiceProvider@1ae369b7]
+SLF4J(W): Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@6fffcba5]
+SLF4J(W): See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J(I): Actual provider is of type [org.slf4j.nop.NOPServiceProvider@1ae369b7]
+Sep 04, 2026 10:05:00 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle started split=training
+Sep 04, 2026 10:05:01 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle completed published=250 rejected=0
+scenarios     250
+buckets       190
+links         1500
+lessons 50/190 (replayed singly)
+lessons 100/190 (replayed singly)
+lessons 150/190 (replayed singly)
+lessons 190/190 (replayed singly)
+links 50/1500 (replayed singly)
+links 100/1500 (replayed singly)
+links 150/1500 (replayed singly)
+links 200/1500 (replayed singly)
+Exception in thread "main" club.podlodka.snowball.adapter.memory.XmemoryError: xmemory 400 on /write: {"ids":[],"items":[],"errors":[{"code":"VALIDATION_ERROR","message":"Participant 'lesson' (Lesson) was not found.","field":null,"resource_id":null,"details":null}],"console_url":null}
+	at club.podlodka.snowball.adapter.memory.XmemoryHttp.post(XmemoryHttp.kt:95)
+	at club.podlodka.snowball.adapter.memory.XmemoryLearningMemory.write(XmemoryLearningMemory.kt:202)
+	at club.podlodka.snowball.adapter.memory.XmemoryLearningMemory.linkCaseToLesson(XmemoryLearningMemory.kt:75)
+	at club.podlodka.snowball.adapter.memory.XmemoryLearningMemory.seed(XmemoryLearningMemory.kt:128)
+	at club.podlodka.snowball.adapter.cli.SeedLessonBuckets.main(SeedLessonBuckets.kt:89)

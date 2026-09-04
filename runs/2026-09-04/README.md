@@ -39,6 +39,31 @@ scenarios ran with no memory at all, because the shared xmemory quota ran out mi
 And memory answered for 44 of the 50 scenarios: the training split does not cover every lesson key
 the benchmark asks about.
 
+## Looser keys: the cascade
+
+A second measurement, same 50 scenarios, same trained memory, after the looser lesson buckets were
+written into it. The agent falls back to a more general bucket when the exact one has no answer.
+
+| | clean | strict key | cascade |
+|---|---|---|---|
+| optimal decisions | 44% | 76% | 80% |
+| total regret | 44.04 | 12.17 | 7.18 |
+| memory answered | - | 44/50 | 50/50 |
+| fallbacks | 0 | 0 | 0 |
+
+Against clean memory the cascade removes 84% of the lost profit. The offline estimate in
+`AnalyzeLessonKeys` predicted 7.16 before the run; the run produced 7.18.
+
+What this does **not** establish: that the cascade beats the strict key by a statistically
+significant margin. The two disagree on six scenarios out of fifty - cascade better on four, worse
+on two, p = 0.69. The gain in money is real but concentrated in a few expensive scenarios rather
+than spread across the set. Only the difference against clean memory is significant.
+
+The buckets were seeded by recomputing them offline rather than by retraining: the simulator is
+deterministic, so every training case reproduces exactly without asking the model. The seeding run
+is `seed-lesson-buckets.log`. It ended in an error partway through the evidence links - see the
+read-after-write entry in `GOTCHAS.md` - which leaves the lessons themselves complete.
+
 ## Training run
 
 250 scenarios in 68 minutes, 16.5s each, 2 fallbacks. Mean regret 0.2195, 73.6% optimal.

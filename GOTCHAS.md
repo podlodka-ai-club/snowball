@@ -98,3 +98,31 @@ JSON - observed twice: a body cut off inside a string, and an unescaped CR (code
 The model adapter must treat an unreadable body like any other failed answer. It did not, and one
 such response ended a 250-scenario training run at scenario 50. Retrying does not always help: the
 CR case reproduced on both attempts and the scenario fell back.
+
+## A written record is not immediately readable by key (measured 2026-09-04)
+
+Writing a few hundred Lesson records and then linking to them failed with "Participant 'lesson'
+(Lesson) was not found" - while a `create` for that same key was refused as a CONFLICT, saying a
+record with that `lesson_key` already exists. Both are true at once: the write is durable and the
+uniqueness check sees it, but the primary-key resolution used by scoped reads and by relation
+endpoints lags behind. The same key answered "No 'lesson' object matches the provided primary key"
+for minutes and then resolved normally.
+
+Consequences for anything that writes in bulk. A relation must not be created in the same breath as
+the object it points at, unless both are in one batch - the batch itself is applied in dependency
+order and does work. Reading a record back to confirm a write is unreliable by design here. And a
+run that seeds objects, then links them, needs either a delay or a retry that treats "participant
+not found" as transient rather than as a failure.
+
+## A duplicate is reported three different ways (measured 2026-09-04)
+
+Writing a record that already exists answers, depending on the path taken:
+
+- HTTP 400 `VALIDATION_ERROR` - "A 'Lesson' with this primary key already exists."
+- HTTP 409 `CONFLICT` - "Cannot save this write: an existing Lesson record already has the same
+  primary key."
+- HTTP 409 `CONFLICT` naming the value - "... already has lesson_key: sku:MEAT1|store:any|..."
+
+A client that recognises one wording passes its tests and then aborts a bulk write partway through
+on the second. Match on the condition rather than on a sentence, and treat the code as part of the
+signal - which is why the client now carries the error code alongside the message.

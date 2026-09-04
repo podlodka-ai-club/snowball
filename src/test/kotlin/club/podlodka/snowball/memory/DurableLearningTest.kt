@@ -9,6 +9,7 @@ import club.podlodka.snowball.config.XmemoryConfig
 import club.podlodka.snowball.domain.CommittedDocs
 import club.podlodka.snowball.domain.ContractJson
 import club.podlodka.snowball.domain.Discount
+import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.PromotionDecision
 import club.podlodka.snowball.domain.PromotionDecisionEvent
 import club.podlodka.snowball.domain.PromotionOutcomeEvent
@@ -19,6 +20,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.Clock
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -106,6 +108,30 @@ class DurableLearningTest {
         assertThat(second.lessons).isEqualTo(first.lessons)
         assertThat(store.objectsOf("PromotionCase")).hasSize(1)
         assertThat(store.linkCount()).isEqualTo(6)
+    }
+
+    @Test
+    fun `seeding writes every bucket in batches and can be run twice`() {
+        // Rebuilding buckets a past run never created. The service applies a batch atomically, so
+        // the second pass collides with everything the first wrote - and has to end in the same
+        // state rather than in an error or in doubled evidence.
+        val memory = connect()
+        val learned = PromotionEvaluator(engine, memory).evaluate(outcome(Discount.TEN))
+        val extra =
+            learned.lessons.map { it.key }.map { key ->
+                Lesson(key, Discount.THIRTY, 7, BigDecimal("9.00"), BigDecimal("0.90"), "seeded")
+            }
+        val links = extra.map { "CASE-v1-SCN-DURABLE" to it.key }
+
+        memory.seed(extra, links)
+        val afterFirst = store.objectsOf("Lesson").size to store.linkCount()
+        memory.seed(extra, links)
+
+        assertThat(store.objectsOf("Lesson")).hasSize(afterFirst.first)
+        assertThat(store.linkCount()).isEqualTo(afterFirst.second)
+        // The seeded aggregate replaced what the run had computed, on the same keys.
+        assertThat(memory.lesson(extra.first().key)?.recommendedDiscount).isEqualTo(Discount.THIRTY)
+        assertThat(memory.lesson(extra.first().key)?.evidenceCount).isEqualTo(7)
     }
 
     @Test

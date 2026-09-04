@@ -187,6 +187,67 @@ class XmemoryLearningMemoryTest {
     }
 
     @Test
+    fun `a duplicate reported as a 409 conflict is also an outcome, not a failure`() {
+        // The service reports the same condition three ways. Knowing only the 400 wording was
+        // enough to pass every test and still abort a bulk write partway through.
+        var writes = 0
+        status = 409
+        reply = { path ->
+            if (path == "write" && writes++ == 0) {
+                """{"ids":[],"items":[],"errors":[{"code":"CONFLICT",
+                "message":"Cannot save this write: an existing Lesson record already has the same primary key."}]}"""
+            } else {
+                status = 200
+                """{"ids":[],"items":[{}],"errors":[]}"""
+            }
+        }
+
+        memory.saveLesson(Lesson(key, Discount.TWENTY, 3, BigDecimal("1.00"), BigDecimal("0.50"), "why"))
+
+        val mutations = requests.filter { it.first == "write" }.map { it.second.path("structured_mutations").first() }
+        assertThat(mutations).hasSize(2)
+        assertThat(mutations[1].path("object_mutation").has("update")).isTrue()
+    }
+
+    @Test
+    fun `a record that exists but does not resolve yet is retried, not abandoned`() {
+        // Measured on the real service under a bulk write: `create` answers "already exists" while
+        // `update` for the same key answers "no such record", because the uniqueness check and the
+        // key lookup do not become consistent at the same moment.
+        var writes = 0
+        reply = { path ->
+            if (path != "write") {
+                """{"ids":[],"items":[{}],"errors":[]}"""
+            } else {
+                when (writes++) {
+                    0 -> {
+                        status = 409
+                        """{"ids":[],"items":[],"errors":[{"code":"CONFLICT",
+                        "message":"an existing Lesson record already has the same primary key."}]}"""
+                    }
+
+                    1 -> {
+                        status = 400
+                        """{"ids":[],"items":[],"errors":[{"code":"VALIDATION_ERROR",
+                        "message":"No 'Lesson' matches the given key."}]}"""
+                    }
+
+                    else -> {
+                        status = 200
+                        """{"ids":[],"items":[{}],"errors":[]}"""
+                    }
+                }
+            }
+        }
+
+        memory.saveLesson(Lesson(key, Discount.TWENTY, 3, BigDecimal("1.00"), BigDecimal("0.50"), "why"))
+
+        val mutations = requests.filter { it.first == "write" }.map { it.second.path("structured_mutations").first() }
+        assertThat(mutations).hasSize(3)
+        assertThat(mutations.drop(1)).allSatisfy { assertThat(it.path("object_mutation").has("update")).isTrue() }
+    }
+
+    @Test
     fun `a missing instance is refused before the run starts`() {
         // A mistyped instance id answers 404 on every call, and the agent's own resilience then
         // hides it: it logs "memory unavailable" per scenario and decides without lessons, so a
