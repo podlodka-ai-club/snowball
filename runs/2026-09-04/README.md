@@ -60,9 +60,14 @@ on two, p = 0.69. The gain in money is real but concentrated in a few expensive 
 than spread across the set. Only the difference against clean memory is significant.
 
 The buckets were seeded by recomputing them offline rather than by retraining: the simulator is
-deterministic, so every training case reproduces exactly without asking the model. The seeding run
-is `seed-lesson-buckets.log`. It ended in an error partway through the evidence links - see the
-read-after-write entry in `GOTCHAS.md` - which leaves the lessons themselves complete.
+deterministic, so every training case reproduces exactly without asking the model.
+`seed-lesson-buckets.log` is the first attempt, which died partway through the evidence links -
+see the read-after-write entry in `GOTCHAS.md`. `seed-evidence-links.log` is the run that finished
+them: 1500 links in 15 minutes, waiting 157 times for a written record to become addressable.
+
+The trained memory now holds all 190 buckets across three levels of generalisation, with every
+case linked to every bucket it supports - so a later training run aggregates each lesson from the
+whole history rather than from whatever single case it just saw.
 
 ## Training run
 
