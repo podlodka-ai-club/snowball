@@ -57,8 +57,15 @@ class PromotionDecisionService(
     private val decisions: DecisionSink,
     private val clock: Clock = Clock.systemUTC(),
     private val validate: (PromotionDecisionEvent) -> Unit = ContractValidator::validateDecision,
+    private val validateInput: (PromotionScenarioEvent) -> Unit = ContractValidator::validateScenario,
 ) {
     fun decide(scenario: PromotionScenarioEvent): DecisionOutcome {
+        // Before anything with a consequence. A scenario that violates its contract must not reach
+        // the journal, the memory or the model: a rejected input should cost nothing and leave no
+        // trace, while a half-processed one leaves a journal entry that a later run would faithfully
+        // republish, and spends model tokens deciding on numbers already known to be wrong.
+        validateInput(scenario)
+
         journal.find(scenario.scenarioId)?.let { entry ->
             // A finished scenario must not be decided twice, and a half-finished one republishes
             // exactly what was stored: a restart cannot be allowed to change a decision that was

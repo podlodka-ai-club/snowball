@@ -8,6 +8,7 @@ import club.podlodka.snowball.application.MemoryStatus
 import club.podlodka.snowball.application.PromotionDecisionService
 import club.podlodka.snowball.domain.CommittedDocs
 import club.podlodka.snowball.domain.ContractJson
+import club.podlodka.snowball.domain.ContractViolation
 import club.podlodka.snowball.domain.Discount
 import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.LessonKey
@@ -19,6 +20,7 @@ import club.podlodka.snowball.port.ModelDecision
 import club.podlodka.snowball.port.SimulationPort
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Clock
@@ -58,12 +60,79 @@ class PromotionDecisionServiceTest {
         evidence: Int = 5,
     ) = Lesson(key, discount, evidence, BigDecimal("10.00"), BigDecimal(confidence), "because $discount")
 
+    /** Counts reads, so a test can assert the memory was never consulted at all. */
+    private class CountingMemory : InMemoryLearningMemory() {
+        var reads = 0
+
+        override fun lesson(key: LessonKey): Lesson? {
+            reads += 1
+            return super.lesson(key)
+        }
+    }
+
     private fun service(
         model: DecisionModel,
         memory: InMemoryLearningMemory = InMemoryLearningMemory(),
         journal: InMemoryDecisionJournal = InMemoryDecisionJournal(),
         sink: DecisionSink = DecisionSink { },
     ) = PromotionDecisionService(memory, model, journal, sink, clock)
+
+    @Test
+    fun `an invalid scenario is refused before the journal, the memory or the model`() {
+        // The contract is checked at the door rather than at the exit. A journal entry written for
+        // a bad scenario is worse than the bad scenario itself: a later run finds it and
+        // republishes that decision as settled, without asking anything again.
+        val model = SpyModel(Discount.TWENTY)
+        val memory = CountingMemory()
+        val journal = InMemoryDecisionJournal()
+        val published = mutableListOf<String>()
+        val scenario = scenarioEvent()
+
+        assertThatExceptionOfType(ContractViolation::class.java)
+            .isThrownBy {
+                PromotionDecisionService(
+                    memory,
+                    model,
+                    journal,
+                    DecisionSink { published += it.decisionId },
+                    clock,
+                    validateInput = { throw ContractViolation("rejected by contract") },
+                ).decide(scenario)
+            }
+
+        assertThat(model.calls).isZero()
+        assertThat(memory.reads).isZero()
+        assertThat(journal.find(scenario.scenarioId)).isNull()
+        assertThat(published).isEmpty()
+    }
+
+    @Test
+    fun `the input contract is checked ahead of the journal shortcut`() {
+        // Ordering, not just presence: a scenario already in the journal returns early, so a
+        // validation call placed after that lookup would never run for the case where a stored
+        // decision is about to be republished.
+        val model = SpyModel(Discount.TWENTY)
+        val journal = InMemoryDecisionJournal()
+        val scenario = scenarioEvent()
+        service(model, journal = journal).decide(scenario)
+        assertThat(journal.find(scenario.scenarioId)).isNotNull
+
+        val republished = mutableListOf<String>()
+
+        assertThatExceptionOfType(ContractViolation::class.java)
+            .isThrownBy {
+                PromotionDecisionService(
+                    InMemoryLearningMemory(),
+                    model,
+                    journal,
+                    DecisionSink { republished += it.decisionId },
+                    clock,
+                    validateInput = { throw ContractViolation("rejected by contract") },
+                ).decide(scenario)
+            }
+
+        assertThat(republished).isEmpty()
+    }
 
     @Test
     fun `the model choice becomes the decision`() {

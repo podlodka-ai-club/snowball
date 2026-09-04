@@ -23,4 +23,4 @@
 - [x] 4.1 Implement the `OutcomeSink` adapter/application entry point connecting completed Market Simulator outcomes to Evaluator/Learner.
 - [x] 4.2 Implement `LEARNING_ENABLED=false` path that calculates evaluation results but performs zero xmemory writes.
 - [x] 4.3 Add an observer/result boundary usable by benchmark code without adding another Kafka topic.
-- [ ] 4.4 Run an acceptance case proving one outcome creates one immutable case, updates exactly two Lessons, and a retry does not increase evidence count twice.
+- [x] 4.4 Run an acceptance case proving one outcome creates one immutable case, updates exactly two Lessons, and a retry does not increase evidence count twice.
