@@ -68,14 +68,21 @@ class PromotionEvaluatorTest {
     }
 
     @Test
-    fun `a case teaches exactly two buckets, its SKU and its category`() {
+    fun `a case teaches a cascade of buckets, from its exact conditions to none of them`() {
+        // Criterion changed deliberately: a case used to teach two buckets, its SKU and its
+        // category. The benchmark showed the limit was coverage - the strict key answered 47 of 50
+        // held-out scenarios and the three it missed carried more loss than all 47 together - so
+        // each scope now also teaches looser buckets that a later scenario can fall back to.
         val memory = InMemoryLearningMemory()
 
         val result = PromotionEvaluator(engine, memory).evaluate(outcomeFor(decision().scenario, Discount.TEN))
 
-        assertThat(result.lessons).hasSize(2)
+        assertThat(result.lessons).hasSize(6)
         assertThat(result.lessons.map { it.key.scope })
-            .containsExactlyInAnyOrder(LessonScope.SKU, LessonScope.CATEGORY)
+            .containsOnly(LessonScope.SKU, LessonScope.CATEGORY)
+        // Three levels per scope: every condition, no weather, no conditions at all.
+        assertThat(result.lessons.filter { it.key.scope == LessonScope.SKU }.map { it.key.specificity })
+            .containsExactlyInAnyOrder(3, 2, 0)
         assertThat(result.lessons.map { it.key.wire })
             .allSatisfy { assertThat(it).contains("store:any", "event:any") }
     }
@@ -140,7 +147,8 @@ class PromotionEvaluatorTest {
             evaluator.evaluate(outcomeFor(scenario, discount, scenarioId = "SCN-ACC-$index"))
         }
 
-        val skuLesson = memory.allLessons.single { it.key.scope == LessonScope.SKU }
+        val skuLesson =
+            memory.allLessons.single { it.key.scope == LessonScope.SKU && it.key.specificity == 3 }
         assertThat(skuLesson.evidenceCount).isEqualTo(3)
         val expected =
             Discount.entries.maxByOrNull { discount ->

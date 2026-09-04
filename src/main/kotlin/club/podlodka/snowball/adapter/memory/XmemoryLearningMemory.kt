@@ -129,11 +129,12 @@ class XmemoryLearningMemory(
         val values =
             json.createObjectNode().apply {
                 put("scope", "${lesson.key.scope.prefix}:${lesson.key.scopeValue}")
-                put("store_scope", "any")
-                put("day_type", lesson.key.dayType.wire)
-                put("weather", lesson.key.weather.wire)
-                put("event_type", "any")
-                put("stock_level", lesson.key.stockLevel.wire)
+                // An absent condition is left out of the record, which is what the schema asks
+                // for - "leave empty when the lesson applies to both". Writing "any" into these
+                // columns also broke their enums: `event_type` allows none and local_event only.
+                lesson.key.dayType?.let { put("day_type", it.wire) }
+                lesson.key.weather?.let { put("weather", it.wire) }
+                lesson.key.stockLevel?.let { put("stock_level", it.wire) }
                 put("recommended_discount", lesson.recommendedDiscount.percent)
                 put("rationale", lesson.rationale)
                 put("evidence_count", lesson.evidenceCount)

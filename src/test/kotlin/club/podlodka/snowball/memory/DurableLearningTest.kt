@@ -84,13 +84,14 @@ class DurableLearningTest {
     }
 
     @Test
-    fun `one outcome writes one case and exactly two lessons`() {
+    fun `one outcome writes one case and the whole cascade of lessons`() {
         val result = PromotionEvaluator(engine, connect()).evaluate(outcome(Discount.TEN))
 
         assertThat(store.objectsOf("PromotionCase")).hasSize(1)
-        assertThat(store.objectsOf("Lesson")).hasSize(2)
-        assertThat(store.linkCount()).isEqualTo(2)
-        assertThat(result.lessons).hasSize(2)
+        // Three levels of key per scope, and one evidence link from the case to each.
+        assertThat(store.objectsOf("Lesson")).hasSize(6)
+        assertThat(store.linkCount()).isEqualTo(6)
+        assertThat(result.lessons).hasSize(6)
     }
 
     @Test
@@ -104,7 +105,7 @@ class DurableLearningTest {
         assertThat(second.lessons.map { it.evidenceCount }).containsOnly(1)
         assertThat(second.lessons).isEqualTo(first.lessons)
         assertThat(store.objectsOf("PromotionCase")).hasSize(1)
-        assertThat(store.linkCount()).isEqualTo(2)
+        assertThat(store.linkCount()).isEqualTo(6)
     }
 
     @Test
