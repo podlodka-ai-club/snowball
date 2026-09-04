@@ -93,6 +93,15 @@ class ModelAdapterTest {
     }
 
     @Test
+    fun `a body cut off mid-stream costs one scenario, not the run`() {
+        // A 200 whose body ends inside a string: seen in a training run, where the unguarded parse
+        // threw out of the decision service and ended the run at scenario 50 of 250.
+        body = """{"choices":[{"message":{"content":"{\"discount\": 1"""
+
+        assertThat(model().choose(scenario(), emptyList())).isNull()
+    }
+
+    @Test
     fun `a server error is refused, not retried into a wrong answer`() {
         status = 500
         body = "upstream on fire"

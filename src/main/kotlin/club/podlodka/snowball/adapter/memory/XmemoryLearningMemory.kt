@@ -22,10 +22,10 @@ import java.math.BigDecimal
  * involved. That is what makes writing a few hundred training cases affordable at all; the text
  * path would spend model tokens on data we already have in typed form.
  *
- * Reads are scoped by primary key. A natural-language read costs 20-26 seconds and a model call,
- * and worse, it proved unreliable for fetching known records - three queries asking for cases by
- * SKU answered "no matching case" while the rows were provably there. Retrieval here is never
- * conversational.
+ * Reads ask for `raw-tables`, which returns the stored columns and rows verbatim. The
+ * alternative, `xresponse`, is a model's rendering of the query text rather than of the scope: the
+ * same scoped read returned one field for a vaguely worded query and all twelve for a precise one,
+ * so retrieval here is never conversational.
  */
 class XmemoryLearningMemory(
     private val http: XmemoryHttp,
@@ -55,7 +55,7 @@ class XmemoryLearningMemory(
                 case.scenario.temperatureC?.let { put("temperature_c", it) }
                 case.scenario.eventNote?.let { put("event_note", it) }
             }
-        write(listOf(objectMutation("PromotionCase", "case_id", case.caseId, values)))
+        upsert("PromotionCase", "case_id", case.caseId, values)
     }
 
     override fun findCase(caseId: String): PromotionCase? {
@@ -66,32 +66,17 @@ class XmemoryLearningMemory(
         return null
     }
 
-    /** Whether this case is already recorded, which is the question `findCase` really answers. */
-    fun hasCase(caseId: String): Boolean =
-        scopedRead("PromotionCase", "case_id", caseId).any { it.identifier("case_id") == caseId }
-
     override fun linkCaseToLesson(
         caseId: String,
         key: LessonKey,
     ) {
+        // `object_name` names the participant *role* from the schema relation - `lesson` and
+        // `case` - not the object type. Naming the types instead is accepted as far as parsing and
+        // then rejected for missing both roles, which reads like a key problem and is not one.
         val endpoints =
             json.createArrayNode().apply {
-                add(
-                    json
-                        .createObjectNode()
-                        .put(
-                            "object_name",
-                            "Lesson",
-                        ).set<ObjectNode>("key", keyNode("lesson_key", key.wire)),
-                )
-                add(
-                    json
-                        .createObjectNode()
-                        .put(
-                            "object_name",
-                            "PromotionCase",
-                        ).set<ObjectNode>("key", keyNode("case_id", caseId)),
-                )
+                add(endpoint("lesson", "lesson_key", key.wire))
+                add(endpoint("case", "case_id", caseId))
             }
         val mutation =
             json.createObjectNode().apply {
@@ -103,13 +88,40 @@ class XmemoryLearningMemory(
                     },
                 )
             }
-        write(listOf(mutation))
+        // Re-linking a case already linked to this lesson is the resume path, not a failure.
+        write(listOf(mutation), ALREADY_EXISTS)
     }
 
-    override fun casesFor(key: LessonKey): List<CaseEvidence> =
-        scopedRead("Lesson", "lesson_key", key.wire, withRelations = true)
-            .filter { it.path("name").asText() == "PromotionCase" }
-            .map(::toEvidence)
+    /**
+     * The evidence behind one lesson, read by walking the `lesson_evidence` relation.
+     *
+     * This read is deliberately unscoped. A `scope` restricts a read to the objects it lists and
+     * nothing else - `all_relations` exposes the relations *among those* objects, it does not pull
+     * in their neighbours - so scoping to the lesson makes its cases invisible by construction.
+     * The traversal costs around 20 seconds on a key the service has not answered for before.
+     */
+    override fun casesFor(key: LessonKey): List<CaseEvidence> {
+        val columns = Discount.entries.joinToString(", ") { "profit_${it.percent}" }
+        return unscopedRead(
+            "For the Lesson whose lesson_key is \"${key.wire}\", list every PromotionCase linked to it " +
+                "through the lesson_evidence relation. Return case_id, $columns and best_discount.",
+        ).map(::toEvidence)
+    }
+
+    /**
+     * Every recorded `lesson_evidence` link, keyed by the lesson it belongs to, in one call.
+     *
+     * A run that aggregates lessons needs all of this and nothing else, and asking for it per
+     * lesson costs a model call each time. One traversal returns the whole join.
+     */
+    fun allEvidence(): Map<String, List<CaseEvidence>> {
+        val columns = Discount.entries.joinToString(", ") { "profit_${it.percent}" }
+        return unscopedRead(
+            "List every lesson_evidence link in the instance. For each link return the Lesson " +
+                "lesson_key and the linked PromotionCase case_id, $columns and best_discount.",
+        ).filter { it["lesson_key"]?.asText().isNullOrEmpty().not() }
+            .groupBy({ it.getValue("lesson_key").asText() }, ::toEvidence)
+    }
 
     override fun saveLesson(lesson: Lesson) {
         val values =
@@ -128,21 +140,43 @@ class XmemoryLearningMemory(
             }
         // A lesson updates in place on its deterministic key, including when new evidence
         // overturns the recommendation - a contradiction is a changed lesson, not a second one.
-        val operation = if (lesson(lesson.key) == null) "create" else "update"
-        write(listOf(objectMutation("Lesson", "lesson_key", lesson.key.wire, values, operation)))
+        upsert("Lesson", "lesson_key", lesson.key.wire, values)
     }
 
     override fun lesson(key: LessonKey): Lesson? =
         scopedRead("Lesson", "lesson_key", key.wire)
-            .firstOrNull { it.identifier("lesson_key") == key.wire }
+            .firstOrNull { it["lesson_key"]?.asText() == key.wire }
             ?.let { toLesson(key, it) }
 
-    private fun write(mutations: List<JsonNode>) {
+    private fun write(
+        mutations: List<JsonNode>,
+        tolerate: (String) -> Boolean = { false },
+    ): JsonNode? {
         val body =
             json.createObjectNode().apply {
                 set<ArrayNode>("structured_mutations", json.createArrayNode().addAll(mutations))
             }
-        http.post("/write", body)
+        return http.post("/write", body, tolerate)
+    }
+
+    /**
+     * Writes a record whether or not it is already there.
+     *
+     * A training run is resumable and a lesson is rewritten as evidence accumulates, so both
+     * happen: `create` on a key that exists is refused, and `update` on one that does not. Rather
+     * than reading first - a second round trip on every single write - this tries the create and
+     * falls back, which costs the extra call only on the writes that need it.
+     */
+    private fun upsert(
+        type: String,
+        keyField: String,
+        keyValue: String,
+        values: ObjectNode,
+    ) {
+        val created = write(listOf(objectMutation(type, keyField, keyValue, values)), ALREADY_EXISTS)
+        if (created == null) {
+            write(listOf(objectMutation(type, keyField, keyValue, values, "update")))
+        }
     }
 
     private fun objectMutation(
@@ -177,12 +211,11 @@ class XmemoryLearningMemory(
         type: String,
         keyField: String,
         keyValue: String,
-        withRelations: Boolean = false,
-    ): List<JsonNode> {
+    ): List<Map<String, JsonNode>> {
         val body =
             json.createObjectNode().apply {
-                put("query", "Return the scoped records.")
-                put("mode", "xresponse")
+                put("query", "Return every stored field of the scoped $type records.")
+                put("mode", "raw-tables")
                 set<ObjectNode>(
                     "scope",
                     json.createObjectNode().apply {
@@ -195,59 +228,87 @@ class XmemoryLearningMemory(
                                 },
                             ),
                         )
-                        put("relations_scope", if (withRelations) "all_relations" else "no_relations")
+                        put("relations_scope", "no_relations")
                     },
                 )
             }
-        return http
-            .post("/read", body)
-            .path("reader_result")
-            .path("objects")
-            .toList()
+        return rows(http.post("/read", body, NO_SUCH_KEY))
     }
+
+    /** A read over the whole instance, which is what a traversal across a relation requires. */
+    private fun unscopedRead(query: String): List<Map<String, JsonNode>> {
+        val body =
+            json.createObjectNode().apply {
+                put("query", query)
+                put("mode", "raw-tables")
+            }
+        return rows(http.post("/read", body, NO_SUCH_KEY))
+    }
+
+    /** `raw-tables` answers with the column list and the rows under it; pair them up by position. */
+    private fun rows(result: JsonNode?): List<Map<String, JsonNode>> {
+        val reader = result?.path("reader_result") ?: return emptyList()
+        val columns = reader.path("columns").map { it.path("name").asText() }
+        return reader.path("rows").map { row -> columns.withIndex().associate { (i, name) -> name to row.path(i) } }
+    }
+
+    /** One participant of a relation: its role, and the primary key of the object filling it. */
+    private fun endpoint(
+        role: String,
+        keyField: String,
+        keyValue: String,
+    ): ObjectNode =
+        json
+            .createObjectNode()
+            .put("object_name", role)
+            .set("key", json.createObjectNode().put(keyField, keyValue))
 
     private fun keyNode(
         field: String,
         value: String,
     ): ObjectNode = json.createObjectNode().set("key", json.createObjectNode().put(field, value))
 
-    private fun JsonNode.identifier(field: String): String? =
-        path("fields").firstOrNull { it.path("name").asText() == field }?.value()?.asText()
-            ?: path(field).takeIf { !it.isMissingNode }?.asText()
-
-    private fun JsonNode.value(): JsonNode? = path("value").let { v -> v.elements().asSequence().firstOrNull() ?: v }
-
-    private fun JsonNode.field(name: String): JsonNode =
-        path("fields").firstOrNull { it.path("name").asText() == name }?.value() ?: path(name)
+    private fun Map<String, JsonNode>.number(name: String): BigDecimal =
+        this[name]?.takeIf { !it.isNull }?.let { if (it.isNumber) it.decimalValue() else BigDecimal(it.asText()) }
+            ?: BigDecimal.ZERO
 
     /**
      * Only the columns a lesson aggregates. The stored case does not carry the SKU or category as
      * its own fields - they live on the related SKU record - so reconstructing a full case here
      * would mean inventing them.
      */
-    private fun toEvidence(node: JsonNode): CaseEvidence =
+    private fun toEvidence(row: Map<String, JsonNode>): CaseEvidence =
         CaseEvidence(
-            caseId = node.identifier("case_id")!!,
-            profitByDiscount =
-                Discount.entries.associateWith { BigDecimal(node.field("profit_${it.percent}").asText()) },
-            bestDiscount = Discount.fromPercent(node.field("best_discount").asInt()),
+            caseId = row.getValue("case_id").asText(),
+            profitByDiscount = Discount.entries.associateWith { row.number("profit_${it.percent}") },
+            bestDiscount = Discount.fromPercent(row.number("best_discount").toInt()),
         )
 
     private fun toLesson(
         key: LessonKey,
-        node: JsonNode,
+        row: Map<String, JsonNode>,
     ): Lesson =
         Lesson(
             key = key,
-            recommendedDiscount = Discount.fromPercent(node.field("recommended_discount").asInt()),
-            evidenceCount = node.field("evidence_count").asInt(),
-            avgProfitAdvantagePct = BigDecimal(node.field("avg_profit_advantage_pct").asText("0")),
-            confidence = BigDecimal(node.field("confidence").asText("0")),
-            rationale = node.field("rationale").asText(""),
+            recommendedDiscount = Discount.fromPercent(row.number("recommended_discount").toInt()),
+            evidenceCount = row.number("evidence_count").toInt(),
+            avgProfitAdvantagePct = row.number("avg_profit_advantage_pct"),
+            confidence = row.number("confidence"),
+            rationale = row["rationale"]?.asText("").orEmpty(),
         )
 
     private companion object {
         @Suppress("unused")
         private val SCOPES = LessonScope.entries
+
+        /**
+         * xmemory reports both of these as HTTP 400 `VALIDATION_ERROR`, which is also what a
+         * genuinely malformed call returns, so they are recognised by their message text. Each
+         * matches one phrase and nothing else: broadening either would start swallowing real
+         * rejections, and a swallowed write is a run that learns nothing while reporting success.
+         */
+        private val NO_SUCH_KEY: (String) -> Boolean = { it.contains("matches the provided primary key") }
+
+        private val ALREADY_EXISTS: (String) -> Boolean = { it.contains("already exists") }
     }
 }
