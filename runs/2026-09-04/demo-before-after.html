@@ -1,0 +1,528 @@
+<title>Snowball до и после</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@500;600;700&family=Literata:opsz,wght@7..72,400;7..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap&subset=cyrillic,latin">
+<style>
+  :root {
+    --ground: #F4F6F5;
+    --surface: #FFFFFF;
+    --sunk: #ECEFEE;
+    --ink: #131A19;
+    --ink-2: #46524F;
+    --ink-3: #6E7A77;
+    --line: #DCE2E0;
+    --line-soft: #E7EBEA;
+    --cold: #BE5504;
+    --warm: #0A8F86;
+    --shadow: 0 1px 2px rgba(19, 26, 25, .05), 0 8px 24px -16px rgba(19, 26, 25, .25);
+    --display: "Golos Text", "Helvetica Neue", Arial, sans-serif;
+    --body: "Literata", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1413;
+      --surface: #161E1D;
+      --sunk: #111917;
+      --ink: #E8EEEC;
+      --ink-2: #A9B5B2;
+      --ink-3: #7C8A86;
+      --line: #263230;
+      --line-soft: #1E2827;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0E1413;
+    --surface: #161E1D;
+    --sunk: #111917;
+    --ink: #E8EEEC;
+    --ink-2: #A9B5B2;
+    --ink-3: #7C8A86;
+    --line: #263230;
+    --line-soft: #1E2827;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .prose { max-width: 68ch; display: flex; flex-direction: column; gap: 18px; }
+  p { margin: 0; color: var(--ink-2); }
+  strong { color: var(--ink); font-weight: 500; }
+
+  h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; color: var(--ink); }
+  h1 { font-size: clamp(34px, 5.2vw, 52px); font-weight: 700; line-height: 1.06; letter-spacing: -.022em; }
+  h2 { font-size: 25px; font-weight: 600; letter-spacing: -.012em; }
+  h3 { font-size: 17px; font-weight: 600; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  header .lede { font-size: 19px; max-width: 62ch; }
+
+  .headline {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    box-shadow: var(--shadow);
+    padding: 32px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  @media (min-width: 720px) { .headline { grid-template-columns: auto minmax(0, 1fr); gap: 40px; align-items: center; } }
+
+  .headline .figure { display: flex; flex-direction: column; gap: 4px; }
+  .headline .value {
+    font-family: var(--display);
+    font-size: clamp(64px, 11vw, 104px);
+    font-weight: 700;
+    line-height: .88;
+    letter-spacing: -.04em;
+    color: var(--warm);
+    font-variant-numeric: tabular-nums;
+  }
+  .headline .caption { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--ink-2); }
+
+  section { display: flex; flex-direction: column; gap: 22px; }
+  .section-head { display: flex; flex-direction: column; gap: 8px; }
+
+  figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  figcaption { font-size: 14px; color: var(--ink-3); max-width: 66ch; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 26px 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .bars { display: flex; flex-direction: column; gap: 20px; }
+  .bar-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; }
+  .bar-label { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .bar-name { font-family: var(--display); font-weight: 600; font-size: 14.5px; }
+  .bar-value { font-family: var(--mono); font-size: 14px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .bar-track { background: var(--sunk); border-radius: 2px; height: 26px; position: relative; overflow: hidden; }
+  .bar-fill {
+    height: 100%;
+    border-radius: 0 4px 4px 0;
+    transition: width .7s cubic-bezier(.22, 1, .36, 1);
+  }
+  .bar-fill[data-arm="cold"] { background: var(--cold); }
+  .bar-fill[data-arm="warm"] { background: var(--warm); }
+  .bar-sub { font-size: 13.5px; color: var(--ink-3); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  .scroll { overflow-x: auto; }
+  th, td { text-align: right; padding: 11px 14px; border-bottom: 1px solid var(--line-soft); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 400;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody td { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  tbody td:first-child { font-family: var(--display); font-weight: 500; color: var(--ink); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr[data-best] td { color: var(--ink); }
+
+  .swatch {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    margin-right: 8px;
+    vertical-align: baseline;
+  }
+
+  .cards { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 780px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card[data-kind="counter"] { border-style: dashed; }
+  .card .sku { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+  .card .context { font-size: 15px; color: var(--ink-2); }
+
+  .swap { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .choice { display: flex; flex-direction: column; gap: 2px; }
+  .choice .pct {
+    font-family: var(--display);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .choice[data-arm="cold"] .pct { color: var(--cold); }
+  .choice[data-arm="warm"] .pct { color: var(--warm); }
+  .choice .who { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .arrow { color: var(--ink-3); font-size: 20px; line-height: 1; }
+
+  .money { font-family: var(--mono); font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .money b { color: var(--ink); font-weight: 500; }
+
+  .lesson {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--sunk);
+    border-radius: 2px;
+    padding: 9px 11px;
+    color: var(--ink-2);
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .notes { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 780px) { .notes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .note { border-left: 2px solid var(--line); padding-left: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .note h3 { font-size: 15px; }
+  .note p { font-size: 15px; }
+
+  .setup { display: flex; flex-direction: column; gap: 0; }
+  .setup div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  @media (min-width: 640px) { .setup div { grid-template-columns: 210px minmax(0, 1fr); gap: 20px; align-items: baseline; } }
+  .setup div:last-child { border-bottom: none; }
+  .setup dt { font-family: var(--display); font-weight: 600; font-size: 14.5px; }
+  .setup dd { margin: 0; font-size: 15px; color: var(--ink-2); }
+
+  .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .chart .grid { stroke: var(--line-soft); stroke-width: 1; }
+  .chart .axis { stroke: var(--line); stroke-width: 1; }
+  .chart .tick { font-family: var(--mono); font-size: 11px; fill: var(--ink-3); }
+  .chart .series { fill: none; stroke: var(--warm); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .chart .series[data-state="prior"] { stroke: var(--ink-3); stroke-dasharray: 3 4; }
+  .chart .dot { fill: var(--warm); stroke: var(--surface); stroke-width: 2; }
+  .chart .dot[data-state="prior"] { fill: var(--ink-3); }
+  .chart .point-label { font-family: var(--mono); font-size: 12px; fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+  footer { border-top: 1px solid var(--line); padding-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+  footer p { font-size: 14.5px; }
+  code { font-family: var(--mono); font-size: .88em; color: var(--ink); }
+
+  a { color: var(--warm); text-underline-offset: 3px; }
+  a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--warm); outline-offset: 3px; border-radius: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bar-fill { transition: none; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="prose">
+    <span class="eyebrow">Hacker Sprint 2 &middot; команда Snowball</span>
+    <h1>Что изменилось после обучения</h1>
+    <p class="lede">Промо-агент выбирает скидку для товара в магазине на конкретный день: 0, 10, 20 или 30 процентов. После 250 сценариев обучения его проверили на 50 отложенных днях, которых он не видел. Ниже - что именно изменилось в решениях и сколько это стоит в деньгах.</p>
+  </header>
+
+  <div class="headline">
+    <div class="figure">
+      <span class="value">84%</span>
+      <span class="caption">недополученной прибыли<br>агент перестал терять</span>
+    </div>
+    <div class="prose">
+      <p>На одних и тех же 50 сценариях агент без памяти отдал <strong>44.04</strong> условных единиц прибыли, агент с накопленными уроками - <strong>7.18</strong>. Доля решений, попавших в лучшее из четырёх действий, выросла с <strong>44%</strong> до <strong>80%</strong>.</p>
+      <p>Обе руки решают одни и те же сценарии, одной и той же моделью, по одному и тому же промпту. Отличается ровно одно: что лежит в памяти.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">метрика</span>
+      <h2>Что считается потерей</h2>
+    </div>
+    <div class="prose">
+      <p>Симулятор рынка детерминирован, поэтому для каждого сценария можно проиграть все четыре скидки на одном и том же рыночном шоке и узнать, какая была лучшей. Разница между лучшей и выбранной - это и есть потеря.</p>
+      <p>Пример из памяти агента: мясная нарезка, дождливый будний день, полный склад. Прибыль по четырём действиям - <strong>6.48</strong> при нулевой скидке, 6.30 при десяти процентах, 5.28 при двадцати и 3.64 при тридцати. Агент без памяти дал 20% и заработал 5.28, потеряв <strong>1.20</strong>. После обучения он выбирает 0% и не теряет ничего.</p>
+      <p>Доля попаданий не отличает промах на копейку от промаха, съедающего маржу, поэтому основная метрика - деньги, а не проценты.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">результат</span>
+      <h2>Три политики памяти на одной выборке</h2>
+    </div>
+
+    <figure>
+      <div class="panel bars" id="bars">
+        <div class="bar-row">
+          <div class="bar-label">
+            <span class="bar-name">Без памяти</span>
+            <span class="bar-value">44.04</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" data-arm="cold" data-width="97.9"></div></div>
+          <span class="bar-sub">44% оптимальных решений, 28 ошибок</span>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">
+            <span class="bar-name">Память, точный ключ</span>
+            <span class="bar-value">12.17</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" data-arm="warm" data-width="27.0"></div></div>
+          <span class="bar-sub">76% оптимальных, урок нашёлся для 44 сценариев из 50</span>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">
+            <span class="bar-name">Память с откатом на общий урок</span>
+            <span class="bar-value">7.18</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" data-arm="warm" data-width="16.0"></div></div>
+          <span class="bar-sub">80% оптимальных, урок нашёлся для всех 50</span>
+        </div>
+      </div>
+      <figcaption>Суммарная потерянная прибыль на 50 отложенных сценариях, меньше - лучше. Обучение не велось ни в одной из трёх рук: измерение не должно менять то, что измеряет.</figcaption>
+    </figure>
+
+    <div class="panel scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Политика</th>
+            <th>Оптимальных</th>
+            <th>Потери</th>
+            <th>Ошибок</th>
+            <th>Память ответила</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="swatch" style="background: var(--cold)"></span>Без памяти</td>
+            <td>44%</td>
+            <td>44.04</td>
+            <td>28</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td><span class="swatch" style="background: var(--warm)"></span>Точный ключ</td>
+            <td>76%</td>
+            <td>12.17</td>
+            <td>12</td>
+            <td>44 / 50</td>
+          </tr>
+          <tr data-best>
+            <td><span class="swatch" style="background: var(--warm)"></span>С откатом</td>
+            <td>80%</td>
+            <td>7.18</td>
+            <td>10</td>
+            <td>50 / 50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>Разница с рукой без памяти не объясняется случайностью: по одним и тем же сценариям обученный агент лучше на 25, хуже на 6, одинаково на 19, точный биномиальный тест даёт <strong>p = 0.0009</strong>. Для ориентира: случайный выбор из четырёх действий дал бы около 25% попаданий, так что 44% у руки без памяти - это уже разумная модель, а не ноль.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">как это выглядит по ходу обучения</span>
+      <h2>Кривая обучения</h2>
+    </div>
+    <figure>
+      <div class="panel">
+        <svg class="chart" viewBox="0 0 720 260" role="img" aria-label="Доля оптимальных решений по полусотням обучающих сценариев: 90, 52, 74, 78, 76 процентов">
+          <line class="grid" x1="56" y1="40" x2="700" y2="40"></line>
+          <line class="grid" x1="56" y1="95" x2="700" y2="95"></line>
+          <line class="grid" x1="56" y1="150" x2="700" y2="150"></line>
+          <line class="axis" x1="56" y1="205" x2="700" y2="205"></line>
+          <text class="tick" x="46" y="44" text-anchor="end">100%</text>
+          <text class="tick" x="46" y="99" text-anchor="end">75%</text>
+          <text class="tick" x="46" y="154" text-anchor="end">50%</text>
+          <text class="tick" x="46" y="209" text-anchor="end">25%</text>
+
+          <path class="series" data-state="prior" d="M 120 62 L 248 146"></path>
+          <path class="series" d="M 248 146 L 376 98 L 504 89 L 632 93"></path>
+
+          <circle class="dot" data-state="prior" cx="120" cy="62" r="5"></circle>
+          <circle class="dot" cx="248" cy="146" r="5"></circle>
+          <circle class="dot" cx="376" cy="98" r="5"></circle>
+          <circle class="dot" cx="504" cy="89" r="5"></circle>
+          <circle class="dot" cx="632" cy="93" r="5"></circle>
+
+          <text class="point-label" x="120" y="44" text-anchor="middle">90%</text>
+          <text class="point-label" x="248" y="168" text-anchor="middle">52%</text>
+          <text class="point-label" x="376" y="80" text-anchor="middle">74%</text>
+          <text class="point-label" x="504" y="71" text-anchor="middle">78%</text>
+          <text class="point-label" x="632" y="75" text-anchor="middle">76%</text>
+
+          <text class="tick" x="120" y="232" text-anchor="middle">1-50</text>
+          <text class="tick" x="248" y="232" text-anchor="middle">51-100</text>
+          <text class="tick" x="376" y="232" text-anchor="middle">101-150</text>
+          <text class="tick" x="504" y="232" text-anchor="middle">151-200</text>
+          <text class="tick" x="632" y="232" text-anchor="middle">201-250</text>
+        </svg>
+      </div>
+      <figcaption>Доля оптимальных решений внутри обучающего прогона, по полусотням сценариев. Первая точка показана пунктиром и в сравнении не участвует: эти сценарии уже были в памяти от предыдущего, упавшего прогона. Содержательная часть начинается со второй - 52% на незнакомых ключах, затем подъём до 74-78% по мере накопления уроков и выход на плато.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">разбор</span>
+      <h2>Где память изменила решение</h2>
+    </div>
+    <div class="cards">
+
+      <article class="card">
+        <span class="sku">SCN-20111111 &middot; CHIPS1 &middot; чипсы</span>
+        <p class="context">Будний день, полный склад. Без памяти агент осторожничает и даёт 10%.</p>
+        <div class="swap">
+          <span class="choice" data-arm="cold"><span class="pct">10%</span><span class="who">без памяти</span></span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+          <span class="choice" data-arm="warm"><span class="pct">20%</span><span class="who">с памятью</span></span>
+        </div>
+        <p class="money">потеря <b>4.94</b> &rarr; <b>0.00</b></p>
+        <p class="lesson">sku:CHIPS1|store:any|weekday|any|event:any|stock:high</p>
+        <p class="context">Урок здесь общий - без погоды. Точного урока на этот день в памяти не было, сработал откат на более широкий ключ.</p>
+      </article>
+
+      <article class="card">
+        <span class="sku">SCN-20111125 &middot; ICE500 &middot; мороженое</span>
+        <p class="context">Жаркий будний день, полный склад - ровно тот случай, для которого у агента накопились наблюдения.</p>
+        <div class="swap">
+          <span class="choice" data-arm="cold"><span class="pct">10%</span><span class="who">без памяти</span></span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+          <span class="choice" data-arm="warm"><span class="pct">20%</span><span class="who">с памятью</span></span>
+        </div>
+        <p class="money">потеря <b>4.70</b> &rarr; <b>0.00</b></p>
+        <p class="lesson">sku:ICE500|store:any|weekday|hot|event:any|stock:high</p>
+        <p class="context">Здесь ключ точный: товар, тип дня, погода и остаток совпали с накопленным опытом.</p>
+      </article>
+
+      <article class="card" data-kind="counter">
+        <span class="sku">SCN-20111218 &middot; ICE500 &middot; контрпример</span>
+        <p class="context">Тот же товар, другой день. Память уверенно советует 20%, но именно здесь лучше было дать 10%.</p>
+        <div class="swap">
+          <span class="choice" data-arm="cold"><span class="pct">10%</span><span class="who">без памяти</span></span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+          <span class="choice" data-arm="warm"><span class="pct">20%</span><span class="who">с памятью</span></span>
+        </div>
+        <p class="money">потеря <b>0.00</b> &rarr; <b>3.76</b></p>
+        <p class="context">Обученный агент проигрывает на 6 сценариях из 50. Урок обобщает по нескольким наблюдениям и не может знать рыночный шум конкретного дня - это цена обобщения, а не сбой.</p>
+      </article>
+
+      <article class="card">
+        <span class="sku">итог по разбору</span>
+        <p class="context">Выигрыши крупнее проигрышей и случаются вчетверо чаще.</p>
+        <div class="swap">
+          <span class="choice" data-arm="warm"><span class="pct">25</span><span class="who">лучше</span></span>
+          <span class="choice" data-arm="cold"><span class="pct">6</span><span class="who">хуже</span></span>
+          <span class="choice"><span class="pct" style="color: var(--ink-3)">19</span><span class="who">поровну</span></span>
+        </div>
+        <p class="context">Число ошибок упало с 28 до 10, а средняя цена оставшейся ошибки - с 1.57 до примерно 0.72.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">постановка</span>
+      <h2>Как поставлен эксперимент</h2>
+    </div>
+    <div class="panel">
+      <dl class="setup">
+        <div><dt>Данные</dt><dd>Открытый датасет dunnhumby "Breakfast at the Frat", 300 дней-товаров: 250 обучающих и 50 отложенных.</dd></div>
+        <div><dt>Разделение</dt><dd>По времени, а не случайно. Обучение - до 21 октября 2011, замер - после.</dd></div>
+        <div><dt>Изоляция рук</dt><dd>Чистая и обученная память живут в разных инстансах xmemory. Чистая рука спрашивала память все 50 раз и все 50 раз получала пустой ответ.</dd></div>
+        <div><dt>Обучение выключено</dt><dd>Во время замера ни одна рука не пишет в память - это проверено отдельным тестом, а не только чтением кода.</dd></div>
+        <div><dt>Оракул</dt><dd>Все четыре действия проигрываются на одном и том же рыночном шоке: шум выводится из идентификатора сценария и не зависит от скидки.</dd></div>
+        <div><dt>Что видит агент</dt><dd>Только сценарий и уроки из памяти. Симулятор ему недоступен - ни через API, ни через логи, ни через память.</dd></div>
+        <div><dt>Модель</dt><dd>muse-glimmer-30b-q3 на локальном сервере, temperature 0. Ни одного отказа модели в зачётных прогонах.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">оговорки</span>
+      <h2>Чего эти цифры не доказывают</h2>
+    </div>
+    <div class="notes">
+      <div class="note">
+        <h3>Откат не доказан статистически</h3>
+        <p>Политика с откатом отличается от политики с точным ключом всего на шести сценариях из пятидесяти: лучше на четырёх, хуже на двух, p = 0.69. Выигрыш в деньгах реален, но сосредоточен в нескольких дорогих случаях. Значимо подтверждена только разница с чистой памятью.</p>
+      </div>
+      <div class="note">
+        <h3>Замер с точным ключом занижен</h3>
+        <p>Три из пятидесяти сценариев эта рука отработала вообще без памяти: закончилась дневная квота сервиса. Её настоящий результат немного лучше показанного.</p>
+      </div>
+      <div class="note">
+        <h3>Мир синтетический</h3>
+        <p>Базовые продажи взяты из реального датасета, но реакция на скидку и рыночный шум смоделированы. Это делает измерение честным и воспроизводимым, но не превращает его в прогноз для настоящей полки.</p>
+      </div>
+      <div class="note">
+        <h3>Категорийные уроки пока бесполезны</h3>
+        <p>В фикстуре шесть товаров и шесть категорий - соответствие один к одному, поэтому категорийный уровень уроков дублирует товарный. На реальном ассортименте он заработал бы, здесь он ничего не добавляет.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="prose">
+    <span class="eyebrow">воспроизведение</span>
+    <p>Логи всех прогонов и параметры лежат в репозитории в <code>runs/2026-09-04/</code>. Прогон повторяется командой <code>RunExperiment --split=benchmark --no-learning --arm=clean|trained</code>; симулятор сеется идентификатором сценария, поэтому оракул воспроизводится точно.</p>
+    <p>Оценка эффекта отката была посчитана офлайн до живого прогона и предсказала потери 7.16 - живой прогон дал 7.18.</p>
+  </footer>
+
+</div>
+
+<script>
+  // Bars animate from zero on first paint; the widths themselves live in the markup
+  // so the page reads correctly with scripting off or motion reduced.
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll(".bar-fill").forEach((fill, i) => {
+    const target = fill.dataset.width + "%";
+    if (reduce) { fill.style.width = target; return; }
+    fill.style.width = "0%";
+    setTimeout(() => { fill.style.width = target; }, 120 + i * 110);
+  });
+</script>
