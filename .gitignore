@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+build/
+
+# JVM
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.log
+hs_err_pid*
+replay_pid*
+
+# Local environment
+.env
+.env.local
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+out/
+
+# OS
+.DS_Store

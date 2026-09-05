@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-08-30
+goal: Establish the shared Gradle/Kotlin build, the typed models of the committed v1 contracts, and neutral internal ports that every component change builds on.
+affected_areas:
+  - build
+  - contracts
+  - ports
+  - ci

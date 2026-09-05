@@ -1,0 +1,170 @@
+## Purpose
+
+Provide one reproducible build, one typed projection of the three committed v1 contracts, and one set of transport-neutral internal ports, so that the five component changes start from a shared foundation instead of each inventing its own DTOs, style rules, and boundary names.
+
+## ADDED Requirements
+
+### Requirement: Reproducible single-command build
+The repository SHALL build and verify itself through a committed Gradle wrapper with a single command, on a JDK 21 toolchain, without any tool installed beyond a JVM.
+
+#### Scenario: Contributor builds a clean clone
+- **WHEN** `./gradlew spotlessCheck build` is run on a freshly cloned repository
+- **THEN** the build SHALL resolve its own Gradle distribution, compile with the configured Kotlin toolchain, run all tests, and succeed
+
+#### Scenario: Sources violate the formatting rules
+- **WHEN** a Kotlin source or Gradle Kotlin script does not match the configured ktlint style
+- **THEN** `spotlessCheck` SHALL fail and SHALL report the offending file before compilation results are interpreted
+
+### Requirement: Single declaration of versions
+Dependency and plugin versions SHALL be declared in the Gradle version catalog and SHALL NOT be duplicated in build scripts.
+
+#### Scenario: A dependency version is changed
+- **WHEN** a contributor updates a library or plugin version
+- **THEN** exactly one catalog entry SHALL change and the build scripts SHALL remain untouched
+
+### Requirement: Contract models mirror the committed schemas
+The module SHALL expose Kotlin models for `promotion-scenario-v1`, `promotion-decision-v1`, and `promotion-outcome-v1` that mirror the committed JSON Schemas under `docs/` and SHALL NOT define any alternative or parallel contract format.
+
+#### Scenario: A committed example is read
+- **WHEN** a committed `*.example.json` is deserialized into its model
+- **THEN** every property present in the example SHALL be represented by a model property, with no property silently discarded
+
+#### Scenario: A schema declares a shared payload by reference
+- **WHEN** the decision and outcome schemas reference the scenario payload defined by the scenario schema
+- **THEN** the models SHALL reuse one scenario payload type rather than redeclaring the same fields
+
+#### Scenario: The model is narrower than the schema
+- **WHEN** the Kotlin type cannot represent every value the schema permits - an `integer` beyond 32 bits, or an integer written in the non-canonical form `320.0`
+- **THEN** the input SHALL be rejected loudly rather than silently truncated, and the narrowing SHALL be recorded in the design as a deliberate deviation
+
+### Requirement: Lossless round trip against the committed examples
+Each of the three contracts SHALL support a lossless round trip: parsing a committed example and serializing it back SHALL produce a semantically identical JSON document.
+
+#### Scenario: Scenario example is round-tripped
+- **WHEN** `docs/scenario-generator/promotion-scenario-v1.example.json` is parsed into the model and serialized back
+- **THEN** the result SHALL equal the source document as a JSON tree, with no field dropped, renamed, added, or retyped
+
+#### Scenario: Decision example is round-tripped
+- **WHEN** `docs/promotion-agent/promotion-decision-v1.example.json` is parsed into the model and serialized back
+- **THEN** the result SHALL equal the source document as a JSON tree
+
+#### Scenario: Outcome example is round-tripped
+- **WHEN** `docs/market-simulator/promotion-outcome-v1.example.json` is parsed into the model and serialized back
+- **THEN** the result SHALL equal the source document as a JSON tree
+
+#### Scenario: Optional fields are absent
+- **WHEN** a document omits fields the schema marks as optional
+- **THEN** parsing SHALL succeed and serialization SHALL NOT emit those fields as explicit nulls
+
+#### Scenario: A timestamp carries an offset other than UTC
+- **WHEN** a `date-time` field is written with an offset such as `+01:00`
+- **THEN** the round trip SHALL preserve that offset rather than normalising it to `Z`
+
+#### Scenario: A number carries more precision than a binary float holds
+- **WHEN** a JSON number in the document exceeds the precision or range of a 64-bit float
+- **THEN** the round trip SHALL preserve its value exactly
+
+### Requirement: Contract violations fail at the boundary
+Deserialization SHALL reject a document that the committed schema would reject on required fields, closed enumerations, constant envelope values, unknown properties, JSON types, string lengths, and numeric bounds. Construction of a model directly in Kotlin SHALL enforce the same invariants.
+
+#### Scenario: A required field is missing
+- **WHEN** a document omits a field listed as required by its schema
+- **THEN** deserialization SHALL fail rather than produce a partially populated model
+
+#### Scenario: A value falls outside a closed enumeration
+- **WHEN** a discount other than 0, 10, 20, or 30, or a `stock_level`, `day_type`, `weather`, or scenario `event_type` value outside its enumeration is supplied
+- **THEN** deserialization SHALL fail
+
+#### Scenario: An unknown property is supplied
+- **WHEN** a document carries a property that the schema forbids through `additionalProperties: false`
+- **THEN** deserialization SHALL fail
+
+#### Scenario: A constant envelope value is wrong
+- **WHEN** `event_type`, `schema_version`, or `simulator_version` does not equal the constant fixed by the schema
+- **THEN** deserialization SHALL fail, and for a valid document those constants SHALL survive the round trip unchanged
+
+#### Scenario: A value has the wrong JSON type
+- **WHEN** a `number` field carries a string, an `integer` field carries a fractional number, a `string` field carries a number or a boolean, or a `date`/`date-time` field carries a number or an array
+- **THEN** deserialization SHALL fail rather than coerce the value, since the schema constrains the JSON type
+
+#### Scenario: An enumeration is given as a number
+- **WHEN** a closed enumeration receives a JSON number
+- **THEN** deserialization SHALL fail rather than interpret it as the ordinal of a constant
+
+#### Scenario: A required numeric field is null
+- **WHEN** a required `integer` or `number` field is present with an explicit `null`
+- **THEN** deserialization SHALL fail rather than substitute zero
+
+#### Scenario: An optional field is present and null
+- **WHEN** a field the schema declares optional is present with an explicit `null`
+- **THEN** deserialization SHALL fail, because the schema permits the field to be absent but never to be null
+
+#### Scenario: A string or number falls outside its schema bounds
+- **WHEN** a `minLength: 1` string is empty, or `price` is not greater than zero, or `cost`, `stock`, `baseline_sales`, or `units_sold` is negative
+- **THEN** the value SHALL be rejected, whether it arrives through deserialization or through direct construction
+
+### Requirement: The committed schemas are the test oracle
+The tests SHALL validate against the committed JSON Schemas themselves, not against a restatement of them.
+
+#### Scenario: A committed example is checked
+- **WHEN** the test suite runs
+- **THEN** each committed `*.example.json` SHALL be validated against its committed schema, and each model's serialized form SHALL be validated against that schema too
+
+#### Scenario: A committed schema is changed
+- **WHEN** a constraint in a committed schema is loosened or tightened without a matching change to the models
+- **THEN** a test SHALL fail, because every negative case asserts that the schema and the model reject the same document
+
+### Requirement: A constructed model cannot publish an invalid document
+Construction in Kotlin SHALL enforce the schema formats that the Kotlin types are too wide to express.
+
+#### Scenario: A temporal value outside the schema format is constructed
+- **WHEN** a `date` is built with a year beyond four digits, or a `date-time` with an offset carrying seconds
+- **THEN** construction SHALL fail, since both would serialize to a value the schema rejects
+
+#### Scenario: A downstream event is built from its upstream event
+- **WHEN** a decision is built from a scenario event, or an outcome from a decision event
+- **THEN** a constructor SHALL be available that copies the identity and the snapshot from the upstream event, so the parts of one event cannot come from unrelated events
+
+### Requirement: Transport-neutral internal ports
+The module SHALL define `SimulationPort`, `OutcomeSink`, and `ScenarioPublisher` as plain interfaces over the contract models, and their signatures SHALL NOT name any messaging, framework, persistence, or configuration type.
+
+#### Scenario: A component change implements a port
+- **WHEN** a later change supplies an adapter for a port
+- **THEN** it SHALL do so without altering the interface, whichever transport the team ultimately chooses
+
+#### Scenario: Tests need a port implementation
+- **WHEN** a test requires a working port
+- **THEN** a trivial in-process implementation SHALL be available that records or returns fixed values and contains no domain arithmetic
+
+#### Scenario: The simulator needs the scenario identity
+- **WHEN** `SimulationPort` is called
+- **THEN** it SHALL receive `scenario_id` as well as the scenario payload and the discount, because the documented deterministic noise is derived from `v1|<scenario_id>` and the committed `scenario` object does not carry the id
+
+### Requirement: The skeleton carries no domain behavior
+The module SHALL NOT contain simulator coefficients or formulas, oracle selection, regret calculation, Lesson derivation, prompt construction, model invocation, or xmemory access.
+
+#### Scenario: The simulation port is exercised
+- **WHEN** `SimulationPort` is called through the implementation shipped by this change
+- **THEN** it SHALL return only the committed outcome payload and SHALL expose no coefficient, noise factor, counterfactual set, or oracle-best action
+
+#### Scenario: A component is wired to a real simulation
+- **WHEN** a later change supplies a real `SimulationPort` implementation
+- **THEN** it SHALL NOT be reachable from the Promotion Agent, since any holder can call it once per allowed discount and reconstruct the counterfactual profits for the current scenario, which the narrow return type alone does not prevent
+
+#### Scenario: A component change begins
+- **WHEN** the Market Simulator, Promotion Agent, Scenario Generator, Evaluator/Learner, or xmemory change is implemented
+- **THEN** it SHALL own its behavior itself, and the skeleton SHALL require no change beyond additive extension
+
+### Requirement: No secret material in the repository
+The repository SHALL commit a secret-free example environment file and SHALL ignore real environment files.
+
+#### Scenario: A contributor configures xmemory access
+- **WHEN** an API key is needed locally
+- **THEN** `.env.example` SHALL declare `XMEM_API_KEY` with an empty value, using the name the component documentation uses, the real file SHALL be ignored by version control, and no key value SHALL appear in any tracked file
+
+### Requirement: Continuous verification of the same command
+Continuous integration SHALL run the same verification command as a local contributor, on every push and pull request.
+
+#### Scenario: A pull request is opened
+- **WHEN** a pull request targets the default branch
+- **THEN** CI SHALL provision a Temurin JDK 21 toolchain and run `./gradlew spotlessCheck build`, and SHALL fail the check if either step fails

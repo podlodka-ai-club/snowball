@@ -1,14 +1,17 @@
 # OpenSpec implementation plan
 
-This directory turns the existing architecture into five independently executable coding-agent changes.
+This directory turns the existing architecture into one foundation change plus five independently executable coding-agent changes.
 
 Recommended implementation order:
 
+0. `implement-project-skeleton`
 1. `implement-scenario-generator`
 2. `integrate-xmemory-learning-memory`
 3. `implement-promotion-agent`
 4. `implement-market-simulator`
 5. `implement-evaluator-learner`
+
+`implement-project-skeleton` comes first because every component change starts by asking for typed models of the same committed JSON contracts, so building them once removes the merge conflict that parallel work would otherwise create.
 
 Promotion Agent and Market Simulator can be developed in parallel once the committed scenario/decision contracts are treated as fixed. Evaluator/Learner depends on the pure simulation capability and xmemory schema.
 
