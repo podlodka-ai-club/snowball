@@ -1,5 +1,6 @@
 package club.podlodka.snowball.application
 
+import club.podlodka.snowball.domain.CaseEvidence
 import club.podlodka.snowball.domain.Discount
 import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.PromotionCase
@@ -90,10 +91,16 @@ class PromotionEvaluator(
         }
 
         memory.saveCase(case)
+        val evidence = CaseEvidence(case.caseId, case.profitByDiscount, case.bestDiscount)
         val lessons =
             case.lessonKeys.map { key ->
+                // The lesson is written before the relation that points at it, because a durable
+                // memory cannot link to a record that does not exist yet. The case just saved is
+                // part of the evidence either way: aggregating it here rather than re-reading it
+                // afterwards also keeps the lesson correct if the relation write is retried.
+                val lesson = Lesson.from(key, memory.casesFor(key) + evidence).also(memory::saveLesson)
                 memory.linkCaseToLesson(case.caseId, key)
-                Lesson.from(key, memory.casesFor(key)).also(memory::saveLesson)
+                lesson
             }
         log.info {
             "evaluated scenario_id=${outcome.scenarioId} chosen=${case.chosenDiscount.percent} " +

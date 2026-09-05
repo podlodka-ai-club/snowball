@@ -28,10 +28,15 @@ import java.net.InetSocketAddress
  * The quota is shared and one overnight run has already been reported to eat a tenth of the
  * monthly allowance; spending it on assertions would be indefensible. What matters here is the
  * request this adapter builds and how it reacts to the answers - both checkable without a network.
+ *
+ * Every stubbed reply below is copied from a recorded answer of the real service. An earlier
+ * version of this file invented the response shape instead, and every test passed while the
+ * adapter could not read a single stored field back.
  */
 class XmemoryLearningMemoryTest {
     private lateinit var server: HttpServer
     private lateinit var memory: XmemoryLearningMemory
+    private lateinit var http: XmemoryHttp
     private val requests = mutableListOf<Pair<String, JsonNode>>()
     private var reply: (String) -> String = { """{"ids":[],"items":[{}],"errors":[]}""" }
     private var status = 200
@@ -50,16 +55,15 @@ class XmemoryLearningMemoryTest {
             exchange.responseBody.use { it.write(payload) }
         }
         server.start()
-        memory =
-            XmemoryLearningMemory(
-                XmemoryHttp(
-                    XmemoryConfig(
-                        baseUrl = "http://127.0.0.1:${server.address.port}",
-                        instanceId = "test-instance",
-                        apiKey = "test-key",
-                    ),
+        http =
+            XmemoryHttp(
+                XmemoryConfig(
+                    baseUrl = "http://127.0.0.1:${server.address.port}",
+                    instanceId = "test-instance",
+                    apiKey = "test-key",
                 ),
             )
+        memory = XmemoryLearningMemory(http)
     }
 
     @AfterEach
@@ -110,7 +114,23 @@ class XmemoryLearningMemoryTest {
                 .path("lesson_key")
                 .asText(),
         ).isEqualTo(key.wire)
-        assertThat(read.path("mode").asText()).isEqualTo("xresponse")
+        // `xresponse` renders the query text rather than the scope - the same scoped read answered
+        // with one field for a vague query and with all of them for a precise one. `raw-tables`
+        // returns the stored columns and rows and does not depend on the wording.
+        assertThat(read.path("mode").asText()).isEqualTo("raw-tables")
+    }
+
+    @Test
+    fun `a missing instance is refused before the run starts`() {
+        // A mistyped instance id answers 404 on every call, and the agent's own resilience then
+        // hides it: it logs "memory unavailable" per scenario and decides without lessons, so a
+        // benchmark arm reports fifty ordinary-looking results for a memory that was never there.
+        status = 404
+        reply = { """{"ids":[],"items":[],"errors":[{"code":"NOT_FOUND","message":"Resource not found"}]}""" }
+
+        assertThatExceptionOfType(XmemoryError::class.java)
+            .isThrownBy { http.requireInstance() }
+            .withMessageContaining("not usable")
     }
 
     @Test
@@ -138,13 +158,11 @@ class XmemoryLearningMemoryTest {
     fun `a stored lesson is read back`() {
         reply = { path ->
             if (path == "read") {
-                """{"items":[{"reader_result":{"objects":[{"identifier":"lesson_key='${key.wire}'","fields":[
-                {"name":"lesson_key","value":{"string_value":"${key.wire}"}},
-                {"name":"recommended_discount","value":{"integer_value":20}},
-                {"name":"evidence_count","value":{"integer_value":4}},
-                {"name":"avg_profit_advantage_pct","value":{"float_value":12.5}},
-                {"name":"confidence","value":{"float_value":0.8}},
-                {"name":"rationale","value":{"string_value":"because numbers"}}]}]}}],"errors":[]}"""
+                """{"ids":[],"items":[{"trace_id":"918160_ett","reader_result":{"columns":[
+                {"name":"lesson_key","type":"text"},{"name":"recommended_discount","type":"integer"},
+                {"name":"rationale","type":"text"},{"name":"evidence_count","type":"integer"},
+                {"name":"confidence","type":"float"},{"name":"avg_profit_advantage_pct","type":"float"}],
+                "rows":[["${key.wire}",20,"because numbers",4,0.8,12.5]]},"sql":null}],"errors":[]}"""
             } else {
                 """{"ids":[],"items":[{}],"errors":[]}"""
             }
@@ -159,16 +177,14 @@ class XmemoryLearningMemoryTest {
     }
 
     @Test
-    fun `evidence is read through the lesson's relations`() {
+    fun `evidence is read by traversing the relation, and that read is not scoped`() {
         reply = { path ->
             if (path == "read") {
-                """{"items":[{"reader_result":{"objects":[{"name":"PromotionCase","fields":[
-                {"name":"case_id","value":{"string_value":"CASE-v1-SCN-1"}},
-                {"name":"profit_0","value":{"float_value":10.0}},
-                {"name":"profit_10","value":{"float_value":20.0}},
-                {"name":"profit_20","value":{"float_value":15.0}},
-                {"name":"profit_30","value":{"float_value":5.0}},
-                {"name":"best_discount","value":{"integer_value":10}}]}]}}],"errors":[]}"""
+                """{"ids":[],"items":[{"trace_id":"513948_kyg","reader_result":{"columns":[
+                {"name":"case_id","type":"text"},{"name":"profit_0","type":"float"},
+                {"name":"profit_10","type":"float"},{"name":"profit_20","type":"float"},
+                {"name":"profit_30","type":"float"},{"name":"best_discount","type":"integer"}],
+                "rows":[["CASE-v1-SCN-1",10.0,20.0,15.0,5.0,10]]},"sql":null}],"errors":[]}"""
             } else {
                 """{"ids":[],"items":[{}],"errors":[]}"""
             }
@@ -179,8 +195,75 @@ class XmemoryLearningMemoryTest {
         assertThat(evidence).hasSize(1)
         assertThat(evidence.single().bestDiscount).isEqualTo(Discount.TEN)
         assertThat(evidence.single().profitByDiscount.getValue(Discount.TEN)).isEqualByComparingTo("20.0")
+
+        // A scope restricts a read to the objects it names: `all_relations` exposes the relations
+        // among those, it does not reach their neighbours. Scoping this read to the lesson would
+        // hide the very cases it asks for, which is how it returned nothing for a full day.
         val read = requests.last { it.first == "read" }.second
-        assertThat(read.path("scope").path("relations_scope").asText()).isEqualTo("all_relations")
+        assertThat(read.has("scope")).isFalse()
+        assertThat(read.path("query").asText()).contains("lesson_evidence").contains(key.wire)
+    }
+
+    @Test
+    fun `a relation names participant roles, not object types`() {
+        memory.linkCaseToLesson("CASE-v1-SCN-1", key)
+
+        val endpoints =
+            requests
+                .last { it.first == "write" }
+                .second
+                .path("structured_mutations")
+                .first()
+                .path("relation_mutation")
+                .path("create")
+                .path("endpoints")
+        // Naming the types - `Lesson`, `PromotionCase` - parses and is then rejected for missing
+        // both participant roles, which reads like a key problem and is not one.
+        assertThat(endpoints.map { it.path("object_name").asText() }).containsExactlyInAnyOrder("lesson", "case")
+        assertThat(
+            endpoints
+                .first { it.path("object_name").asText() == "case" }
+                .path("key")
+                .path("case_id")
+                .asText(),
+        ).isEqualTo("CASE-v1-SCN-1")
+    }
+
+    @Test
+    fun `a read of an absent key is an empty answer, not a failure`() {
+        // The service reports "no such record" as HTTP 400. Treating that as an outage cost the
+        // agent its whole memory: it logged "memory unavailable" and decided as if untrained.
+        status = 400
+        reply = {
+            """{"ids":[],"items":[],"errors":[{"code":"VALIDATION_ERROR",
+            "message":"No 'lesson' object matches the provided primary key."}]}"""
+        }
+
+        assertThat(memory.lesson(key)).isNull()
+    }
+
+    @Test
+    fun `writing a record that already exists updates it instead of failing`() {
+        // Re-running a training scenario must be allowed: a run is resumable, and a lesson is
+        // rewritten as evidence accumulates.
+        var writes = 0
+        status = 400
+        reply = { path ->
+            if (path == "write" && writes++ == 0) {
+                """{"ids":[],"items":[],"errors":[{"code":"VALIDATION_ERROR",
+                "message":"A 'Lesson' with this primary key already exists."}]}"""
+            } else {
+                status = 200
+                """{"ids":[],"items":[{}],"errors":[]}"""
+            }
+        }
+
+        memory.saveLesson(Lesson(key, Discount.TWENTY, 3, BigDecimal("12.50"), BigDecimal("0.71"), "because"))
+
+        val mutations = requests.filter { it.first == "write" }.map { it.second.path("structured_mutations").first() }
+        assertThat(mutations).hasSize(2)
+        assertThat(mutations[0].path("object_mutation").has("create")).isTrue()
+        assertThat(mutations[1].path("object_mutation").has("update")).isTrue()
     }
 
     @Test

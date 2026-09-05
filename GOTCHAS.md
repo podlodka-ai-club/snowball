@@ -60,3 +60,41 @@ quota problem. A keyed read answers in well under a second without the model, so
 retrieval path has to be keyed rather than conversational. The exact `scope` request shape was not
 settled here - the API wants a different key form than the one documented inline - and belongs to
 the change that implements the client.
+
+## Writing and reading relations (measured 2026-09-03)
+
+- In a `relation_mutation`, `object_name` on an endpoint is the participant **role** from the
+  schema (`lesson`, `case`), not the object type. Passing the type parses fine and is then rejected
+  with "missing participant role(s)", which reads like a key problem and is not one.
+- An endpoint key is flat - `"key": {"lesson_key": "..."}` - while a read `scope` key is nested
+  twice. The two shapes are not interchangeable.
+- `create` on an existing object answers HTTP 400 `VALIDATION_ERROR` "already exists", and a read of
+  an absent key answers 400 "No 'x' object matches the provided primary key". Both are ordinary
+  outcomes on a resumable run, so the client treats those two message texts as results rather than
+  failures, and falls back to `update`.
+- **`xresponse` returns what the query text asks for, not what the scope contains.** The same scoped
+  read returned one field for "Return the scoped records." and every field, plus the identifier, for
+  "Return every stored field of the scoped Lesson record." A vague query silently yields a partial
+  record, which then looks like missing data. `raw-tables` (note the hyphen; `raw_tables` is
+  rejected) returns columns and rows verbatim and does not depend on the wording.
+- **A `scope` narrows a read; it never widens one.** `all_relations` exposes the relations *among
+  the objects the scope lists* - it does not pull in their neighbours. Scoping a read to a Lesson
+  therefore hides the very cases linked to it, and the answer is an empty relation list rather than
+  an error. Traversals run **unscoped**: an unscoped `raw-tables` read asking for "every
+  PromotionCase linked to the Lesson whose lesson_key is X through lesson_evidence" returns exactly
+  those rows. Cost: about 20 seconds for a key the service has not answered before, ~1 second when
+  it repeats.
+- `write` answers with a `changes` report of what it actually created, updated or deleted, grouped
+  by operation. Reading it is the way to confirm a write; the REST envelope's `items` is not.
+
+The read and write formats above are documented in the `tools` array of `GET /instances/<id>`,
+which is worth reading in full before guessing at a shape - most of a day was spent inferring
+things that were written down there.
+
+## The inference server occasionally answers with invalid JSON (measured 2026-09-04)
+
+Roughly once in a hundred completions the server returns HTTP 200 with a body that is not valid
+JSON - observed twice: a body cut off inside a string, and an unescaped CR (code 13) inside one.
+The model adapter must treat an unreadable body like any other failed answer. It did not, and one
+such response ended a 250-scenario training run at scenario 50. Retrying does not always help: the
+CR case reproduced on both attempts and the scenario fell back.

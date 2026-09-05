@@ -72,11 +72,17 @@ class OpenAiCompatibleDecisionModel(
             return null
         }
 
-        val choice =
-            ContractJson.mapper
-                .readTree(response.body())
-                .path("choices")
-                .firstOrNull()
+        // The body is parsed defensively: a 200 whose stream was cut mid-token is not a protocol
+        // error the caller should die on. One truncated answer ended a 250-scenario training run
+        // at scenario 50 - a failed answer has to cost one scenario's retry, never the run.
+        val parsed =
+            try {
+                ContractJson.mapper.readTree(response.body())
+            } catch (failure: Exception) {
+                log.warning { "decision model answer was not readable: ${failure.message}" }
+                return null
+            }
+        val choice = parsed.path("choices").firstOrNull()
         val answer =
             choice
                 ?.path("message")

@@ -1,0 +1,316 @@
+SLF4J(W): Class path contains multiple SLF4J providers.
+SLF4J(W): Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@4b013c76]
+SLF4J(W): Found provider [org.slf4j.nop.NOPServiceProvider@53fb3dab]
+SLF4J(W): See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J(I): Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@4b013c76]
+Sep 04, 2026 11:54:17 AM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle started split=benchmark
+Sep 04, 2026 11:54:21 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111021-LONDON_CENTRAL-BEER6 regret=0.00 learning=disabled
+Sep 04, 2026 11:54:21 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111021-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111021-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111021-LONDON_CENTRAL-BEER6 discount=0 units=14 profit=18.62
+Sep 04, 2026 11:54:21 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111021-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111021-LONDON_CENTRAL-BEER6 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:54:31 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111022-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 11:54:31 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111022-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111022-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111022-LONDON_CENTRAL-CHIPS1 discount=10 units=27 profit=45.63
+Sep 04, 2026 11:54:31 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111022-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111022-LONDON_CENTRAL-CHIPS1 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:54:35 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111023-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 11:54:35 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111023-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111023-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111023-LONDON_CENTRAL-MEAT1 discount=0 units=11 profit=9.57
+Sep 04, 2026 11:54:35 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111023-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111023-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:54:38 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111026-LONDON_CENTRAL-COLA15 regret=0.10 learning=disabled
+Sep 04, 2026 11:54:38 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111026-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111026-LONDON_CENTRAL-COLA15 discount=0 units=14 profit=13.16
+Sep 04, 2026 11:54:38 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111026-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-COLA15 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:54:43 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111026-LONDON_CENTRAL-YOG500 regret=0.28 learning=disabled
+Sep 04, 2026 11:54:43 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111026-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111026-LONDON_CENTRAL-YOG500 discount=0 units=11 profit=18.48
+Sep 04, 2026 11:54:43 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111026-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:54:47 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111027-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 11:54:47 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111027-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111027-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111027-LONDON_CENTRAL-MEAT1 discount=0 units=10 profit=8.90
+Sep 04, 2026 11:54:47 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111027-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111027-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:54:50 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111028-LONDON_CENTRAL-BEER6 regret=0.24 learning=disabled
+Sep 04, 2026 11:54:50 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111028-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111028-LONDON_CENTRAL-BEER6 discount=0 units=12 profit=15.96
+Sep 04, 2026 11:54:50 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111028-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-BEER6 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:54:57 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111028-LONDON_CENTRAL-CHIPS1 regret=3.52 learning=disabled
+Sep 04, 2026 11:54:57 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111028-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111028-LONDON_CENTRAL-CHIPS1 discount=10 units=24 profit=40.32
+Sep 04, 2026 11:54:57 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111028-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-CHIPS1 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:55:04 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111030-LONDON_CENTRAL-COLA15 regret=0.36 learning=disabled
+Sep 04, 2026 11:55:04 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111030-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111030-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111030-LONDON_CENTRAL-COLA15 discount=10 units=21 profit=16.38
+Sep 04, 2026 11:55:04 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111030-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111030-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:55:13 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111031-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 11:55:13 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111031-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111031-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111031-LONDON_CENTRAL-ICE500 discount=20 units=48 profit=36.96
+Sep 04, 2026 11:55:13 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111031-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111031-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:55:26 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111103-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 11:55:26 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111103-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111103-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111103-LONDON_CENTRAL-COLA15 discount=10 units=23 profit=17.94
+Sep 04, 2026 11:55:26 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111103-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111103-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:55:33 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111104-LONDON_CENTRAL-ICE500 regret=4.54 learning=disabled
+Sep 04, 2026 11:55:33 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111104-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111104-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111104-LONDON_CENTRAL-ICE500 discount=10 units=39 profit=36.27
+Sep 04, 2026 11:55:33 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111104-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111104-LONDON_CENTRAL-ICE500 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:55:38 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111105-LONDON_CENTRAL-YOG500 regret=0.58 learning=disabled
+Sep 04, 2026 11:55:38 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111105-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111105-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111105-LONDON_CENTRAL-YOG500 discount=20 units=18 profit=18.18
+Sep 04, 2026 11:55:38 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111105-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111105-LONDON_CENTRAL-YOG500 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:55:43 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111106-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 11:55:43 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111106-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111106-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111106-LONDON_CENTRAL-CHIPS1 discount=20 units=36 profit=49.32
+Sep 04, 2026 11:55:43 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111106-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111106-LONDON_CENTRAL-CHIPS1 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:55:54 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111108-LONDON_CENTRAL-BEER6 regret=1.20 learning=disabled
+Sep 04, 2026 11:55:54 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111108-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111108-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111108-LONDON_CENTRAL-BEER6 discount=0 units=13 profit=17.16
+Sep 04, 2026 11:55:54 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111108-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111108-LONDON_CENTRAL-BEER6 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:02 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111109-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 11:56:02 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111109-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111109-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111109-LONDON_CENTRAL-MEAT1 discount=0 units=10 profit=8.20
+Sep 04, 2026 11:56:02 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111109-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111109-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:12 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111111-LONDON_CENTRAL-CHIPS1 regret=4.94 learning=disabled
+Sep 04, 2026 11:56:12 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111111-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111111-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111111-LONDON_CENTRAL-CHIPS1 discount=10 units=30 profit=45.90
+Sep 04, 2026 11:56:12 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111111-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111111-LONDON_CENTRAL-CHIPS1 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:20 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111112-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 11:56:20 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111112-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111112-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111112-LONDON_CENTRAL-ICE500 discount=0 units=34 profit=37.40
+Sep 04, 2026 11:56:20 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111112-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111112-LONDON_CENTRAL-ICE500 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:23 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111113-LONDON_CENTRAL-YOG500 regret=0.64 learning=disabled
+Sep 04, 2026 11:56:23 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111113-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111113-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111113-LONDON_CENTRAL-YOG500 discount=0 units=10 profit=16.00
+Sep 04, 2026 11:56:23 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111113-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111113-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:31 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111115-LONDON_CENTRAL-COLA15 regret=0.52 learning=disabled
+Sep 04, 2026 11:56:31 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111115-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111115-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111115-LONDON_CENTRAL-COLA15 discount=10 units=20 profit=15.60
+Sep 04, 2026 11:56:31 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111115-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111115-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:37 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111118-LONDON_CENTRAL-MEAT1 regret=0.35 learning=disabled
+Sep 04, 2026 11:56:37 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111118-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111118-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111118-LONDON_CENTRAL-MEAT1 discount=10 units=11 profit=6.49
+Sep 04, 2026 11:56:37 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111118-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111118-LONDON_CENTRAL-MEAT1 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:42 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111119-LONDON_CENTRAL-YOG500 regret=0.70 learning=disabled
+Sep 04, 2026 11:56:42 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111119-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111119-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111119-LONDON_CENTRAL-YOG500 discount=0 units=10 profit=16.20
+Sep 04, 2026 11:56:42 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111119-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111119-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:56:55 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111121-LONDON_CENTRAL-ICE500 regret=2.58 learning=disabled
+Sep 04, 2026 11:56:55 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111121-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111121-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111121-LONDON_CENTRAL-ICE500 discount=0 units=25 profit=27.50
+Sep 04, 2026 11:56:55 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111121-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111121-LONDON_CENTRAL-ICE500 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:57:07 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111122-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 11:57:07 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111122-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111122-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111122-LONDON_CENTRAL-COLA15 discount=10 units=22 profit=17.38
+Sep 04, 2026 11:57:07 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111122-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111122-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:57:17 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111124-LONDON_CENTRAL-COLA15 regret=1.28 learning=disabled
+Sep 04, 2026 11:57:17 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111124-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111124-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111124-LONDON_CENTRAL-COLA15 discount=10 units=23 profit=17.94
+Sep 04, 2026 11:57:17 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111124-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111124-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:57:25 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111125-LONDON_CENTRAL-ICE500 regret=4.70 learning=disabled
+Sep 04, 2026 11:57:25 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111125-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111125-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111125-LONDON_CENTRAL-ICE500 discount=10 units=38 profit=35.34
+Sep 04, 2026 11:57:25 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111125-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111125-LONDON_CENTRAL-ICE500 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:57:30 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111126-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 11:57:30 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111126-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111126-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111126-LONDON_CENTRAL-MEAT1 discount=0 units=11 profit=9.24
+Sep 04, 2026 11:57:30 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111126-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111126-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:57:35 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111129-LONDON_CENTRAL-YOG500 regret=0.00 learning=disabled
+Sep 04, 2026 11:57:35 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111129-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111129-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111129-LONDON_CENTRAL-YOG500 discount=10 units=13 profit=16.51
+Sep 04, 2026 11:57:35 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111129-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111129-LONDON_CENTRAL-YOG500 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:57:44 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111205-LONDON_CENTRAL-COLA15 regret=0.70 learning=disabled
+Sep 04, 2026 11:57:44 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111205-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111205-LONDON_CENTRAL-COLA15 discount=0 units=20 profit=18.80
+Sep 04, 2026 11:57:44 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111205-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-COLA15 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:57:55 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111205-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 11:57:55 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111205-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111205-LONDON_CENTRAL-ICE500 discount=20 units=60 profit=46.80
+Sep 04, 2026 11:57:55 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111205-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:06 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111207-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 11:58:06 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111207-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111207-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111207-LONDON_CENTRAL-CHIPS1 discount=10 units=32 profit=52.16
+Sep 04, 2026 11:58:06 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111207-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111207-LONDON_CENTRAL-CHIPS1 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:14 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111210-LONDON_CENTRAL-BEER6 regret=0.00 learning=disabled
+Sep 04, 2026 11:58:14 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111210-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111210-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111210-LONDON_CENTRAL-BEER6 discount=20 units=29 profit=24.36
+Sep 04, 2026 11:58:14 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111210-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111210-LONDON_CENTRAL-BEER6 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:18 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111212-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 11:58:18 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111212-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111212-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111212-LONDON_CENTRAL-MEAT1 discount=0 units=12 profit=9.96
+Sep 04, 2026 11:58:18 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111212-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111212-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:27 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111213-LONDON_CENTRAL-CHIPS1 regret=3.00 learning=disabled
+Sep 04, 2026 11:58:27 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111213-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111213-LONDON_CENTRAL-CHIPS1 discount=10 units=26 profit=42.90
+Sep 04, 2026 11:58:27 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111213-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-CHIPS1 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:32 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111213-LONDON_CENTRAL-ICE500 regret=2.10 learning=disabled
+Sep 04, 2026 11:58:32 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111213-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111213-LONDON_CENTRAL-ICE500 discount=0 units=28 profit=30.80
+Sep 04, 2026 11:58:32 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111213-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-ICE500 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:43 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111214-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 11:58:43 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111214-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111214-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111214-LONDON_CENTRAL-COLA15 discount=10 units=25 profit=19.50
+Sep 04, 2026 11:58:43 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111214-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111214-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:49 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111215-LONDON_CENTRAL-BEER6 regret=0.32 learning=disabled
+Sep 04, 2026 11:58:49 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111215-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111215-LONDON_CENTRAL-BEER6 discount=20 units=19 profit=15.58
+Sep 04, 2026 11:58:49 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111215-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-BEER6 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:58:57 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111215-LONDON_CENTRAL-COLA15 regret=1.70 learning=disabled
+Sep 04, 2026 11:58:57 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111215-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111215-LONDON_CENTRAL-COLA15 discount=10 units=32 profit=24.96
+Sep 04, 2026 11:58:57 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111215-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:59:04 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111216-LONDON_CENTRAL-MEAT1 regret=1.66 learning=disabled
+Sep 04, 2026 11:59:04 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111216-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111216-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111216-LONDON_CENTRAL-MEAT1 discount=20 units=20 profit=9.00
+Sep 04, 2026 11:59:04 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111216-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111216-LONDON_CENTRAL-MEAT1 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:59:16 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111218-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 11:59:16 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111218-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111218-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111218-LONDON_CENTRAL-ICE500 discount=10 units=62 profit=57.66
+Sep 04, 2026 11:59:16 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111218-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111218-LONDON_CENTRAL-ICE500 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:59:21 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111221-LONDON_CENTRAL-YOG500 regret=0.63 learning=disabled
+Sep 04, 2026 11:59:21 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111221-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111221-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111221-LONDON_CENTRAL-YOG500 discount=0 units=10 profit=16.40
+Sep 04, 2026 11:59:21 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111221-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111221-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:59:30 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111225-LONDON_CENTRAL-YOG500 regret=0.06 learning=disabled
+Sep 04, 2026 11:59:30 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111225-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111225-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111225-LONDON_CENTRAL-YOG500 discount=20 units=15 profit=15.15
+Sep 04, 2026 11:59:30 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111225-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111225-LONDON_CENTRAL-YOG500 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:59:39 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111227-LONDON_CENTRAL-BEER6 regret=0.00 learning=disabled
+Sep 04, 2026 11:59:39 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111227-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111227-LONDON_CENTRAL-BEER6 discount=10 units=9 profit=9.63
+Sep 04, 2026 11:59:39 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111227-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-BEER6 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:59:48 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111227-LONDON_CENTRAL-MEAT1 regret=1.96 learning=disabled
+Sep 04, 2026 11:59:48 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111227-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111227-LONDON_CENTRAL-MEAT1 discount=20 units=21 profit=8.82
+Sep 04, 2026 11:59:48 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111227-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-MEAT1 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 11:59:55 AM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111228-LONDON_CENTRAL-COLA15 regret=0.94 learning=disabled
+Sep 04, 2026 11:59:55 AM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111228-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111228-LONDON_CENTRAL-COLA15 discount=10 units=29 profit=22.62
+Sep 04, 2026 11:59:55 AM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111228-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 12:00:03 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111228-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 12:00:03 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111228-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111228-LONDON_CENTRAL-ICE500 discount=20 units=46 profit=35.42
+Sep 04, 2026 12:00:03 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111228-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 12:00:19 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111231-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 12:00:19 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111231-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111231-LONDON_CENTRAL-COLA15 discount=0 units=23 profit=21.62
+Sep 04, 2026 12:00:19 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111231-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-COLA15 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 12:00:30 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111231-LONDON_CENTRAL-ICE500 regret=3.45 learning=disabled
+Sep 04, 2026 12:00:30 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111231-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111231-LONDON_CENTRAL-ICE500 discount=10 units=41 profit=38.13
+Sep 04, 2026 12:00:30 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111231-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-ICE500 discount=10 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 12:00:37 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20120102-LONDON_CENTRAL-YOG500 regret=0.99 learning=disabled
+Sep 04, 2026 12:00:37 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20120102-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20120102-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20120102-LONDON_CENTRAL-YOG500 discount=20 units=14 profit=13.86
+Sep 04, 2026 12:00:37 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20120102-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20120102-LONDON_CENTRAL-YOG500 discount=20 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 12:00:45 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20120104-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 12:00:45 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20120104-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20120104-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20120104-LONDON_CENTRAL-MEAT1 discount=0 units=13 profit=9.88
+Sep 04, 2026 12:00:45 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20120104-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20120104-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=EMPTY lessons=[] model=muse-glimmer-30b-q3
+Sep 04, 2026 12:00:45 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle completed published=50 rejected=0
+scenarios      50
+mean regret    0.8808
+optimal rate   44.0%
+fallbacks      0
+elapsed        388s
+per scenario   7763ms
+learning       off
