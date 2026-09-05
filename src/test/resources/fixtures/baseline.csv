@@ -1,0 +1,301 @@
+source_reference,date,split,sku_id,sku_name,category,price,cost,baseline_sales,stock
+dunnhumby-batf:store-25027:upc-7027316204:week-2010-11-10,2010-11-09,training,MEAT1,Meat Pack,meat,1.85,1.04,8,20
+dunnhumby-batf:store-25027:upc-1600027527:week-2010-11-10,2010-11-10,training,CHIPS1,Chips,chips,3.10,1.12,18,27
+dunnhumby-batf:store-25027:upc-1111009477:week-2010-11-17,2010-11-11,training,ICE500,Ice Cream 500ml,ice_cream,1.47,0.47,19,28
+dunnhumby-batf:store-25027:upc-1600027527:week-2010-11-17,2010-11-14,training,CHIPS1,Chips,chips,2.90,1.04,18,27
+dunnhumby-batf:store-25027:upc-1111009497:week-2010-11-17,2010-11-16,training,COLA15,Soft Drink 1.5L,soft_drinks,1.49,0.63,11,28
+dunnhumby-batf:store-25027:upc-7027316204:week-2010-11-17,2010-11-17,training,MEAT1,Meat Pack,meat,1.67,0.94,9,14
+dunnhumby-batf:store-25027:upc-1600027527:week-2010-11-24,2010-11-18,training,CHIPS1,Chips,chips,2.91,1.05,18,27
+dunnhumby-batf:store-25027:upc-3800031838:week-2010-11-24,2010-11-18,training,YOG500,Yogurt 500g,yogurt,2.99,1.50,10,15
+dunnhumby-batf:store-25027:upc-1111085350:week-2010-11-24,2010-11-20,training,BEER6,Beer 6 Pack,beer,1.94,0.89,16,24
+dunnhumby-batf:store-25027:upc-1111009477:week-2010-11-24,2010-11-20,training,ICE500,Ice Cream 500ml,ice_cream,1.47,0.47,20,30
+dunnhumby-batf:store-25027:upc-7027316204:week-2010-11-24,2010-11-21,training,MEAT1,Meat Pack,meat,2.00,1.12,10,15
+dunnhumby-batf:store-25027:upc-1111009497:week-2010-11-24,2010-11-22,training,COLA15,Soft Drink 1.5L,soft_drinks,1.49,0.63,11,28
+dunnhumby-batf:store-25027:upc-1600027527:week-2010-12-01,2010-11-25,training,CHIPS1,Chips,chips,2.91,1.05,18,45
+dunnhumby-batf:store-25027:upc-3800031838:week-2010-12-01,2010-11-26,training,YOG500,Yogurt 500g,yogurt,2.87,1.44,9,14
+dunnhumby-batf:store-25027:upc-1111009497:week-2010-12-01,2010-11-27,training,COLA15,Soft Drink 1.5L,soft_drinks,1.52,0.64,11,28
+dunnhumby-batf:store-25027:upc-7027316204:week-2010-12-01,2010-11-28,training,MEAT1,Meat Pack,meat,1.89,1.06,10,15
+dunnhumby-batf:store-25027:upc-1111085350:week-2010-12-01,2010-11-29,training,BEER6,Beer 6 Pack,beer,1.96,0.90,13,20
+dunnhumby-batf:store-25027:upc-1111009477:week-2010-12-01,2010-12-01,training,ICE500,Ice Cream 500ml,ice_cream,1.51,0.48,20,50
+dunnhumby-batf:store-25027:upc-1111009497:week-2010-12-08,2010-12-02,training,COLA15,Soft Drink 1.5L,soft_drinks,1.53,0.64,13,32
+dunnhumby-batf:store-25027:upc-1111009477:week-2010-12-08,2010-12-03,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,21,32
+dunnhumby-batf:store-25027:upc-1111085350:week-2010-12-08,2010-12-04,training,BEER6,Beer 6 Pack,beer,1.96,0.90,13,32
+dunnhumby-batf:store-25027:upc-3800031838:week-2010-12-08,2010-12-07,training,YOG500,Yogurt 500g,yogurt,3.21,1.60,9,14
+dunnhumby-batf:store-25027:upc-1111009477:week-2010-12-15,2010-12-09,training,ICE500,Ice Cream 500ml,ice_cream,1.50,0.48,21,32
+dunnhumby-batf:store-25027:upc-1111009497:week-2010-12-15,2010-12-10,training,COLA15,Soft Drink 1.5L,soft_drinks,1.51,0.63,13,32
+dunnhumby-batf:store-25027:upc-1111085350:week-2010-12-15,2010-12-14,training,BEER6,Beer 6 Pack,beer,1.96,0.90,10,15
+dunnhumby-batf:store-25027:upc-3800031838:week-2010-12-15,2010-12-15,training,YOG500,Yogurt 500g,yogurt,3.17,1.58,9,22
+dunnhumby-batf:store-25027:upc-1111085350:week-2010-12-22,2010-12-18,training,BEER6,Beer 6 Pack,beer,1.96,0.90,10,15
+dunnhumby-batf:store-25027:upc-1111009477:week-2010-12-22,2010-12-18,training,ICE500,Ice Cream 500ml,ice_cream,1.49,0.48,21,52
+dunnhumby-batf:store-25027:upc-1111009497:week-2010-12-22,2010-12-19,training,COLA15,Soft Drink 1.5L,soft_drinks,1.51,0.63,13,32
+dunnhumby-batf:store-25027:upc-3800031838:week-2010-12-22,2010-12-19,training,YOG500,Yogurt 500g,yogurt,3.32,1.66,8,12
+dunnhumby-batf:store-25027:upc-1111009477:week-2010-12-29,2010-12-23,training,ICE500,Ice Cream 500ml,ice_cream,1.48,0.47,20,30
+dunnhumby-batf:store-25027:upc-7027316204:week-2010-12-29,2010-12-25,training,MEAT1,Meat Pack,meat,1.72,0.96,10,25
+dunnhumby-batf:store-25027:upc-1111085350:week-2010-12-29,2010-12-26,training,BEER6,Beer 6 Pack,beer,1.97,0.91,10,25
+dunnhumby-batf:store-25027:upc-1111009497:week-2010-12-29,2010-12-26,training,COLA15,Soft Drink 1.5L,soft_drinks,1.50,0.63,12,18
+dunnhumby-batf:store-25027:upc-3800031838:week-2010-12-29,2010-12-27,training,YOG500,Yogurt 500g,yogurt,3.16,1.58,8,20
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-01-05,2011-01-04,training,BEER6,Beer 6 Pack,beer,1.95,0.90,14,21
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-01-05,2011-01-04,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,20,50
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-01-05,2011-01-04,training,MEAT1,Meat Pack,meat,1.84,1.03,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-01-05,2011-01-04,training,YOG500,Yogurt 500g,yogurt,3.21,1.60,8,12
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-01-05,2011-01-05,training,CHIPS1,Chips,chips,3.06,1.10,18,45
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-01-05,2011-01-05,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,12,18
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-01-12,2011-01-06,training,YOG500,Yogurt 500g,yogurt,3.25,1.62,9,22
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-01-12,2011-01-07,training,CHIPS1,Chips,chips,3.03,1.09,17,42
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-01-12,2011-01-08,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,19,48
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-01-12,2011-01-09,training,BEER6,Beer 6 Pack,beer,1.97,0.91,16,40
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-01-12,2011-01-12,training,COLA15,Soft Drink 1.5L,soft_drinks,1.51,0.63,11,28
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-01-19,2011-01-14,training,COLA15,Soft Drink 1.5L,soft_drinks,1.50,0.63,11,28
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-01-19,2011-01-15,training,CHIPS1,Chips,chips,3.04,1.09,17,26
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-01-19,2011-01-15,training,ICE500,Ice Cream 500ml,ice_cream,1.47,0.47,19,28
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-01-19,2011-01-17,training,BEER6,Beer 6 Pack,beer,1.98,0.91,17,42
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-01-19,2011-01-18,training,MEAT1,Meat Pack,meat,1.67,0.94,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-01-19,2011-01-18,training,YOG500,Yogurt 500g,yogurt,3.32,1.66,9,22
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-01-26,2011-01-20,training,CHIPS1,Chips,chips,3.12,1.12,17,42
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-01-26,2011-01-21,training,MEAT1,Meat Pack,meat,1.67,0.94,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-01-26,2011-01-21,training,YOG500,Yogurt 500g,yogurt,3.32,1.66,9,22
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-01-26,2011-01-22,training,BEER6,Beer 6 Pack,beer,1.97,0.91,16,24
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-01-26,2011-01-23,training,ICE500,Ice Cream 500ml,ice_cream,1.47,0.47,19,28
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-01-26,2011-01-25,training,COLA15,Soft Drink 1.5L,soft_drinks,1.49,0.63,12,30
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-02-02,2011-01-27,training,BEER6,Beer 6 Pack,beer,1.97,0.91,16,40
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-02-02,2011-01-27,training,COLA15,Soft Drink 1.5L,soft_drinks,1.50,0.63,12,18
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-02-02,2011-01-29,training,CHIPS1,Chips,chips,3.12,1.12,17,42
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-02-02,2011-01-30,training,ICE500,Ice Cream 500ml,ice_cream,1.49,0.48,20,30
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-02-02,2011-01-30,training,YOG500,Yogurt 500g,yogurt,3.29,1.65,9,22
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-02-02,2011-02-02,training,MEAT1,Meat Pack,meat,1.65,0.92,9,22
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-02-09,2011-02-03,training,CHIPS1,Chips,chips,2.86,1.03,19,28
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-02-09,2011-02-05,training,YOG500,Yogurt 500g,yogurt,3.03,1.51,10,25
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-02-09,2011-02-07,training,ICE500,Ice Cream 500ml,ice_cream,1.50,0.48,21,32
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-02-09,2011-02-08,training,COLA15,Soft Drink 1.5L,soft_drinks,1.49,0.63,14,21
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-02-09,2011-02-09,training,BEER6,Beer 6 Pack,beer,2.41,1.11,13,20
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-02-09,2011-02-09,training,MEAT1,Meat Pack,meat,1.62,0.91,8,12
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-02-16,2011-02-10,training,MEAT1,Meat Pack,meat,1.54,0.86,7,10
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-02-16,2011-02-12,training,COLA15,Soft Drink 1.5L,soft_drinks,1.51,0.63,14,35
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-02-16,2011-02-14,training,ICE500,Ice Cream 500ml,ice_cream,1.48,0.47,21,52
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-02-16,2011-02-15,training,CHIPS1,Chips,chips,2.86,1.03,20,50
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-02-16,2011-02-16,training,BEER6,Beer 6 Pack,beer,2.38,1.09,12,18
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-02-23,2011-02-17,training,MEAT1,Meat Pack,meat,1.75,0.98,7,18
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-02-23,2011-02-19,training,CHIPS1,Chips,chips,2.91,1.05,20,30
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-02-23,2011-02-22,training,BEER6,Beer 6 Pack,beer,2.44,1.12,12,18
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-02-23,2011-02-22,training,COLA15,Soft Drink 1.5L,soft_drinks,1.52,0.64,14,21
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-02-23,2011-02-22,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,22,55
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-03-02,2011-02-25,training,BEER6,Beer 6 Pack,beer,2.45,1.13,12,30
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-03-02,2011-02-27,training,CHIPS1,Chips,chips,2.95,1.06,19,48
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-03-02,2011-02-28,training,COLA15,Soft Drink 1.5L,soft_drinks,1.51,0.63,16,40
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-03-02,2011-03-02,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,22,33
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-03-02,2011-03-02,training,MEAT1,Meat Pack,meat,1.69,0.95,7,18
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-03-09,2011-03-03,training,YOG500,Yogurt 500g,yogurt,3.30,1.65,10,25
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-03-09,2011-03-04,training,BEER6,Beer 6 Pack,beer,2.46,1.13,14,21
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-03-09,2011-03-07,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,22,55
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-03-09,2011-03-09,training,CHIPS1,Chips,chips,3.11,1.12,13,32
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-03-09,2011-03-09,training,COLA15,Soft Drink 1.5L,soft_drinks,1.52,0.64,16,40
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-03-16,2011-03-10,training,COLA15,Soft Drink 1.5L,soft_drinks,1.51,0.63,16,40
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-03-16,2011-03-12,training,MEAT1,Meat Pack,meat,1.69,0.95,10,15
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-03-16,2011-03-12,training,YOG500,Yogurt 500g,yogurt,3.32,1.66,11,16
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-03-16,2011-03-13,training,CHIPS1,Chips,chips,3.22,1.16,13,20
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-03-16,2011-03-13,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,23,58
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-03-16,2011-03-15,training,BEER6,Beer 6 Pack,beer,2.45,1.13,15,38
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-03-23,2011-03-17,training,BEER6,Beer 6 Pack,beer,2.45,1.13,15,22
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-03-23,2011-03-18,training,MEAT1,Meat Pack,meat,1.68,0.94,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-03-23,2011-03-18,training,YOG500,Yogurt 500g,yogurt,3.32,1.66,11,16
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-03-23,2011-03-20,training,COLA15,Soft Drink 1.5L,soft_drinks,1.53,0.64,16,24
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-03-23,2011-03-21,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,23,34
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-03-23,2011-03-23,training,CHIPS1,Chips,chips,3.02,1.09,13,20
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-03-30,2011-03-24,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,16,40
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-03-30,2011-03-24,training,YOG500,Yogurt 500g,yogurt,3.25,1.62,10,25
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-03-30,2011-03-25,training,BEER6,Beer 6 Pack,beer,2.43,1.12,15,22
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-03-30,2011-03-25,training,CHIPS1,Chips,chips,3.13,1.13,13,20
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-03-30,2011-03-25,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,23,58
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-04-06,2011-03-31,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,16,40
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-04-06,2011-04-02,training,CHIPS1,Chips,chips,3.12,1.12,16,40
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-04-06,2011-04-02,training,MEAT1,Meat Pack,meat,1.81,1.01,12,18
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-04-06,2011-04-04,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,24,60
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-04-06,2011-04-06,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,9,14
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-04-13,2011-04-07,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,15,38
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-04-13,2011-04-07,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,8,20
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-04-13,2011-04-10,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,24,36
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-04-13,2011-04-11,training,MEAT1,Meat Pack,meat,1.73,0.97,12,18
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-04-13,2011-04-13,training,CHIPS1,Chips,chips,3.16,1.14,16,40
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-04-20,2011-04-15,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,15,38
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-04-20,2011-04-15,training,MEAT1,Meat Pack,meat,1.77,0.99,10,15
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-04-20,2011-04-16,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,24,60
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-04-20,2011-04-20,training,YOG500,Yogurt 500g,yogurt,3.27,1.64,8,12
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-04-27,2011-04-23,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,15,38
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-04-27,2011-04-23,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,24,60
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-04-27,2011-04-27,training,MEAT1,Meat Pack,meat,1.83,1.02,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-04-27,2011-04-27,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,9,22
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-05-04,2011-04-29,training,MEAT1,Meat Pack,meat,2.03,1.14,9,14
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-05-04,2011-05-01,training,BEER6,Beer 6 Pack,beer,2.41,1.11,15,22
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-05-04,2011-05-01,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,14,21
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-05-04,2011-05-03,training,ICE500,Ice Cream 500ml,ice_cream,1.51,0.48,24,60
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-05-04,2011-05-04,training,CHIPS1,Chips,chips,3.21,1.16,17,42
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-05-04,2011-05-04,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,8,12
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-05-11,2011-05-06,training,BEER6,Beer 6 Pack,beer,2.45,1.13,13,32
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-05-11,2011-05-07,training,COLA15,Soft Drink 1.5L,soft_drinks,1.53,0.64,14,21
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-05-11,2011-05-09,training,YOG500,Yogurt 500g,yogurt,3.24,1.62,7,10
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-05-11,2011-05-11,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,23,58
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-05-18,2011-05-13,training,BEER6,Beer 6 Pack,beer,2.42,1.11,13,32
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-05-18,2011-05-14,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,23,58
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-05-18,2011-05-18,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,14,21
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-05-18,2011-05-18,training,YOG500,Yogurt 500g,yogurt,2.99,1.50,9,22
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-05-25,2011-05-19,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,24,36
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-05-25,2011-05-19,training,YOG500,Yogurt 500g,yogurt,3.00,1.50,7,18
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-05-25,2011-05-25,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,13,32
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-06-01,2011-05-26,training,CHIPS1,Chips,chips,3.07,1.11,19,48
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-06-01,2011-05-26,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,13,32
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-06-01,2011-05-27,training,YOG500,Yogurt 500g,yogurt,3.19,1.59,7,18
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-06-01,2011-06-01,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,24,60
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-06-08,2011-06-02,training,CHIPS1,Chips,chips,2.95,1.06,17,42
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-06-08,2011-06-07,training,COLA15,Soft Drink 1.5L,soft_drinks,1.53,0.64,14,21
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-06-08,2011-06-07,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,23,58
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-06-08,2011-06-08,training,YOG500,Yogurt 500g,yogurt,3.08,1.54,9,14
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-06-15,2011-06-09,training,CHIPS1,Chips,chips,2.96,1.07,16,24
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-06-15,2011-06-10,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,14,21
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-06-15,2011-06-11,training,YOG500,Yogurt 500g,yogurt,3.23,1.61,10,25
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-06-15,2011-06-14,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,23,58
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-06-22,2011-06-16,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,22,33
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-06-22,2011-06-17,training,CHIPS1,Chips,chips,2.96,1.07,19,28
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-06-22,2011-06-20,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,13,32
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-06-22,2011-06-20,training,MEAT1,Meat Pack,meat,1.78,1.00,9,22
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-06-22,2011-06-21,training,BEER6,Beer 6 Pack,beer,2.44,1.12,12,30
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-06-29,2011-06-23,training,CHIPS1,Chips,chips,3.01,1.08,20,50
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-06-29,2011-06-25,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,13,32
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-06-29,2011-06-25,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,19,28
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-06-29,2011-06-28,training,BEER6,Beer 6 Pack,beer,2.43,1.12,12,30
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-06-29,2011-06-28,training,MEAT1,Meat Pack,meat,2.02,1.13,10,15
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-07-06,2011-06-30,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,13,20
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-07-06,2011-07-03,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,19,48
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-07-06,2011-07-04,training,CHIPS1,Chips,chips,3.04,1.09,19,48
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-07-06,2011-07-06,training,BEER6,Beer 6 Pack,beer,2.44,1.12,12,18
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-07-06,2011-07-06,training,YOG500,Yogurt 500g,yogurt,3.25,1.62,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-07-13,2011-07-09,training,YOG500,Yogurt 500g,yogurt,3.26,1.63,10,25
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-07-13,2011-07-10,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,12,18
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-07-13,2011-07-11,training,BEER6,Beer 6 Pack,beer,2.44,1.12,12,18
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-07-13,2011-07-11,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,19,28
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-07-13,2011-07-13,training,CHIPS1,Chips,chips,3.05,1.10,19,28
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-07-20,2011-07-15,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,9,14
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-07-20,2011-07-16,training,BEER6,Beer 6 Pack,beer,2.46,1.13,12,18
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-07-20,2011-07-17,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,12,18
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-07-20,2011-07-19,training,CHIPS1,Chips,chips,2.95,1.06,19,28
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-07-20,2011-07-20,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,22,55
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-07-27,2011-07-24,training,COLA15,Soft Drink 1.5L,soft_drinks,1.55,0.65,10,25
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-07-27,2011-07-24,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,22,55
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-07-27,2011-07-25,training,CHIPS1,Chips,chips,3.07,1.11,19,28
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-07-27,2011-07-25,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,9,14
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-08-03,2011-07-30,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,22,55
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-08-03,2011-08-03,training,BEER6,Beer 6 Pack,beer,2.47,1.14,13,20
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-08-03,2011-08-03,training,COLA15,Soft Drink 1.5L,soft_drinks,1.55,0.65,12,18
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-08-03,2011-08-03,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,9,22
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-08-10,2011-08-04,training,BEER6,Beer 6 Pack,beer,2.43,1.12,13,32
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-08-10,2011-08-04,training,MEAT1,Meat Pack,meat,1.79,1.00,10,15
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-08-10,2011-08-05,training,YOG500,Yogurt 500g,yogurt,3.20,1.60,9,14
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-08-10,2011-08-10,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,12,30
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-08-10,2011-08-10,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,22,55
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-08-17,2011-08-11,training,BEER6,Beer 6 Pack,beer,2.28,1.05,12,30
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-08-17,2011-08-12,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,22,55
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-08-17,2011-08-14,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,13,20
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-08-17,2011-08-15,training,MEAT1,Meat Pack,meat,1.86,1.04,11,16
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-08-17,2011-08-17,training,YOG500,Yogurt 500g,yogurt,3.26,1.63,9,22
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-08-24,2011-08-19,training,MEAT1,Meat Pack,meat,1.82,1.02,11,16
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-08-24,2011-08-21,training,BEER6,Beer 6 Pack,beer,2.31,1.06,11,16
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-08-24,2011-08-21,training,ICE500,Ice Cream 500ml,ice_cream,1.56,0.50,20,30
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-08-24,2011-08-22,training,COLA15,Soft Drink 1.5L,soft_drinks,1.58,0.66,14,35
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-08-24,2011-08-22,training,YOG500,Yogurt 500g,yogurt,3.22,1.61,9,22
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-08-31,2011-08-27,training,COLA15,Soft Drink 1.5L,soft_drinks,1.58,0.66,15,38
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-08-31,2011-08-28,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,9,22
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-08-31,2011-08-31,training,BEER6,Beer 6 Pack,beer,2.33,1.07,13,32
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-08-31,2011-08-31,training,CHIPS1,Chips,chips,2.93,1.05,19,28
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-08-31,2011-08-31,training,ICE500,Ice Cream 500ml,ice_cream,1.58,0.51,20,50
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-09-07,2011-09-01,training,MEAT1,Meat Pack,meat,1.70,0.95,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-09-07,2011-09-01,training,YOG500,Yogurt 500g,yogurt,3.20,1.60,8,12
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-09-07,2011-09-02,training,CHIPS1,Chips,chips,3.01,1.08,22,33
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-09-07,2011-09-02,training,COLA15,Soft Drink 1.5L,soft_drinks,1.52,0.64,15,38
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-09-07,2011-09-04,training,BEER6,Beer 6 Pack,beer,2.41,1.11,11,16
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-09-07,2011-09-04,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,20,30
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-09-14,2011-09-10,training,BEER6,Beer 6 Pack,beer,2.36,1.09,11,28
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-09-14,2011-09-10,training,CHIPS1,Chips,chips,3.03,1.09,22,55
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-09-14,2011-09-12,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,15,22
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-09-14,2011-09-12,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,21,52
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-09-14,2011-09-13,training,MEAT1,Meat Pack,meat,2.02,1.13,10,15
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-09-14,2011-09-13,training,YOG500,Yogurt 500g,yogurt,3.27,1.64,8,12
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-09-21,2011-09-15,training,ICE500,Ice Cream 500ml,ice_cream,1.54,0.49,23,34
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-09-21,2011-09-15,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,10,15
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-09-21,2011-09-17,training,BEER6,Beer 6 Pack,beer,2.40,1.10,12,30
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-09-21,2011-09-18,training,CHIPS1,Chips,chips,2.99,1.08,24,60
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-09-21,2011-09-19,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,16,24
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-09-21,2011-09-21,training,MEAT1,Meat Pack,meat,1.85,1.04,9,22
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-09-28,2011-09-22,training,MEAT1,Meat Pack,meat,2.00,1.12,9,22
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-09-28,2011-09-23,training,YOG500,Yogurt 500g,yogurt,3.27,1.64,10,25
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-09-28,2011-09-24,training,BEER6,Beer 6 Pack,beer,2.47,1.14,13,20
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-09-28,2011-09-24,training,CHIPS1,Chips,chips,3.00,1.08,24,60
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-09-28,2011-09-26,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,23,58
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-09-28,2011-09-28,training,COLA15,Soft Drink 1.5L,soft_drinks,1.54,0.65,15,22
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-10-05,2011-09-30,training,ICE500,Ice Cream 500ml,ice_cream,1.53,0.49,23,58
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-10-05,2011-10-01,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,10,15
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-10-05,2011-10-02,training,CHIPS1,Chips,chips,3.05,1.10,22,55
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-10-05,2011-10-03,training,MEAT1,Meat Pack,meat,1.88,1.05,10,15
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-10-05,2011-10-04,training,BEER6,Beer 6 Pack,beer,2.45,1.13,13,32
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-10-05,2011-10-04,training,COLA15,Soft Drink 1.5L,soft_drinks,1.53,0.64,14,21
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-10-12,2011-10-06,training,COLA15,Soft Drink 1.5L,soft_drinks,1.55,0.65,15,22
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-10-12,2011-10-09,training,CHIPS1,Chips,chips,3.01,1.08,20,50
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-10-12,2011-10-09,training,ICE500,Ice Cream 500ml,ice_cream,1.52,0.49,23,58
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-10-12,2011-10-10,training,BEER6,Beer 6 Pack,beer,2.45,1.13,13,20
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-10-12,2011-10-10,training,YOG500,Yogurt 500g,yogurt,3.28,1.64,11,28
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-10-12,2011-10-12,training,MEAT1,Meat Pack,meat,1.80,1.01,10,15
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-10-19,2011-10-13,training,BEER6,Beer 6 Pack,beer,2.41,1.11,14,35
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-10-19,2011-10-15,training,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,15,22
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-10-19,2011-10-16,training,ICE500,Ice Cream 500ml,ice_cream,1.62,0.52,23,34
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-10-19,2011-10-16,training,MEAT1,Meat Pack,meat,1.65,0.92,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-10-19,2011-10-16,training,YOG500,Yogurt 500g,yogurt,3.20,1.60,11,16
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-10-19,2011-10-19,training,CHIPS1,Chips,chips,3.06,1.10,19,48
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-10-26,2011-10-20,training,ICE500,Ice Cream 500ml,ice_cream,1.61,0.52,21,52
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-10-26,2011-10-21,benchmark,BEER6,Beer 6 Pack,beer,2.46,1.13,14,21
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-10-26,2011-10-22,benchmark,CHIPS1,Chips,chips,3.12,1.12,19,28
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-10-26,2011-10-23,benchmark,MEAT1,Meat Pack,meat,1.97,1.10,10,15
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-10-26,2011-10-26,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,14,21
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-10-26,2011-10-26,benchmark,YOG500,Yogurt 500g,yogurt,3.37,1.69,11,16
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-11-02,2011-10-27,benchmark,MEAT1,Meat Pack,meat,2.03,1.14,10,15
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-11-02,2011-10-28,benchmark,BEER6,Beer 6 Pack,beer,2.47,1.14,12,18
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-11-02,2011-10-28,benchmark,CHIPS1,Chips,chips,3.11,1.12,19,48
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-11-02,2011-10-30,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,15,38
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-11-02,2011-10-31,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.60,0.51,21,52
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-11-09,2011-11-03,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,16,24
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-11-09,2011-11-04,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.61,0.52,23,58
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-11-09,2011-11-05,benchmark,YOG500,Yogurt 500g,yogurt,3.37,1.69,11,28
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-11-09,2011-11-06,benchmark,CHIPS1,Chips,chips,3.11,1.12,19,48
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-11-09,2011-11-08,benchmark,BEER6,Beer 6 Pack,beer,2.45,1.13,12,18
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-11-09,2011-11-09,benchmark,MEAT1,Meat Pack,meat,1.87,1.05,10,15
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-11-16,2011-11-11,benchmark,CHIPS1,Chips,chips,2.83,1.02,19,48
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-11-16,2011-11-12,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.62,0.52,23,34
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-11-16,2011-11-13,benchmark,YOG500,Yogurt 500g,yogurt,3.20,1.60,10,15
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-11-16,2011-11-15,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,16,40
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-11-23,2011-11-18,benchmark,MEAT1,Meat Pack,meat,1.72,0.96,10,25
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-11-23,2011-11-19,benchmark,YOG500,Yogurt 500g,yogurt,3.24,1.62,10,15
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-11-23,2011-11-21,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.62,0.52,23,34
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-11-23,2011-11-22,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.63,0.68,16,40
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-11-30,2011-11-24,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,16,40
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-11-30,2011-11-25,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.61,0.52,23,58
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-11-30,2011-11-26,benchmark,MEAT1,Meat Pack,meat,1.92,1.08,10,15
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-11-30,2011-11-29,benchmark,YOG500,Yogurt 500g,yogurt,3.18,1.59,10,25
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-12-07,2011-12-05,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,17,26
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-12-07,2011-12-05,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.62,0.52,24,60
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-12-07,2011-12-07,benchmark,CHIPS1,Chips,chips,3.01,1.08,21,32
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-12-14,2011-12-10,benchmark,BEER6,Beer 6 Pack,beer,2.46,1.13,12,30
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-12-14,2011-12-12,benchmark,MEAT1,Meat Pack,meat,1.88,1.05,12,18
+dunnhumby-batf:store-25027:upc-1600027527:week-2011-12-14,2011-12-13,benchmark,CHIPS1,Chips,chips,3.07,1.11,19,48
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-12-14,2011-12-13,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.62,0.52,28,42
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-12-14,2011-12-14,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,18,27
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-12-21,2011-12-15,benchmark,BEER6,Beer 6 Pack,beer,2.41,1.11,11,28
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-12-21,2011-12-15,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,18,45
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-12-21,2011-12-16,benchmark,MEAT1,Meat Pack,meat,1.87,1.05,13,32
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-12-21,2011-12-18,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.61,0.52,28,70
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-12-21,2011-12-21,benchmark,YOG500,Yogurt 500g,yogurt,3.29,1.65,10,15
+dunnhumby-batf:store-25027:upc-3800031838:week-2011-12-28,2011-12-25,benchmark,YOG500,Yogurt 500g,yogurt,3.38,1.69,9,22
+dunnhumby-batf:store-25027:upc-1111085350:week-2011-12-28,2011-12-27,benchmark,BEER6,Beer 6 Pack,beer,2.42,1.11,8,20
+dunnhumby-batf:store-25027:upc-7027316204:week-2011-12-28,2011-12-27,benchmark,MEAT1,Meat Pack,meat,1.76,0.99,13,32
+dunnhumby-batf:store-25027:upc-1111009497:week-2011-12-28,2011-12-28,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,19,48
+dunnhumby-batf:store-25027:upc-1111009477:week-2011-12-28,2011-12-28,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.61,0.52,28,70
+dunnhumby-batf:store-25027:upc-1111009497:week-2012-01-04,2011-12-31,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,1.62,0.68,18,27
+dunnhumby-batf:store-25027:upc-1111009477:week-2012-01-04,2011-12-31,benchmark,ICE500,Ice Cream 500ml,ice_cream,1.61,0.52,28,70
+dunnhumby-batf:store-25027:upc-3800031838:week-2012-01-04,2012-01-02,benchmark,YOG500,Yogurt 500g,yogurt,3.30,1.65,9,22
+dunnhumby-batf:store-25027:upc-7027316204:week-2012-01-04,2012-01-04,benchmark,MEAT1,Meat Pack,meat,1.72,0.96,14,21

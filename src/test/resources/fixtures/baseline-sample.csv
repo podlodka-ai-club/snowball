@@ -1,0 +1,13 @@
+source_reference,date,split,sku_id,sku_name,category,price,cost,baseline_sales,stock
+sample:week-2026-06-01:ICE500,2026-06-03,training,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,100,150
+sample:week-2026-06-01:BEER6,2026-06-06,training,BEER6,Beer 6 Pack,beer,6.50,4.03,85,213
+sample:week-2026-06-08:COLA15,2026-06-09,training,COLA15,Soft Drink 1.5L,soft_drinks,2.20,1.25,140,210
+sample:week-2026-06-08:ICE500,2026-06-13,training,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,112,280
+sample:week-2026-06-15:CHIPS1,2026-06-16,training,CHIPS1,Chips,chips,3.40,1.87,96,144
+sample:week-2026-06-15:BEER6,2026-06-20,training,BEER6,Beer 6 Pack,beer,6.50,4.03,78,195
+sample:week-2026-06-22:YOG500,2026-06-23,training,YOG500,Yogurt 500g,yogurt,1.80,1.04,120,180
+sample:week-2026-06-22:MEAT1,2026-06-27,training,MEAT1,Meat Pack,meat,9.90,6.93,45,113
+sample:week-2026-07-06:ICE500,2026-07-07,benchmark,ICE500,Ice Cream 500ml,ice_cream,5.00,3.00,105,158
+sample:week-2026-07-06:COLA15,2026-07-11,benchmark,COLA15,Soft Drink 1.5L,soft_drinks,2.20,1.25,132,330
+sample:week-2026-07-13:BEER6,2026-07-14,benchmark,BEER6,Beer 6 Pack,beer,6.50,4.03,82,123
+sample:week-2026-07-13:CHIPS1,2026-07-18,benchmark,CHIPS1,Chips,chips,3.40,1.87,101,253

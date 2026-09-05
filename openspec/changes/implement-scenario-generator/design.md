@@ -1,39 +1,125 @@
 ## Context
 
-`docs/scenario-generator/README.md` already defines the service as the ingestion boundary. The committed JSON Schema and example event are authoritative. The MVP uses one synthetic market and a prepared fixture derived offline from dunnhumby data.
+`docs/scenario-generator/README.md` defines this service as the ingestion boundary, and the committed JSON Schema and example event are authoritative. The MVP uses one synthetic market and a fixture prepared offline from dunnhumby data.
+
+Two things have changed since that material was written. Transport is deferred by `adopt-in-process-transport`, so scenarios are handed off through `ScenarioPublisher` rather than published to a topic. And `AGENTS.md` now requires that measurement data be separated from training data by time rather than at random, which the preparation guide predates.
+
+## The four gaps, and their common root
+
+The original plan left four things undecided, and three of them turn out to be the same problem. The recommended fixture columns in `docs/scenario-generator/dataset-preparation.md` carry no date, yet:
+
+- `scenario.date` is required by the committed schema;
+- the documented `scenario_id` shape is `<date>|<store_id>|<sku_id>|<source_reference>`;
+- `day_type` is derived from the date, and it is part of every Lesson key;
+- a split by time is impossible without dates to split on.
+
+So the fixture gains a `date` column, decided once during offline preparation. That is stricter than the preparation guide, deliberately: a date invented at generation time would make `scenario_id` depend on when the generator ran, which contradicts the committed requirement that the same source fact always yields the same identity. The guide's own instruction to commit benchmark identifiers alongside the fixture already implies this, since those identifiers contain the date.
+
+The fourth gap, the `stock_level` threshold, is unrelated but equally cheap to close.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Small Kotlin/Spring Boot service with ports for input and Kafka output.
-- Deterministic scenario generation that can be replayed in tests.
-- Stable external contract independent of the baseline source.
-- Simple scheduling/manual demo control and useful logs/health.
+- A small plain-Kotlin generator with ports for input and output.
+- Generation that is deterministic and replayable in tests.
+- A contract stable across baseline sources.
+- Simple scheduled and manual control, with useful logs.
 
 **Non-Goals:**
-- SAP/JDBC/HTTP production adapters.
-- Database persistence.
-- xmemory integration.
-- Promotion decisions or market simulation.
-- Schema Registry or distributed exactly-once processing.
+- Spring Boot or any application framework.
+- Kafka, Schema Registry, or distributed exactly-once processing.
+- SAP/JDBC/HTTP production adapters, database persistence, xmemory, decisions, or simulation.
+- Preparing the fixture, which is offline work.
 
 ## Decisions
 
-1. Use `Trigger -> ScenarioGenerationService -> BaselineSource + ContextEnricher -> ScenarioPublisher` as the internal flow.
-2. Implement `DatasetBaselineSource` first. Runtime consumes a normalized fixture, never the raw public dataset.
-3. Keep market identity in configuration and inject it after source mapping.
-4. Keep `ContextEnricher` deterministic for the benchmark. Real weather/event integrations can replace it later without changing the event schema.
-5. Validate JSON/domain invariants before sending to Kafka. The committed `promotion-scenario-v1.schema.json` is the transport contract.
-6. Publish one event per Kafka message to `promotion.scenarios.v1` with key `<store_id>:<sku_id>`.
-7. Do not introduce a local database. Duplicate delivery is handled downstream by deterministic `scenario_id`.
+1. `Trigger -> ScenarioGenerationService -> BaselineSource + ContextEnricher -> ScenarioPublisher` remains the internal flow.
+2. Implement `DatasetBaselineSource` first. The runtime reads the normalized fixture, never the raw public dataset.
+3. Market identity stays in configuration and is injected after source mapping.
+4. **The fixture carries `date` and `split` per row**, in addition to the columns the preparation guide recommends. `split` is `training` or `benchmark`, and every benchmark date is strictly later than every training date. Putting the split in the data rather than in a runtime flag makes the two sets immutable and reviewable, which is what the preparation guide asks for and what `AGENTS.md` requires; putting it in a config value would let a rerun silently reclassify a scenario.
+5. **`stock_level` is `high` when `stock >= 2 * baseline_sales`, otherwise `normal`.** Preparation derives stock as roughly `1.5x` baseline for normal and `2.5x` for high, so the midpoint separates them cleanly and tolerates the tuning the guide allows. Rows with `baseline_sales = 0` carry no demand signal, cannot produce a meaningful stock level, and are rejected by the fixture invariants rather than defaulted.
+6. **The `ContextEnricher` is specified by properties, not by a formula.** It must be a pure function of the baseline row, so that regenerating the same fixture yields identical scenarios in a different process or on a different machine; `day_type` comes from the date in `Europe/London`; and `temperature_c` must agree with `weather` rather than contradict it. The concrete derivation is an implementation choice, but it must not use a JVM-session-dependent hash, wall-clock time, or an unseeded random.
+7. **The enricher must exercise the values a Lesson key ranges over.** `weather` and `event_type` feed directly into Lesson identity, so a training set in which one weather value never appears silently removes a whole family of lessons and flattens the delta being measured. This is a property of the generated set, and it is asserted as such.
+8. Validate the schema and the domain invariants before handing a scenario off. The committed `promotion-scenario-v1.schema.json` is the contract.
+9. Exactly one scenario per handoff, with no local database. Duplicate delivery stays a downstream concern handled by deterministic `scenario_id`.
 
-Suggested implementation shape follows `docs/scenario-generator/README.md`; exact package names may follow the repository's eventual Gradle module convention.
+## Where the context comes from, and when to revisit it
+
+The Lesson key is `sku + day_type + weather + stock_level`. Three of those four are synthetic: `weather` is not in the dataset at all, `day_type` follows from a date assigned during preparation, and `stock_level` follows from a stock figure derived by multiplier. The simulator then reacts to them through its own coefficient tables, which `docs/market-simulator/README.md` deliberately separates from promotion affinity so that context changes which discount is best. Both halves of that relationship are therefore ours, and the team recorded exactly this risk when the case was chosen: the agent may end up learning the generator rather than a market.
+
+For the MVP this is accepted. The dataset supplies `price`, `baseline_sales`, `category`, and `sku`; the context stays synthetic and deterministic. The alternative - deriving `weather` and `day_type` from the real `WEEK_END_DATE` so that the seasonal signal and the demand in those same rows come from the same real weeks - costs the same preparation effort and would make the answer to "did the agent just learn your generator" a real one rather than a deflection. It is deliberately held in reserve.
+
+**Revisit trigger.** Move the context onto real dates if the first training runs show any of: a trained agent that does not beat the best constant action; lessons whose recommendation is constant across every context bucket; or a clean-versus-trained delta that survives shuffling the context labels. Any of those means the learned signal is an artifact of our own rules rather than of the data, and the reserve option becomes the cheaper fix.
+
+## What the real fixture turned out to require
+
+The fixture was built from the real dataset and then checked by replaying all four actions over
+every row. Two things the plan did not anticipate came out of that, and both are recorded here
+because they are calibration decisions, not implementation details.
+
+**Donor series must be chosen by volume, not by history length.** Selecting the longest clean
+series gave a daily baseline of 1-9 units. At that volume the simulator's discount lifts vanish
+into integer rounding, every action sells the same number of units, and the scenario teaches
+nothing. Selecting by median non-promotional units instead gives 7-28, which is the smallest
+range in which the four actions separate. The dataset does not offer more: nothing in it exceeds
+156 units a week, so a daily baseline above ~22 is unavailable at any selection.
+
+**The synthetic cost ratios are calibration and had to be fitted.** With realistic grocery
+margins of 30-45 percent the oracle chose 0 percent in 248 of 300 scenarios, and the best action
+beat "always 0 percent" by 0.089 on average - an agent answering 0 percent every time would have
+been near-optimal, and the before/after delta would have been noise. The fitted ratios spread the
+oracle across 0/10/20 percent roughly evenly and, more importantly, make the best action differ
+per SKU: meat almost always wants 0 percent, ice cream and chips want 20 percent. That is what
+gives a Lesson keyed on SKU something to carry.
+
+One limit of the coverage property is worth stating plainly: it requires every `weather` and
+`event_type` value to appear in each split, and that holds. It does not require every combination
+of the full Lesson key to appear, and it does not - the training set covers 65 of 72
+`sku x day_type x weather x stock_level` combinations and the benchmark 36 of 72. A benchmark
+scenario can therefore land on a key the training set never filled, which is a property of the
+experiment rather than a defect: it measures generalisation instead of recall, and the reported
+delta should be read that way.
+
+The resulting margins of 44-68 percent are higher than real grocery retail. This is a property of
+the synthetic world chosen to make the action space discriminable, and it must be presented that
+way rather than as a finding about the data. `docs/market-simulator/README.md` anticipates exactly
+this step - calibrate against the prepared fixture, then freeze - and the coefficients must not
+move again once training evidence exists.
+
+## How to run it
+
+Preparing the fixture is offline and manual, because the dataset needs terms accepted on the
+dunnhumby site:
+
+```bash
+python3 tools/prepare_dunnhumby.py \
+    --raw ~/datasets/dunnhumby-breakfast-at-the-frat \
+    --out src/test/resources/fixtures/baseline.csv
+```
+
+Generation itself takes no configuration beyond its defaults - the market is `LONDON_CENTRAL`, the
+source type is `dataset`, and the fixture path is a constructor argument:
+
+```kotlin
+val service = ScenarioGenerationService(
+    baselineSource = DatasetBaselineSource { Path.of("...baseline.csv").reader() },
+    contextEnricher = DeterministicContextEnricher(),
+    publisher = publisher,
+)
+val report = ScenarioGenerationTrigger(service).runNow(DatasetSplit.TRAINING)
+```
+
+`generate()` returns what it published and what it refused, with a reason per row, so a rejected
+fixture is visible rather than silent. The end-to-end path is covered by
+`ScenarioGenerationServiceTest`, which runs all 300 committed rows through the service and
+validates every emitted event against the committed schema.
 
 ## Risks / Trade-offs
 
-- Deterministic synthetic context is less realistic than external weather/events, but it keeps training and benchmark behavior reproducible.
-- At-least-once publication can duplicate events, intentionally delegated to downstream idempotency.
-- A single fixed market limits generality but sharply reduces benchmark variance and implementation scope.
+- **Deterministic synthetic context is less realistic** than real weather and events, but it keeps training and benchmark behavior reproducible, which is the whole point of the exercise.
+- **A single fixed market limits generality** and sharply reduces both benchmark variance and scope. Accepted.
+- **A time split can correlate with seasonality.** If the benchmark tail happens to be all hot weather, the trained agent is measured on a slice its training under-represents. This is a real cost of splitting by time rather than at random, and it is the reason property 7 exists: the coverage assertion has to hold on both sides of the split, not just overall.
+- **The fixture format is now stricter than `docs/scenario-generator/dataset-preparation.md`.** That guide is design material, not a versioned contract, so this change does not edit it; but whoever prepares the fixture must follow this spec, and the divergence is called out here rather than discovered later.
 
 ## References
 
@@ -41,3 +127,4 @@ Suggested implementation shape follows `docs/scenario-generator/README.md`; exac
 - `docs/scenario-generator/dataset-preparation.md`
 - `docs/scenario-generator/promotion-scenario-v1.schema.json`
 - `docs/scenario-generator/promotion-scenario-v1.example.json`
+- `openspec/changes/adopt-in-process-transport/`

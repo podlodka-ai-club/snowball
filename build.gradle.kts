@@ -20,13 +20,27 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.jackson.module.kotlin)
     implementation(libs.jackson.datatype.jsr310)
+    implementation(libs.json.schema.validator)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(kotlin("test"))
     testImplementation(libs.mockk)
     testImplementation(libs.assertj.core)
-    testImplementation(libs.json.schema.validator)
+}
+
+// The committed schemas under docs/ are the single source of truth; the runtime validator
+// needs them on the classpath, so they are copied rather than duplicated by hand.
+val copyContractSchemas by tasks.registering(Copy::class) {
+    from(layout.projectDirectory.dir("docs")) {
+        include("**/*.schema.json")
+        into("contracts")
+    }
+    into(layout.buildDirectory.dir("generated-resources"))
+}
+
+sourceSets.main {
+    resources.srcDir(copyContractSchemas)
 }
 
 spotless {
