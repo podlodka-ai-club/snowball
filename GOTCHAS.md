@@ -21,6 +21,9 @@ for them.
   primary key rejects the whole request and writes nothing.
 - Two `create` mutations for the same primary key in one request are refused, so deduplicate before
   sending.
+- A scoped read nests the key twice: `{"type": "Lesson", "key": {"key": {"lesson_key": "..."}}}`. Passing
+  `{"key": {"lesson_key": "..."}}` is rejected as an extra input, which is why the first probe read
+  nothing back.
 - The committed `docs/xmemory/schema.xmd.yaml` is accepted as-is by instance creation. Field names
   matter: `SKU.cost`, not `unit_cost`.
 

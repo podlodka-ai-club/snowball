@@ -37,7 +37,7 @@ data class Lesson(
          */
         fun from(
             key: LessonKey,
-            cases: List<PromotionCase>,
+            cases: List<CaseEvidence>,
         ): Lesson {
             require(cases.isNotEmpty()) { "cannot compute a lesson for $key without cases" }
             val unique = cases.distinctBy { it.caseId }
@@ -79,7 +79,7 @@ data class Lesson(
          * helps but cannot make a single anecdote look like certainty.
          */
         private fun confidence(
-            cases: List<PromotionCase>,
+            cases: List<CaseEvidence>,
             recommended: Discount,
             advantagePct: BigDecimal,
         ): BigDecimal {
