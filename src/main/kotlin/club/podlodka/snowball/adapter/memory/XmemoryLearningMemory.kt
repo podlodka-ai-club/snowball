@@ -7,6 +7,7 @@ import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.LessonKey
 import club.podlodka.snowball.domain.LessonScope
 import club.podlodka.snowball.domain.PromotionCase
+import club.podlodka.snowball.domain.PromotionScenario
 import club.podlodka.snowball.port.LearningMemory
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -34,31 +35,79 @@ class XmemoryLearningMemory(
 ) : LearningMemory {
     private val json = ContractJson.mapper
 
+    /**
+     * Every SKU this memory is known to hold, with its category.
+     *
+     * Filled by this process's own case writes and, once, from the store - a category lesson is
+     * linked to every product of its category, and the products an earlier run recorded are not
+     * in this process's hands otherwise.
+     */
+    private val knownSkus = mutableMapOf<String, String>()
+    private var skusLoaded = false
+
+    /** Lesson-to-SKU links this process has already confirmed, so a rewritten lesson does not resend them. */
+    private val linkedScopes = mutableSetOf<Pair<String, String>>()
+
     override fun saveCase(case: PromotionCase) {
-        val values =
-            json.createObjectNode().apply {
-                put("store", case.scenario.storeId)
-                put("price", case.scenario.price)
-                put("baseline_sales", case.scenario.baselineSales)
-                put("stock", case.scenario.stock)
-                put("stock_level", case.scenario.stockLevel.wire)
-                put("day_type", case.scenario.dayType.wire)
-                put("weather", case.scenario.weather.wire)
-                put("event_type", case.scenario.eventType.wire)
-                put("chosen_discount", case.chosenDiscount.percent)
-                put("units_sold", case.chosenUnitsSold)
-                put("gross_profit", case.chosenGrossProfit)
-                Discount.entries.forEach { put("profit_${it.percent}", case.profitByDiscount.getValue(it)) }
-                put("best_discount", case.bestDiscount.percent)
-                put("best_gross_profit", case.bestGrossProfit)
-                put("regret", case.regret)
-                put("regret_pct", case.regretPct)
-                put("scenario_date", case.scenario.date.toString())
-                case.scenario.temperatureC?.let { put("temperature_c", it) }
-                case.scenario.eventNote?.let { put("event_note", it) }
-            }
-        upsert("PromotionCase", "case_id", case.caseId, values)
+        val scenario = case.scenario
+        // The SKU goes first and on its own. It is the one record hundreds of cases share, so it
+        // nearly always exists already - and a batch that carried its `create` would be rejected
+        // as a whole for that alone, every time.
+        upsert("SKU", "sku_id", scenario.skuId, skuValues(scenario))
+        knownSkus[scenario.skuId] = scenario.category
+
+        // The case and its relation to the SKU travel together. A batch is applied in dependency
+        // order, so the relation lands with the record it points at instead of waiting for that
+        // record to become resolvable - which under a bulk write took minutes.
+        val caseSku =
+            relationMutation(
+                "case_sku",
+                endpoint("case", "case_id", case.caseId),
+                endpoint("sku", "sku_id", scenario.skuId),
+            )
+        val applied =
+            batched(listOf(objectMutation("PromotionCase", "case_id", case.caseId, caseValues(case)), caseSku))
+        if (applied != null) return
+
+        // The resume path, or an SKU written a moment ago that does not resolve yet: the two
+        // idempotent single writes, each tolerant of what the batch was not.
+        upsert("PromotionCase", "case_id", case.caseId, caseValues(case))
+        awaitingVisibility("case_sku for ${case.caseId}") { write(listOf(caseSku), ALREADY_EXISTS) }
     }
+
+    private fun skuValues(scenario: PromotionScenario): ObjectNode =
+        json.createObjectNode().apply {
+            scenario.skuName?.let { put("name", it) }
+            put("category", scenario.category)
+            // The scenario's shelf price and unit cost are the product's baseline economics as
+            // the simulator sees them; a later scenario for the same product overwrites them,
+            // which keeps the record at what was last observed rather than at what came first.
+            put("base_price", scenario.price)
+            put("cost", scenario.cost)
+        }
+
+    private fun caseValues(case: PromotionCase): ObjectNode =
+        json.createObjectNode().apply {
+            put("store", case.scenario.storeId)
+            put("price", case.scenario.price)
+            put("baseline_sales", case.scenario.baselineSales)
+            put("stock", case.scenario.stock)
+            put("stock_level", case.scenario.stockLevel.wire)
+            put("day_type", case.scenario.dayType.wire)
+            put("weather", case.scenario.weather.wire)
+            put("event_type", case.scenario.eventType.wire)
+            put("chosen_discount", case.chosenDiscount.percent)
+            put("units_sold", case.chosenUnitsSold)
+            put("gross_profit", case.chosenGrossProfit)
+            Discount.entries.forEach { put("profit_${it.percent}", case.profitByDiscount.getValue(it)) }
+            put("best_discount", case.bestDiscount.percent)
+            put("best_gross_profit", case.bestGrossProfit)
+            put("regret", case.regret)
+            put("regret_pct", case.regretPct)
+            put("scenario_date", case.scenario.date.toString())
+            case.scenario.temperatureC?.let { put("temperature_c", it) }
+            case.scenario.eventNote?.let { put("event_note", it) }
+        }
 
     override fun findCase(caseId: String): PromotionCase? {
         // Presence is what the evaluator asks about - it uses this to avoid re-learning a case it
@@ -106,25 +155,49 @@ class XmemoryLearningMemory(
     private fun linkMutation(
         caseId: String,
         key: LessonKey,
-    ): JsonNode {
-        // `object_name` names the participant *role* from the schema relation - `lesson` and
-        // `case` - not the object type. Naming the types instead is accepted as far as parsing and
-        // then rejected for missing both roles, which reads like a key problem and is not one.
-        val endpoints =
-            json.createArrayNode().apply {
-                add(endpoint("lesson", "lesson_key", key.wire))
-                add(endpoint("case", "case_id", caseId))
-            }
-        return json.createObjectNode().apply {
+    ): JsonNode =
+        relationMutation(
+            "lesson_evidence",
+            endpoint("lesson", "lesson_key", key.wire),
+            endpoint("case", "case_id", caseId),
+        )
+
+    private fun scopeMutation(
+        key: LessonKey,
+        skuId: String,
+    ): JsonNode =
+        relationMutation(
+            "lesson_sku_scope",
+            endpoint("lesson", "lesson_key", key.wire),
+            endpoint("sku", "sku_id", skuId),
+        )
+
+    /**
+     * One relation between the given participants.
+     *
+     * Each endpoint names the participant *role* from the schema relation - `lesson`, `case`,
+     * `sku` - not the object type. Naming the types instead is accepted as far as parsing and then
+     * rejected for missing every role, which reads like a key problem and is not one.
+     */
+    private fun relationMutation(
+        relationType: String,
+        vararg endpoints: ObjectNode,
+    ): JsonNode =
+        json.createObjectNode().apply {
             set<ObjectNode>(
                 "relation_mutation",
                 json.createObjectNode().apply {
-                    put("relation_type", "lesson_evidence")
-                    set<ObjectNode>("create", json.createObjectNode().set<ArrayNode>("endpoints", endpoints))
+                    put("relation_type", relationType)
+                    set<ObjectNode>(
+                        "create",
+                        json.createObjectNode().set<ArrayNode>(
+                            "endpoints",
+                            json.createArrayNode().apply { endpoints.forEach(::add) },
+                        ),
+                    )
                 },
             )
         }
-    }
 
     /**
      * Writes many lessons and links at once, for rebuilding buckets a past run never created.
@@ -146,7 +219,10 @@ class XmemoryLearningMemory(
         lessons.chunked(BATCH).forEach { chunk ->
             val applied =
                 batched(chunk.map { objectMutation("Lesson", "lesson_key", it.key.wire, lessonValues(it)) })
-            if (applied == null) chunk.forEach(::saveLesson)
+            // The plain lesson write, not `saveLesson`: a seed writes lessons and evidence links
+            // only, and a scope link to a product the instance never recorded would wait out the
+            // visibility retries for a record that is not coming.
+            if (applied == null) chunk.forEach(::upsertLesson)
             done += chunk.size
             onProgress("lessons $done/${lessons.size}${if (applied == null) " (replayed singly)" else ""}")
         }
@@ -208,8 +284,63 @@ class XmemoryLearningMemory(
     }
 
     override fun saveLesson(lesson: Lesson) {
+        upsertLesson(lesson)
+        linkLessonScope(lesson)
+    }
+
+    private fun upsertLesson(lesson: Lesson) {
         upsert("Lesson", "lesson_key", lesson.key.wire, lessonValues(lesson))
     }
+
+    /**
+     * Links a lesson to the products it speaks for.
+     *
+     * A SKU lesson names its one product. A category lesson is linked to every product of that
+     * category the memory knows at the time of writing - the schema allows leaving category
+     * lessons unlinked, but then "which lessons cover this product" would answer for half of
+     * them. A product that turns up later is picked up the next time the lesson is rewritten,
+     * and a lesson is rewritten by every case that teaches it.
+     */
+    private fun linkLessonScope(lesson: Lesson) {
+        val skus =
+            when (lesson.key.scope) {
+                LessonScope.SKU -> listOf(lesson.key.scopeValue)
+                LessonScope.CATEGORY -> skusInCategory(lesson.key.scopeValue)
+            }
+        // A category lesson is rewritten on every case that teaches it; resending its links each
+        // time would be a few hundred rejected writes over a training run for nothing.
+        val pending = skus.filter { (lesson.key.wire to it) !in linkedScopes }
+        if (pending.isEmpty()) return
+        pending.map { scopeMutation(lesson.key, it) }.chunked(BATCH).forEach { chunk ->
+            batched(chunk)
+                ?: chunk.forEach {
+                    awaitingVisibility(
+                        "lesson_sku_scope for ${lesson.key.wire}",
+                    ) { write(listOf(it), ALREADY_EXISTS) }
+                }
+        }
+        pending.forEach { linkedScopes += lesson.key.wire to it }
+    }
+
+    private fun skusInCategory(category: String): List<String> {
+        if (!skusLoaded) {
+            // Once per process, and only when a category lesson is first written: a run with
+            // learning off never pays for it. The store's answer does not override what this
+            // process wrote itself, which is newer.
+            skusLoaded = true
+            allSkus().forEach { (skuId, skuCategory) -> knownSkus.putIfAbsent(skuId, skuCategory) }
+        }
+        return knownSkus.filterValues { it == category }.keys.sorted()
+    }
+
+    /** Every SKU the memory holds, with its category, in one read. */
+    private fun allSkus(): Map<String, String> =
+        unscopedRead("List every SKU in the instance. For each SKU return sku_id and category.")
+            .mapNotNull { row ->
+                val skuId = row["sku_id"]?.asText().orEmpty()
+                val category = row["category"]?.asText().orEmpty()
+                if (skuId.isEmpty() || category.isEmpty()) null else skuId to category
+            }.toMap()
 
     private fun lessonValues(lesson: Lesson): ObjectNode {
         val values =
@@ -446,9 +577,6 @@ class XmemoryLearningMemory(
         private val NOT_VISIBLE_YET: (String) -> Boolean = {
             NO_SUCH_KEY(it) || it.contains("was not found")
         }
-
-        @Suppress("unused")
-        private val SCOPES = LessonScope.entries
 
         /**
          * The two conditions a write has to tell apart from a real rejection, recognised by their
