@@ -7,8 +7,8 @@
 ## 2. Deterministic write primitives
 
 - [ ] 2.1 Read-before-write comparison of an existing immutable case. Superseded in part: `hasCase` was removed when writes became idempotent (create, falling back to update on "already exists"), so presence is no longer read before writing. What remains open is deciding whether a stored case that differs from the one being written should be reported rather than silently overwritten.
-- [ ] 2.2 Batch the SKU and `case_sku` writes alongside the case. The case itself is written; the SKU record and its relation are not yet.
-- [x] 2.3 Implement structured mutation support for Lesson upsert + `lesson_evidence` + optional `lesson_sku_scope` in one logical update call.
+- [x] 2.2 Write the SKU and `case_sku` with the case. The SKU is upserted on its own (it nearly always exists already, and would reject a batch), then the case and its relation go in one atomic batch, falling back to single idempotent writes.
+- [x] 2.3 Implement structured mutation support for Lesson upsert + `lesson_evidence` + `lesson_sku_scope`. The scope link is written after every lesson upsert: one product for a SKU lesson, every product of the category the memory knows for a category lesson.
 - [x] 2.4 Add duplicate/idempotency tests proving repeated processing does not create duplicate evidence relations.
 
 ## 3. Read primitives
