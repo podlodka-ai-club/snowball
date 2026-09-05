@@ -114,6 +114,21 @@ fixture is visible rather than silent. The end-to-end path is covered by
 `ScenarioGenerationServiceTest`, which runs all 300 committed rows through the service and
 validates every emitted event against the committed schema.
 
+## Running it by hand
+
+The specification asks for a manual trigger alongside the scheduled one, and until now that
+existed only as a method nobody could invoke. `adapter/cli` supplies the missing half:
+
+```bash
+./gradlew run --args="--split=benchmark --limit=3 --pretty"
+```
+
+Scenarios go to stdout as one JSON document per line, the run report to stderr, so the output
+pipes into anything. This is a thin adapter with no generation logic of its own - it calls the
+same service the scheduled trigger does, and the run orchestrator will call it too. It exists
+because "93 tests pass" is not something that can be shown to anyone, and a demo needs the loop
+to be visible.
+
 ## Risks / Trade-offs
 
 - **Deterministic synthetic context is less realistic** than real weather and events, but it keeps training and benchmark behavior reproducible, which is the whole point of the exercise.
