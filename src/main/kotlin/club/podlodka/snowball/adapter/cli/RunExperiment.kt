@@ -25,8 +25,9 @@ object RunExperiment {
           --split <name>       training | benchmark | all   (default: training)
           --limit <n>          stop after n scenarios
           --memory <kind>      xmemory | memory            (default: xmemory)
-          --instance <id>      xmemory instance; defaults to XMEM_INSTANCE_ID
-          --no-learning        evaluate without writing cases or lessons
+          --arm <name>         clean | trained; reads XMEM_INSTANCE_ID_CLEAN / _TRAINED
+          --instance <id>      xmemory instance; overrides --arm, defaults to XMEM_INSTANCE_ID
+          --no-learning        evaluate without writing cases or lessons; also LEARNING_ENABLED=false
           --fixture <path>     baseline fixture CSV
           --model <id>         model name as the server reports it
           --model-url <url>    OpenAI-compatible base URL
@@ -55,7 +56,13 @@ object RunExperiment {
                 else -> DatasetSplit.fromWire(name!!)
             }
         val limit = option("limit")?.toIntOrNull()
-        val learning = !options.contains("--no-learning")
+        // The flag wins over the variable, and the variable over the default: a benchmark arm is
+        // configured once in the environment, while a one-off run says so on the command line.
+        val learning =
+            when {
+                options.contains("--no-learning") -> false
+                else -> System.getenv("LEARNING_ENABLED")?.lowercase() != "false"
+            }
         val fixture = Path.of(option("fixture", "src/test/resources/fixtures/baseline.csv")!!)
         val modelId = option("model", System.getenv("DECISION_MODEL") ?: "muse-glimmer-30b-q3")!!
         val modelUrl = option("model-url", System.getenv("DECISION_MODEL_BASE_URL") ?: "http://192.168.1.212:8080/v1")!!
@@ -64,8 +71,18 @@ object RunExperiment {
             if (option("memory", "xmemory") == "memory") {
                 InMemoryLearningMemory()
             } else {
-                val instance = option("instance") ?: System.getenv("XMEM_INSTANCE_ID")
-                requireNotNull(instance) { "pass --instance or set XMEM_INSTANCE_ID" }
+                // Naming the arm rather than pasting an id: one mistyped identifier already cost a
+                // benchmark run, and it failed as fifty ordinary-looking measurements rather than
+                // as an error.
+                val instance =
+                    option("instance")
+                        ?: when (option("arm")) {
+                            "clean" -> System.getenv("XMEM_INSTANCE_ID_CLEAN")
+                            "trained" -> System.getenv("XMEM_INSTANCE_ID_TRAINED")
+                            null -> System.getenv("XMEM_INSTANCE_ID")
+                            else -> error("unknown --arm ${option("arm")}; use clean or trained")
+                        }
+                requireNotNull(instance) { "pass --instance or --arm, or set XMEM_INSTANCE_ID" }
                 val apiKey = requireNotNull(System.getenv("XMEM_API_KEY")) { "set XMEM_API_KEY" }
                 val http =
                     XmemoryHttp(

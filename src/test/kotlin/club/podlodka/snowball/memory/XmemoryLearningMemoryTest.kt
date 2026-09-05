@@ -121,6 +121,72 @@ class XmemoryLearningMemoryTest {
     }
 
     @Test
+    fun `prose instead of rows is not read as a lesson`() {
+        // The service can answer in prose - that is what its natural-language mode does, and one
+        // wrong `mode` value is enough to get it. Prose carries no recommendation, so the only
+        // honest answer is "no lesson", never a default one.
+        reply = { """{"ids":[],"items":[{"reader_result":{"answer":"The lesson recommends 30%."}}],"errors":[]}""" }
+
+        assertThat(memory.lesson(key)).isNull()
+    }
+
+    @Test
+    fun `a row of some other object type is not read as a lesson`() {
+        reply = {
+            """{"ids":[],"items":[{"reader_result":{"columns":[
+            {"name":"sku_id","type":"text"},{"name":"sku_name","type":"text"}],
+            "rows":[["ICE500","Ice Cream 500ml"]]}}],"errors":[]}"""
+        }
+
+        assertThat(memory.lesson(key)).isNull()
+    }
+
+    @Test
+    fun `a lesson row missing its recommendation is refused, not defaulted to zero`() {
+        // The dangerous case. Reading an absent `recommended_discount` as 0 does not produce a
+        // missing lesson - it produces a confident instruction to give no discount, carrying the
+        // evidence count and confidence of a real one. The agent would follow it.
+        reply = {
+            """{"ids":[],"items":[{"reader_result":{"columns":[
+            {"name":"lesson_key","type":"text"},{"name":"evidence_count","type":"integer"},
+            {"name":"confidence","type":"float"},{"name":"rationale","type":"text"}],
+            "rows":[["${key.wire}",9,0.95,"trust me"]]}}],"errors":[]}"""
+        }
+
+        assertThat(memory.lesson(key)).isNull()
+    }
+
+    @Test
+    fun `an evidence row with an unreadable number is dropped, not read as zero profit`() {
+        // A zero profit is a claim about the market: it would drag the aggregate down and could
+        // flip which action a lesson recommends.
+        reply = {
+            """{"ids":[],"items":[{"reader_result":{"columns":[
+            {"name":"case_id","type":"text"},{"name":"profit_0","type":"float"},
+            {"name":"profit_10","type":"float"},{"name":"profit_20","type":"float"},
+            {"name":"profit_30","type":"float"},{"name":"best_discount","type":"integer"}],
+            "rows":[["CASE-good",1.0,2.0,3.0,4.0,30],["CASE-bad",1.0,null,3.0,4.0,10]]}}],"errors":[]}"""
+        }
+
+        val evidence = memory.casesFor(key)
+
+        assertThat(evidence.map { it.caseId }).containsExactly("CASE-good")
+    }
+
+    @Test
+    fun `an evidence row whose best discount is not an allowed action is dropped`() {
+        reply = {
+            """{"ids":[],"items":[{"reader_result":{"columns":[
+            {"name":"case_id","type":"text"},{"name":"profit_0","type":"float"},
+            {"name":"profit_10","type":"float"},{"name":"profit_20","type":"float"},
+            {"name":"profit_30","type":"float"},{"name":"best_discount","type":"integer"}],
+            "rows":[["CASE-odd",1.0,2.0,3.0,4.0,17]]}}],"errors":[]}"""
+        }
+
+        assertThat(memory.casesFor(key)).isEmpty()
+    }
+
+    @Test
     fun `a missing instance is refused before the run starts`() {
         // A mistyped instance id answers 404 on every call, and the agent's own resilience then
         // hides it: it logs "memory unavailable" per scenario and decides without lessons, so a

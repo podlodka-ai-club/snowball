@@ -2,7 +2,7 @@
 
 - [ ] 1.1 Durable configuration and a persistent decision journal. No Spring and no Kafka - the transport is deferred and a framework was not needed; the journal is in-process, so idempotency holds within a run but not across a restart.
 - [x] 1.2 Add typed mappings and contract validation for scenario input and decision output using committed schemas.
-- [ ] 1.3 Add tests proving invalid input is rejected before journal decision, xmemory, or model calls.
+- [x] 1.3 Add tests proving invalid input is rejected before journal decision, xmemory, or model calls.
 
 ## 2. Durable journal
 

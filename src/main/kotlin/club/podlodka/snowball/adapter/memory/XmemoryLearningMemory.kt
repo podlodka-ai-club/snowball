@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import java.math.BigDecimal
+import java.util.logging.Logger
 
 /**
  * Durable learning memory backed by xmemory.
@@ -105,7 +106,7 @@ class XmemoryLearningMemory(
         return unscopedRead(
             "For the Lesson whose lesson_key is \"${key.wire}\", list every PromotionCase linked to it " +
                 "through the lesson_evidence relation. Return case_id, $columns and best_discount.",
-        ).map(::toEvidence)
+        ).mapNotNull(::toEvidence)
     }
 
     /**
@@ -119,8 +120,9 @@ class XmemoryLearningMemory(
         return unscopedRead(
             "List every lesson_evidence link in the instance. For each link return the Lesson " +
                 "lesson_key and the linked PromotionCase case_id, $columns and best_discount.",
-        ).filter { it["lesson_key"]?.asText().isNullOrEmpty().not() }
-            .groupBy({ it.getValue("lesson_key").asText() }, ::toEvidence)
+        ).filter { !it["lesson_key"]?.asText().isNullOrEmpty() }
+            .mapNotNull { row -> toEvidence(row)?.let { row.getValue("lesson_key").asText() to it } }
+            .groupBy({ it.first }, { it.second })
     }
 
     override fun saveLesson(lesson: Lesson) {
@@ -268,36 +270,69 @@ class XmemoryLearningMemory(
         value: String,
     ): ObjectNode = json.createObjectNode().set("key", json.createObjectNode().put(field, value))
 
-    private fun Map<String, JsonNode>.number(name: String): BigDecimal =
-        this[name]?.takeIf { !it.isNull }?.let { if (it.isNumber) it.decimalValue() else BigDecimal(it.asText()) }
-            ?: BigDecimal.ZERO
+    /**
+     * A stored number, or null if the column is absent, empty or not a number.
+     *
+     * Never a default. An absent `recommended_discount` read as zero is not a missing value, it is
+     * a lesson saying "give no discount" - carrying the confidence and the evidence count of a
+     * real one. A memory that invents advice is worse than one that returns nothing.
+     */
+    private fun Map<String, JsonNode>.number(name: String): BigDecimal? =
+        this[name]
+            ?.takeIf { !it.isNull && !it.isMissingNode }
+            ?.let { if (it.isNumber) it.decimalValue() else it.asText().trim().toBigDecimalOrNull() }
 
     /**
      * Only the columns a lesson aggregates. The stored case does not carry the SKU or category as
      * its own fields - they live on the related SKU record - so reconstructing a full case here
-     * would mean inventing them.
+     * would mean inventing them. A row that cannot be read in full is dropped rather than
+     * half-read into a case with defaults standing in for the missing numbers.
      */
-    private fun toEvidence(row: Map<String, JsonNode>): CaseEvidence =
-        CaseEvidence(
-            caseId = row.getValue("case_id").asText(),
-            profitByDiscount = Discount.entries.associateWith { row.number("profit_${it.percent}") },
-            bestDiscount = Discount.fromPercent(row.number("best_discount").toInt()),
-        )
+    private fun toEvidence(row: Map<String, JsonNode>): CaseEvidence? {
+        val caseId = row["case_id"]?.asText().orEmpty()
+        val profits = Discount.entries.associateWith { row.number("profit_${it.percent}") }
+        val best = row.number("best_discount")?.let(::discountOrNull)
+        if (caseId.isEmpty() || profits.values.any { it == null } || best == null) {
+            log.warning { "dropping an unreadable evidence row: ${row.keys}" }
+            return null
+        }
+        return CaseEvidence(caseId, profits.mapValues { it.value!! }, best)
+    }
 
+    private fun discountOrNull(value: BigDecimal): Discount? =
+        value.toIntOrNull()?.let { percent -> Discount.entries.firstOrNull { it.percent == percent } }
+
+    private fun BigDecimal.toIntOrNull(): Int? = runCatching { intValueExact() }.getOrNull()
+
+    /**
+     * A stored row becomes a lesson only if it carries the two fields a lesson cannot be invented
+     * without: which action it recommends, and how much evidence stands behind it. Anything else -
+     * prose from a natural-language answer, a row of some other object type, a half-written record
+     * - is refused here rather than handed to the agent as advice.
+     */
     private fun toLesson(
         key: LessonKey,
         row: Map<String, JsonNode>,
-    ): Lesson =
-        Lesson(
+    ): Lesson? {
+        val recommended = row.number("recommended_discount")?.let(::discountOrNull)
+        val evidence = row.number("evidence_count")?.toIntOrNull()
+        if (recommended == null || evidence == null || evidence <= 0) {
+            log.warning { "refusing an unreadable lesson row for ${key.wire}: ${row.keys}" }
+            return null
+        }
+        return Lesson(
             key = key,
-            recommendedDiscount = Discount.fromPercent(row.number("recommended_discount").toInt()),
-            evidenceCount = row.number("evidence_count").toInt(),
-            avgProfitAdvantagePct = row.number("avg_profit_advantage_pct"),
-            confidence = row.number("confidence"),
+            recommendedDiscount = recommended,
+            evidenceCount = evidence,
+            avgProfitAdvantagePct = row.number("avg_profit_advantage_pct") ?: BigDecimal.ZERO,
+            confidence = row.number("confidence") ?: BigDecimal.ZERO,
             rationale = row["rationale"]?.asText("").orEmpty(),
         )
+    }
 
     private companion object {
+        private val log: Logger = Logger.getLogger(XmemoryLearningMemory::class.java.name)
+
         @Suppress("unused")
         private val SCOPES = LessonScope.entries
 
