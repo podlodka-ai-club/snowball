@@ -4,7 +4,7 @@ The learning loop requires reproducible ground truth. The Market Simulator must 
 
 ## What Changes
 
-- Add the Market Simulator logical module/runtime consuming `promotion.decisions.v1`.
+- Add the Market Simulator logical module/runtime consuming the decision handoff.
 - Implement the pure deterministic simulator v1 formula, coefficient tables, stock cap, money rounding, and SHA-256 scenario noise already specified in documentation.
 - Produce a schema-valid `PromotionOutcomeV1` through an `OutcomeSink` boundary.
 - Add deterministic/idempotency, configuration, and Kafka handoff tests.

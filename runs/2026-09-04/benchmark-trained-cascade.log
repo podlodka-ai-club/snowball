@@ -1,0 +1,316 @@
+SLF4J(W): Class path contains multiple SLF4J providers.
+SLF4J(W): Found provider [org.slf4j.nop.NOPServiceProvider@3a7442c7]
+SLF4J(W): Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@4be29ed9]
+SLF4J(W): See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J(I): Actual provider is of type [org.slf4j.nop.NOPServiceProvider@3a7442c7]
+Sep 04, 2026 10:53:55 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle started split=benchmark
+Sep 04, 2026 10:53:59 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111021-LONDON_CENTRAL-BEER6 regret=0.26 learning=disabled
+Sep 04, 2026 10:53:59 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111021-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111021-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111021-LONDON_CENTRAL-BEER6 discount=10 units=17 profit=18.36
+Sep 04, 2026 10:53:59 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111021-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111021-LONDON_CENTRAL-BEER6 discount=10 source=MODEL memory=USED lessons=[sku:BEER6|store:any|weekday|any|event:any|stock:normal, category:beer|store:any|weekday|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:10 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111022-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:10 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111022-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111022-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111022-LONDON_CENTRAL-CHIPS1 discount=10 units=27 profit=45.63
+Sep 04, 2026 10:54:10 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111022-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111022-LONDON_CENTRAL-CHIPS1 discount=10 source=MODEL memory=USED lessons=[sku:CHIPS1|store:any|any|any|event:any|stock:any, category:chips|store:any|weekend|any|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:13 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111023-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:13 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111023-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111023-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111023-LONDON_CENTRAL-MEAT1 discount=0 units=11 profit=9.57
+Sep 04, 2026 10:54:13 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111023-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111023-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekend|normal|event:any|stock:normal, category:meat|store:any|weekend|any|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:15 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111026-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:15 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111026-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111026-LONDON_CENTRAL-COLA15 discount=10 units=17 profit=13.26
+Sep 04, 2026 10:54:15 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111026-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|normal|event:any|stock:normal, category:soft_drinks|store:any|weekday|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:27 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111026-LONDON_CENTRAL-YOG500 regret=0.28 learning=disabled
+Sep 04, 2026 10:54:27 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111026-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111026-LONDON_CENTRAL-YOG500 discount=0 units=11 profit=18.48
+Sep 04, 2026 10:54:27 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111026-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111026-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekday|any|event:any|stock:normal, category:yogurt|store:any|weekday|hot|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:29 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111027-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:29 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111027-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111027-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111027-LONDON_CENTRAL-MEAT1 discount=0 units=10 profit=8.90
+Sep 04, 2026 10:54:29 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111027-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111027-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekday|normal|event:any|stock:normal, category:meat|store:any|weekday|any|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:32 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111028-LONDON_CENTRAL-BEER6 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:32 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111028-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111028-LONDON_CENTRAL-BEER6 discount=10 units=15 profit=16.20
+Sep 04, 2026 10:54:32 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111028-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-BEER6 discount=10 source=MODEL memory=USED lessons=[sku:BEER6|store:any|weekday|normal|event:any|stock:normal, category:beer|store:any|weekday|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:34 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111028-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:34 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111028-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111028-LONDON_CENTRAL-CHIPS1 discount=20 units=32 profit=43.84
+Sep 04, 2026 10:54:34 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111028-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111028-LONDON_CENTRAL-CHIPS1 discount=20 source=MODEL memory=USED lessons=[sku:CHIPS1|store:any|weekday|any|event:any|stock:high, category:chips|store:any|weekday|hot|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:36 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111030-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:36 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111030-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111030-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111030-LONDON_CENTRAL-COLA15 discount=20 units=27 profit=16.74
+Sep 04, 2026 10:54:36 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111030-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111030-LONDON_CENTRAL-COLA15 discount=20 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekend|normal|event:any|stock:high, category:soft_drinks|store:any|weekend|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:39 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111031-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:39 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111031-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111031-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111031-LONDON_CENTRAL-ICE500 discount=20 units=48 profit=36.96
+Sep 04, 2026 10:54:39 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111031-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111031-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekday|hot|event:any|stock:high, category:ice_cream|store:any|weekday|hot|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:42 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111103-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:42 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111103-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111103-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111103-LONDON_CENTRAL-COLA15 discount=10 units=23 profit=17.94
+Sep 04, 2026 10:54:42 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111103-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111103-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|any|event:any|stock:normal, category:soft_drinks|store:any|weekday|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:45 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111104-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:45 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111104-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111104-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111104-LONDON_CENTRAL-ICE500 discount=20 units=53 profit=40.81
+Sep 04, 2026 10:54:45 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111104-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111104-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekday|hot|event:any|stock:high, category:ice_cream|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:47 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111105-LONDON_CENTRAL-YOG500 regret=0.28 learning=disabled
+Sep 04, 2026 10:54:47 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111105-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111105-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111105-LONDON_CENTRAL-YOG500 discount=0 units=11 profit=18.48
+Sep 04, 2026 10:54:47 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111105-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111105-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekend|rain|event:any|stock:high, category:yogurt|store:any|weekend|rain|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:49 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111106-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:49 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111106-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111106-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111106-LONDON_CENTRAL-CHIPS1 discount=20 units=36 profit=49.32
+Sep 04, 2026 10:54:49 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111106-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111106-LONDON_CENTRAL-CHIPS1 discount=20 source=MODEL memory=USED lessons=[sku:CHIPS1|store:any|weekend|any|event:any|stock:high, category:chips|store:any|weekend|normal|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:52 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111108-LONDON_CENTRAL-BEER6 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:52 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111108-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111108-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111108-LONDON_CENTRAL-BEER6 discount=10 units=17 profit=18.36
+Sep 04, 2026 10:54:52 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111108-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111108-LONDON_CENTRAL-BEER6 discount=10 source=MODEL memory=USED lessons=[sku:BEER6|store:any|weekday|hot|event:any|stock:normal, category:beer|store:any|weekday|any|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:54 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111109-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:54 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111109-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111109-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111109-LONDON_CENTRAL-MEAT1 discount=0 units=10 profit=8.20
+Sep 04, 2026 10:54:54 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111109-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111109-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekday|hot|event:any|stock:normal, category:meat|store:any|weekday|hot|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:54:57 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111111-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 10:54:57 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111111-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111111-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111111-LONDON_CENTRAL-CHIPS1 discount=20 units=41 profit=50.84
+Sep 04, 2026 10:54:57 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111111-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111111-LONDON_CENTRAL-CHIPS1 discount=20 source=MODEL memory=USED lessons=[sku:CHIPS1|store:any|weekday|any|event:any|stock:high, category:chips|store:any|weekday|hot|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:09 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111112-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:09 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111112-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111112-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111112-LONDON_CENTRAL-ICE500 discount=0 units=34 profit=37.40
+Sep 04, 2026 10:55:09 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111112-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111112-LONDON_CENTRAL-ICE500 discount=0 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekend|hot|event:any|stock:normal, category:ice_cream|store:any|weekend|any|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:11 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111113-LONDON_CENTRAL-YOG500 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:11 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111113-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111113-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111113-LONDON_CENTRAL-YOG500 discount=10 units=13 profit=16.64
+Sep 04, 2026 10:55:11 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111113-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111113-LONDON_CENTRAL-YOG500 discount=10 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekend|rain|event:any|stock:normal, category:yogurt|store:any|weekend|rain|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:14 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111115-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:14 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111115-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111115-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111115-LONDON_CENTRAL-COLA15 discount=20 units=26 profit=16.12
+Sep 04, 2026 10:55:14 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111115-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111115-LONDON_CENTRAL-COLA15 discount=20 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|any|event:any|stock:high, category:soft_drinks|store:any|weekday|normal|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:16 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111118-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:16 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111118-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111118-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111118-LONDON_CENTRAL-MEAT1 discount=0 units=9 profit=6.84
+Sep 04, 2026 10:55:16 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111118-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111118-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekday|hot|event:any|stock:high, category:meat|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:20 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111119-LONDON_CENTRAL-YOG500 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:20 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111119-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111119-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111119-LONDON_CENTRAL-YOG500 discount=10 units=13 profit=16.90
+Sep 04, 2026 10:55:20 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111119-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111119-LONDON_CENTRAL-YOG500 discount=10 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekend|any|event:any|stock:normal, category:yogurt|store:any|weekend|any|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:23 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111121-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:23 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111121-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111121-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111121-LONDON_CENTRAL-ICE500 discount=10 units=32 profit=30.08
+Sep 04, 2026 10:55:23 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111121-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111121-LONDON_CENTRAL-ICE500 discount=10 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekday|normal|event:any|stock:normal, category:ice_cream|store:any|weekday|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:34 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111122-LONDON_CENTRAL-COLA15 regret=0.02 learning=disabled
+Sep 04, 2026 10:55:34 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111122-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111122-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111122-LONDON_CENTRAL-COLA15 discount=20 units=28 profit=17.36
+Sep 04, 2026 10:55:34 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111122-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111122-LONDON_CENTRAL-COLA15 discount=20 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|any|event:any|stock:high, category:soft_drinks|store:any|weekday|rain|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:37 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111124-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:37 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111124-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111124-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111124-LONDON_CENTRAL-COLA15 discount=20 units=31 profit=19.22
+Sep 04, 2026 10:55:37 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111124-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111124-LONDON_CENTRAL-COLA15 discount=20 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|hot|event:any|stock:high, category:soft_drinks|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:39 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111125-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:39 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111125-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111125-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111125-LONDON_CENTRAL-ICE500 discount=20 units=52 profit=40.04
+Sep 04, 2026 10:55:39 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111125-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111125-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekday|hot|event:any|stock:high, category:ice_cream|store:any|weekday|hot|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:41 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111126-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:41 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111126-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111126-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111126-LONDON_CENTRAL-MEAT1 discount=0 units=11 profit=9.24
+Sep 04, 2026 10:55:41 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111126-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111126-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekend|any|event:any|stock:normal, category:meat|store:any|weekend|rain|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:53 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111129-LONDON_CENTRAL-YOG500 regret=0.61 learning=disabled
+Sep 04, 2026 10:55:53 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111129-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111129-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111129-LONDON_CENTRAL-YOG500 discount=0 units=10 profit=15.90
+Sep 04, 2026 10:55:53 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111129-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111129-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekday|normal|event:any|stock:high, category:yogurt|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:56 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111205-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:56 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111205-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111205-LONDON_CENTRAL-COLA15 discount=10 units=25 profit=19.50
+Sep 04, 2026 10:55:56 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111205-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|normal|event:any|stock:normal, category:soft_drinks|store:any|weekday|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:55:59 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111205-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:55:59 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111205-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111205-LONDON_CENTRAL-ICE500 discount=20 units=60 profit=46.80
+Sep 04, 2026 10:55:59 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111205-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111205-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekday|any|event:any|stock:high, category:ice_cream|store:any|weekday|hot|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:02 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111207-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:02 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111207-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111207-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111207-LONDON_CENTRAL-CHIPS1 discount=10 units=32 profit=52.16
+Sep 04, 2026 10:56:02 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111207-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111207-LONDON_CENTRAL-CHIPS1 discount=10 source=MODEL memory=USED lessons=[sku:CHIPS1|store:any|weekday|hot|event:any|stock:normal, category:chips|store:any|weekday|any|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:05 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111210-LONDON_CENTRAL-BEER6 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:05 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111210-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111210-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111210-LONDON_CENTRAL-BEER6 discount=20 units=29 profit=24.36
+Sep 04, 2026 10:56:05 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111210-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111210-LONDON_CENTRAL-BEER6 discount=20 source=MODEL memory=USED lessons=[sku:BEER6|store:any|weekend|normal|event:any|stock:high, category:beer|store:any|weekend|normal|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:17 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111212-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:17 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111212-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111212-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111212-LONDON_CENTRAL-MEAT1 discount=0 units=12 profit=9.96
+Sep 04, 2026 10:56:17 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111212-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111212-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekday|any|event:any|stock:normal, category:meat|store:any|weekday|rain|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:20 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111213-LONDON_CENTRAL-CHIPS1 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:20 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111213-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-CHIPS1 outcome_id=OUT-DEC-SCN-20111213-LONDON_CENTRAL-CHIPS1 discount=20 units=34 profit=45.90
+Sep 04, 2026 10:56:20 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111213-LONDON_CENTRAL-CHIPS1 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-CHIPS1 discount=20 source=MODEL memory=USED lessons=[sku:CHIPS1|store:any|weekday|rain|event:any|stock:high, category:chips|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:23 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111213-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:23 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111213-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111213-LONDON_CENTRAL-ICE500 discount=10 units=35 profit=32.90
+Sep 04, 2026 10:56:23 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111213-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111213-LONDON_CENTRAL-ICE500 discount=10 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekday|normal|event:any|stock:normal, category:ice_cream|store:any|weekday|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:26 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111214-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:26 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111214-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111214-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111214-LONDON_CENTRAL-COLA15 discount=10 units=25 profit=19.50
+Sep 04, 2026 10:56:26 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111214-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111214-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|any|event:any|stock:normal, category:soft_drinks|store:any|weekday|rain|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:38 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111215-LONDON_CENTRAL-BEER6 regret=0.32 learning=disabled
+Sep 04, 2026 10:56:38 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111215-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111215-LONDON_CENTRAL-BEER6 discount=20 units=19 profit=15.58
+Sep 04, 2026 10:56:38 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111215-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-BEER6 discount=20 source=MODEL memory=USED lessons=[sku:BEER6|store:any|weekday|hot|event:any|stock:high, category:beer|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:40 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111215-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:40 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111215-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111215-LONDON_CENTRAL-COLA15 discount=20 units=43 profit=26.66
+Sep 04, 2026 10:56:40 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111215-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111215-LONDON_CENTRAL-COLA15 discount=20 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|hot|event:any|stock:high, category:soft_drinks|store:any|weekday|hot|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:43 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111216-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:56:43 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111216-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111216-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111216-LONDON_CENTRAL-MEAT1 discount=0 units=13 profit=10.66
+Sep 04, 2026 10:56:43 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111216-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111216-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekday|any|event:any|stock:high, category:meat|store:any|weekday|normal|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:55 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111218-LONDON_CENTRAL-ICE500 regret=3.76 learning=disabled
+Sep 04, 2026 10:56:55 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111218-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111218-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111218-LONDON_CENTRAL-ICE500 discount=20 units=70 profit=53.90
+Sep 04, 2026 10:56:55 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111218-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111218-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=USED lessons=[sku:ICE500|store:any|any|any|event:any|stock:any, category:ice_cream|store:any|weekend|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:56:58 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111221-LONDON_CENTRAL-YOG500 regret=0.63 learning=disabled
+Sep 04, 2026 10:56:58 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111221-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111221-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111221-LONDON_CENTRAL-YOG500 discount=0 units=10 profit=16.40
+Sep 04, 2026 10:56:58 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111221-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111221-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekday|any|event:any|stock:normal, category:yogurt|store:any|weekday|hot|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:02 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111225-LONDON_CENTRAL-YOG500 regret=0.00 learning=disabled
+Sep 04, 2026 10:57:02 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111225-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111225-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20111225-LONDON_CENTRAL-YOG500 discount=0 units=9 profit=15.21
+Sep 04, 2026 10:57:02 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111225-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20111225-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekend|any|event:any|stock:high, category:yogurt|store:any|weekend|rain|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:07 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111227-LONDON_CENTRAL-BEER6 regret=0.46 learning=disabled
+Sep 04, 2026 10:57:07 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111227-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-BEER6 outcome_id=OUT-DEC-SCN-20111227-LONDON_CENTRAL-BEER6 discount=0 units=7 profit=9.17
+Sep 04, 2026 10:57:07 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111227-LONDON_CENTRAL-BEER6 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-BEER6 discount=0 source=MODEL memory=USED lessons=[sku:BEER6|store:any|weekday|rain|event:any|stock:high, category:beer|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:11 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111227-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:57:11 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111227-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20111227-LONDON_CENTRAL-MEAT1 discount=0 units=14 profit=10.78
+Sep 04, 2026 10:57:11 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111227-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20111227-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekday|normal|event:any|stock:high, category:meat|store:any|weekday|normal|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:14 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111228-LONDON_CENTRAL-COLA15 regret=0.00 learning=disabled
+Sep 04, 2026 10:57:14 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111228-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111228-LONDON_CENTRAL-COLA15 discount=20 units=38 profit=23.56
+Sep 04, 2026 10:57:14 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111228-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-COLA15 discount=20 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekday|hot|event:any|stock:high, category:soft_drinks|store:any|weekday|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:17 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111228-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:57:17 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111228-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111228-LONDON_CENTRAL-ICE500 discount=20 units=46 profit=35.42
+Sep 04, 2026 10:57:17 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111228-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111228-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekday|normal|event:any|stock:high, category:ice_cream|store:any|weekday|normal|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:20 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111231-LONDON_CENTRAL-COLA15 regret=0.56 learning=disabled
+Sep 04, 2026 10:57:20 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111231-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-COLA15 outcome_id=OUT-DEC-SCN-20111231-LONDON_CENTRAL-COLA15 discount=10 units=27 profit=21.06
+Sep 04, 2026 10:57:20 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111231-LONDON_CENTRAL-COLA15 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-COLA15 discount=10 source=MODEL memory=USED lessons=[sku:COLA15|store:any|weekend|any|event:any|stock:normal, category:soft_drinks|store:any|weekend|normal|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:23 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20111231-LONDON_CENTRAL-ICE500 regret=0.00 learning=disabled
+Sep 04, 2026 10:57:23 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20111231-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-ICE500 outcome_id=OUT-DEC-SCN-20111231-LONDON_CENTRAL-ICE500 discount=20 units=54 profit=41.58
+Sep 04, 2026 10:57:23 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20111231-LONDON_CENTRAL-ICE500 decision_id=DEC-SCN-20111231-LONDON_CENTRAL-ICE500 discount=20 source=MODEL memory=USED lessons=[sku:ICE500|store:any|weekend|normal|event:any|stock:high, category:ice_cream|store:any|weekend|any|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:25 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20120102-LONDON_CENTRAL-YOG500 regret=0.00 learning=disabled
+Sep 04, 2026 10:57:25 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20120102-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20120102-LONDON_CENTRAL-YOG500 outcome_id=OUT-DEC-SCN-20120102-LONDON_CENTRAL-YOG500 discount=0 units=9 profit=14.85
+Sep 04, 2026 10:57:25 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20120102-LONDON_CENTRAL-YOG500 decision_id=DEC-SCN-20120102-LONDON_CENTRAL-YOG500 discount=0 source=MODEL memory=USED lessons=[sku:YOG500|store:any|weekday|hot|event:any|stock:high, category:yogurt|store:any|weekday|hot|event:any|stock:high] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:28 PM club.podlodka.snowball.application.PromotionEvaluator evaluate
+INFO: evaluated scenario_id=SCN-20120104-LONDON_CENTRAL-MEAT1 regret=0.00 learning=disabled
+Sep 04, 2026 10:57:28 PM club.podlodka.snowball.application.SimulationService simulate
+INFO: simulated scenario_id=SCN-20120104-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20120104-LONDON_CENTRAL-MEAT1 outcome_id=OUT-DEC-SCN-20120104-LONDON_CENTRAL-MEAT1 discount=0 units=13 profit=9.88
+Sep 04, 2026 10:57:28 PM club.podlodka.snowball.application.PromotionDecisionService decide
+INFO: scenario_id=SCN-20120104-LONDON_CENTRAL-MEAT1 decision_id=DEC-SCN-20120104-LONDON_CENTRAL-MEAT1 discount=0 source=MODEL memory=USED lessons=[sku:MEAT1|store:any|weekday|any|event:any|stock:normal, category:meat|store:any|weekday|hot|event:any|stock:normal] model=muse-glimmer-30b-q3
+Sep 04, 2026 10:57:28 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle completed published=50 rejected=0
+scenarios      50
+mean regret    0.1436
+optimal rate   80.0%
+fallbacks      0
+elapsed        212s
+per scenario   4243ms
+learning       off

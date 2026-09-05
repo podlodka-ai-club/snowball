@@ -7,23 +7,23 @@
 **Goals:**
 - Pure simulation engine with golden deterministic tests.
 - Hidden immutable simulator v1 configuration.
-- Kafka decision input and `OutcomeSink` output boundary.
+- Decision input through a port and `OutcomeSink` output boundary.
 - Reusable simulation capability for evaluator counterfactuals.
 
 **Non-Goals:**
 - Oracle selection, regret, cases, lessons, xmemory.
-- Separate outcomes Kafka topic in v1.
+- A separate outcomes transport in v1.
 - Hot-reloaded coefficients.
 - Random nondeterministic market behavior.
 
 ## Decisions
 
 1. Load simulator v1 configuration once at startup and fail startup if any supported category/context/action coefficient is missing or invalid.
-2. Implement `SimulationEngine` as a pure function with no Kafka/xmemory dependencies.
+2. Implement `SimulationEngine` as a pure function with no transport or xmemory dependencies.
 3. Follow the exact calculation and rounding order from `docs/market-simulator/README.md`; use BigDecimal where specified.
 4. Derive scenario noise from first eight SHA-256 bytes interpreted unsigned big-endian and reuse it across all actions for a scenario.
 5. Keep deterministic `outcome_id=OUT-<decision_id>` and preserve the scenario snapshot from the decision event.
-6. The Kafka adapter performs validation and invokes the engine, then calls `OutcomeSink`. Only successful handoff permits acknowledgement.
+6. The application service validates, invokes the engine, then calls `OutcomeSink`. A failed handoff fails the simulation rather than being reported as a completed one; `adopt-in-process-transport` defers the broker, so acknowledgement semantics arrive with whichever transport is chosen.
 7. Treat invalid input/config as permanent unhealthy failures. Use only bounded retries for transient downstream handoff failures.
 8. Prevent hidden simulator internals from being serialized into the business outcome, xmemory, or Promotion Agent-accessible logs/interfaces.
 

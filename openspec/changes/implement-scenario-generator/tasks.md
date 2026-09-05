@@ -1,23 +1,37 @@
-## 1. Service foundation
+## 1. Fixture format
 
-- [ ] 1.1 Create the Kotlin/Spring Boot Scenario Generator module with configuration for Kafka, market identity, source fixture, and generation trigger.
-- [ ] 1.2 Add domain/transport models mapped to the committed `promotion-scenario-v1` contract.
-- [ ] 1.3 Add JSON Schema and domain-invariant validation tests using the committed valid example plus invalid fixtures.
+- [x] 1.1 Define the normalized fixture columns - the set in `docs/scenario-generator/dataset-preparation.md` plus `date` and `split` - and commit a small example fixture in the project's test resources. Do not edit anything under `docs/`; the divergence from the preparation guide is recorded in this change's design instead.
+- [x] 1.2 Add fixture invariant checks: `date` and `split` present, `split` is `training` or `benchmark`, every benchmark date strictly later than every training date, `baseline_sales` non-zero, prices and costs within the schema bounds.
+- [x] 1.3 Add tests for each rejection above, using a small hand-written fixture rather than the real dataset.
 
-## 2. Pure generation logic
+- [x] 1.4 Prepare the real fixture from dunnhumby with `tools/prepare_dunnhumby.py`. The dataset must be downloaded manually from the dunnhumby source-files page and extracted outside this repository; the raw data is never committed.
 
-- [ ] 2.1 Implement `BaselineSource` and `DatasetBaselineSource` for the normalized fixture format.
-- [ ] 2.2 Implement deterministic `ContextEnricher`, `stock_level` derivation, market injection, and deterministic `scenario_id` generation.
-- [ ] 2.3 Add repeatability tests proving identical logical input produces identical scenario fields and ID.
+## 2. Generation logic
 
-## 3. Application and triggers
+- [x] 2.1 Implement `BaselineSource` and `DatasetBaselineSource` over the fixture format.
+- [x] 2.2 Implement deterministic `ContextEnricher`: `day_type` from the fixture date in `Europe/London`, and `weather`, `temperature_c`, `event_type` as a pure function of the row, with temperature consistent with weather.
+- [x] 2.3 Implement `stock_level` derivation at the `2 * baseline_sales` boundary, market identity injection, and deterministic `scenario_id` from the committed identity shape.
+- [x] 2.4 Add repeatability tests proving the same row yields identical scenario fields and identical `scenario_id` across separate runs.
+- [x] 2.5 Add a coverage test proving each generated set exercises every `weather` and every `event_type` value.
 
-- [ ] 3.1 Implement `ScenarioGenerationService` orchestration with no source-specific logic.
-- [ ] 3.2 Add scheduled and manual internal triggers that invoke the same service.
-- [ ] 3.3 Add structured rejection/logging behavior for invalid source or generated data.
+## 3. Contract validation
 
-## 4. Kafka output
+- [x] 3.1 Validate every generated event against the committed `promotion-scenario-v1.schema.json` before handoff, reusing the schema-validation approach already established in the skeleton tests.
+- [x] 3.2 Add tests that a schema-valid scenario is handed off and an invalid one is not, with an observable rejection reason.
 
-- [ ] 4.1 Implement `ScenarioPublisher` and Kafka adapter for `promotion.scenarios.v1` using `<store_id>:<sku_id>` keys.
-- [ ] 4.2 Add integration tests verifying one message per valid scenario, schema-valid payload, correct key, and no publication for invalid scenarios.
-- [ ] 4.3 Run an end-to-end local acceptance test from fixture row to consumed Kafka event and document the run command/configuration.
+## 4. Application and triggers
+
+- [x] 4.1 Implement `ScenarioGenerationService` orchestration with no source-specific logic.
+- [x] 4.2 Add scheduled and manual triggers that invoke the same service, without introducing an application framework.
+- [x] 4.3 Add structured rejection and logging behavior carrying `scenario_id`, `source.type`, and `source.reference`.
+
+## 5. Handoff
+
+- [x] 5.1 Hand each validated scenario to `ScenarioPublisher`, exactly one per generation.
+- [x] 5.2 Add tests verifying one handoff per valid scenario, a schema-valid payload, and no handoff for an invalid one.
+
+## 6. Acceptance
+
+- [x] 6.1 Run end to end from fixture rows to handed-off scenarios and document the command and configuration.
+- [x] 6.2 Prove a rerun over the same fixture produces byte-identical scenarios and identifiers.
+- [x] 6.3 Confirm no committed JSON Schema changed, nothing under `docs/` was edited, and the generator holds no port beyond `BaselineSource` and `ScenarioPublisher`.

@@ -1,7 +1,7 @@
 schema: spec-driven
 created: 2026-08-28
-goal: Implement the Kotlin Scenario Generator that converts prepared baseline data into validated promotion.scenarios.v1 Kafka events.
+goal: Implement the Kotlin Scenario Generator that turns prepared baseline rows into validated promotion scenario events handed off through ScenarioPublisher.
 affected_areas:
   - scenario-generator
-  - kafka
   - contracts
+  - fixture

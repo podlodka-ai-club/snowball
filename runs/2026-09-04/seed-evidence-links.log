@@ -1,0 +1,358 @@
+SLF4J(W): Class path contains multiple SLF4J providers.
+SLF4J(W): Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@19bb089b]
+SLF4J(W): Found provider [org.slf4j.nop.NOPServiceProvider@4563e9ab]
+SLF4J(W): See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J(I): Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@19bb089b]
+Sep 04, 2026 11:16:46 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle started split=training
+Sep 04, 2026 11:16:47 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle completed published=250 rejected=0
+stage         --links-only
+scenarios     250
+buckets       190
+links         1500
+Sep 04, 2026 11:16:49 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|rain|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:16:52 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|rain|event:any|stock:high is not visible yet; waiting 5s (attempt 2)
+Sep 04, 2026 11:16:58 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|rain|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:01 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|rain|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:03 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:06 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 5s (attempt 2)
+Sep 04, 2026 11:17:11 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:14 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:17 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:20 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:22 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:25 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:28 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:31 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:34 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:37 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:40 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:43 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:46 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:48 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:51 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:54 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:57 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:17:59 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:02 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:05 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:08 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:10 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:13 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:16 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:19 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:22 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:25 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:28 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:31 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:MEAT1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+links 50/1500 (replayed singly)
+Sep 04, 2026 11:18:36 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|weekday|rain|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:39 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|weekday|rain|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:42 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|weekday|rain|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:45 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:48 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:52 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:55 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|weekday|any|event:any|stock:high is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:18:59 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:02 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:05 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:08 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:11 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:14 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:17 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:21 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:25 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:28 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:31 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+links 100/1500 (replayed singly)
+Sep 04, 2026 11:19:35 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:meat|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:38 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|weekday|normal|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:41 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:45 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:49 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:52 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:55 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:19:59 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:02 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:06 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:09 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:12 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:16 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:19 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:21 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:25 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:27 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+links 150/1500 (replayed singly)
+Sep 04, 2026 11:20:31 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:34 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:37 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|weekday|normal|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:40 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|weekday|normal|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:43 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:47 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:50 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:53 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:55 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:20:59 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:02 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:06 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:09 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:12 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:15 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:18 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:21 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:25 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:27 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 5s (attempt 2)
+Sep 04, 2026 11:21:33 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+links 200/1500 (replayed singly)
+Sep 04, 2026 11:21:36 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:39 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:42 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:45 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:chips|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:48 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|weekday|normal|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:52 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:55 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:21:59 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:02 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:05 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:08 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:11 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:14 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:17 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:21 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:24 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:27 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:31 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:34 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:37 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+links 250/1500 (replayed singly)
+Sep 04, 2026 11:22:40 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:44 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:46 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:50 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:53 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:22:56 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:01 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:04 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:ICE500|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:07 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|weekday|normal|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:11 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:13 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:16 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:20 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:23 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|weekday|any|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:26 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:29 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:32 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:35 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:38 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+links 300/1500 (replayed singly)
+Sep 04, 2026 11:23:42 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:45 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:49 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:52 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:56 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:23:59 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:02 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:05 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:08 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:10 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:13 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:16 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:18 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:21 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:24 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:26 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 5s (attempt 2)
+Sep 04, 2026 11:24:32 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:35 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:38 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:40 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:43 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:46 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:48 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:51 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:53 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:56 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:24:59 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for category:ice_cream|store:any|any|any|event:any|stock:any is not visible yet; waiting 2s (attempt 1)
+Sep 04, 2026 11:25:01 PM club.podlodka.snowball.adapter.memory.XmemoryLearningMemory awaitingVisibility
+WARNING: lesson_evidence for sku:CHIPS1|store:any|weekend|normal|event:any|stock:normal is not visible yet; waiting 2s (attempt 1)
+links 350/1500 (replayed singly)
+links 400/1500 (replayed singly)
+links 450/1500 (replayed singly)
+links 500/1500 (replayed singly)
+links 550/1500 (replayed singly)
+links 600/1500 (replayed singly)
+links 650/1500 (replayed singly)
+links 700/1500 (replayed singly)
+links 750/1500 (replayed singly)
+links 800/1500 (replayed singly)
+links 850/1500 (replayed singly)
+links 900/1500 (replayed singly)
+links 950/1500 (replayed singly)
+links 1000/1500 (replayed singly)
+links 1050/1500 (replayed singly)
+links 1100/1500 (replayed singly)
+links 1150/1500 (replayed singly)
+links 1200/1500 (replayed singly)
+links 1250/1500 (replayed singly)
+links 1300/1500 (replayed singly)
+links 1350/1500 (replayed singly)
+links 1400/1500 (replayed singly)
+links 1450/1500 (replayed singly)
+links 1500/1500 (replayed singly)
+elapsed       904s
