@@ -96,10 +96,20 @@ data class Lesson(
             count: Int,
             advantagePct: BigDecimal,
         ): String =
-            "For ${key.scope.prefix}:${key.scopeValue} on ${key.weather.wire} ${key.dayType.wire} with " +
-                "${key.stockLevel.wire} stock, ${recommended.percent}% has the highest mean gross profit across " +
-                "$count evaluated ${if (count == 1) "case" else "cases"}, beating the next-best action by " +
-                "$advantagePct%."
+            buildString {
+                append("For ${key.scope.prefix}:${key.scopeValue}")
+                val conditions =
+                    listOfNotNull(
+                        key.weather?.wire,
+                        key.dayType?.wire,
+                        key.stockLevel?.let { "${it.wire} stock" },
+                    )
+                append(if (conditions.isEmpty()) " in any conditions" else " on ${conditions.joinToString(" ")}")
+                append(
+                    ", ${recommended.percent}% has the highest mean gross profit across $count evaluated " +
+                        "${if (count == 1) "case" else "cases"}, beating the next-best action by $advantagePct%.",
+                )
+            }
 
         private fun mean(
             total: BigDecimal,

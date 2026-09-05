@@ -12,6 +12,7 @@ import club.podlodka.snowball.domain.ContractViolation
 import club.podlodka.snowball.domain.Discount
 import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.LessonKey
+import club.podlodka.snowball.domain.LessonScope
 import club.podlodka.snowball.domain.PromotionScenario
 import club.podlodka.snowball.domain.PromotionScenarioEvent
 import club.podlodka.snowball.port.DecisionModel
@@ -60,12 +61,13 @@ class PromotionDecisionServiceTest {
         evidence: Int = 5,
     ) = Lesson(key, discount, evidence, BigDecimal("10.00"), BigDecimal(confidence), "because $discount")
 
-    /** Counts reads, so a test can assert the memory was never consulted at all. */
+    /** Records which buckets were asked for, in order, so the cascade itself can be asserted. */
     private class CountingMemory : InMemoryLearningMemory() {
-        var reads = 0
+        val asked = mutableListOf<LessonKey>()
+        val reads get() = asked.size
 
         override fun lesson(key: LessonKey): Lesson? {
-            reads += 1
+            asked += key
             return super.lesson(key)
         }
     }
@@ -188,8 +190,10 @@ class PromotionDecisionServiceTest {
     fun `lessons for this scenario reach the prompt, exact SKU first`() {
         val memory = InMemoryLearningMemory()
         val buckets = LessonKey.bucketsFor(scenarioEvent().scenario)
-        memory.saveLesson(lesson(buckets[1], Discount.TEN, confidence = "0.95"))
-        memory.saveLesson(lesson(buckets[0], Discount.TWENTY, confidence = "0.50"))
+        val exactSku = buckets.first { it.scope == LessonScope.SKU && it.specificity == 3 }
+        val exactCategory = buckets.first { it.scope == LessonScope.CATEGORY && it.specificity == 3 }
+        memory.saveLesson(lesson(exactCategory, Discount.TEN, confidence = "0.95"))
+        memory.saveLesson(lesson(exactSku, Discount.TWENTY, confidence = "0.50"))
         val model = SpyModel(Discount.TWENTY)
 
         val outcome = service(model, memory = memory).decide(scenarioEvent())
@@ -197,8 +201,41 @@ class PromotionDecisionServiceTest {
         assertThat(outcome.memoryStatus).isEqualTo(MemoryStatus.USED)
         // The SKU bucket outranks the category one even with lower confidence: advice about this
         // product beats advice about its family.
-        assertThat(model.lastLessons.first().key).isEqualTo(buckets[0])
-        assertThat(outcome.lessonsUsed).containsExactly(buckets[0], buckets[1])
+        assertThat(model.lastLessons.first().key).isEqualTo(exactSku)
+        assertThat(outcome.lessonsUsed).containsExactly(exactSku, exactCategory)
+    }
+
+    @Test
+    fun `a scenario with no exact lesson falls back to a looser one`() {
+        // The coverage case, and the reason the cascade exists: on the held-out set the strict key
+        // had no answer for three scenarios in fifty, and those three carried more lost profit
+        // than the forty-seven it did answer.
+        val memory = CountingMemory()
+        val buckets = LessonKey.bucketsFor(scenarioEvent().scenario)
+        val looser = buckets.first { it.scope == LessonScope.SKU && it.specificity == 2 }
+        memory.saveLesson(lesson(looser, Discount.THIRTY))
+        val model = SpyModel(Discount.THIRTY)
+
+        val outcome = service(model, memory = memory).decide(scenarioEvent())
+
+        assertThat(outcome.memoryStatus).isEqualTo(MemoryStatus.USED)
+        assertThat(model.lastLessons.map { it.key }).containsExactly(looser)
+    }
+
+    @Test
+    fun `an exact lesson stops the cascade before the looser buckets are read`() {
+        // Reads are the expensive half of this memory - each one is a model call against a shared
+        // quota - so a well-covered scenario has to cost what it always did.
+        val memory = CountingMemory()
+        val buckets = LessonKey.bucketsFor(scenarioEvent().scenario)
+        LessonScope.entries.forEach { scope ->
+            memory.saveLesson(lesson(buckets.first { it.scope == scope && it.specificity == 3 }, Discount.TWENTY))
+        }
+
+        service(SpyModel(Discount.TWENTY), memory = memory).decide(scenarioEvent())
+
+        assertThat(memory.reads).isEqualTo(2)
+        assertThat(memory.asked.map { it.specificity }).containsOnly(3)
     }
 
     @Test

@@ -81,11 +81,13 @@ class XmemoryHttp(
         }
 
         val envelope = runCatching { ContractJson.mapper.readTree(response.body()) }.getOrNull()
+        // Code and message together: the same condition is reported under different codes and
+        // different wordings, so a caller deciding what to tolerate needs both.
         val reasons =
             envelope
                 ?.path("errors")
                 ?.takeIf { it.isArray }
-                ?.map { it.path("message").asText("") }
+                ?.map { "${it.path("code").asText("")}: ${it.path("message").asText("")}" }
                 .orEmpty()
 
         if (response.statusCode() !in 200..299) {

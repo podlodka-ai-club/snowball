@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import java.math.BigDecimal
+import java.time.Duration
 import java.util.logging.Logger
 
 /**
@@ -71,6 +72,41 @@ class XmemoryLearningMemory(
         caseId: String,
         key: LessonKey,
     ) {
+        // Re-linking a case already linked to this lesson is the resume path, not a failure. The
+        // endpoint may also not resolve yet, which is the same visibility lag that affects updates.
+        awaitingVisibility("lesson_evidence for ${key.wire}") {
+            write(listOf(linkMutation(caseId, key)), ALREADY_EXISTS)
+        }
+    }
+
+    /**
+     * Retries a write that failed only because a record it names is not visible yet.
+     *
+     * The store acknowledges a write before the key it is addressed by resolves, so a relation
+     * created straight after its endpoint - or an update straight after the create that said the
+     * record exists - can fail on a record that is provably there. Under a bulk write the lag ran
+     * to a couple of minutes, so the waits are long; anything else is rethrown untouched.
+     */
+    private fun <T> awaitingVisibility(
+        what: String,
+        action: () -> T,
+    ): T? {
+        RETRY_DELAYS.forEachIndexed { attempt, delay ->
+            try {
+                return action()
+            } catch (failure: XmemoryError) {
+                if (failure.reasons.none(NOT_VISIBLE_YET)) throw failure
+                log.warning { "$what is not visible yet; waiting ${delay.seconds}s (attempt ${attempt + 1})" }
+                Thread.sleep(delay.toMillis())
+            }
+        }
+        return action()
+    }
+
+    private fun linkMutation(
+        caseId: String,
+        key: LessonKey,
+    ): JsonNode {
         // `object_name` names the participant *role* from the schema relation - `lesson` and
         // `case` - not the object type. Naming the types instead is accepted as far as parsing and
         // then rejected for missing both roles, which reads like a key problem and is not one.
@@ -79,19 +115,65 @@ class XmemoryLearningMemory(
                 add(endpoint("lesson", "lesson_key", key.wire))
                 add(endpoint("case", "case_id", caseId))
             }
-        val mutation =
-            json.createObjectNode().apply {
-                set<ObjectNode>(
-                    "relation_mutation",
-                    json.createObjectNode().apply {
-                        put("relation_type", "lesson_evidence")
-                        set<ObjectNode>("create", json.createObjectNode().set<ArrayNode>("endpoints", endpoints))
-                    },
-                )
-            }
-        // Re-linking a case already linked to this lesson is the resume path, not a failure.
-        write(listOf(mutation), ALREADY_EXISTS)
+        return json.createObjectNode().apply {
+            set<ObjectNode>(
+                "relation_mutation",
+                json.createObjectNode().apply {
+                    put("relation_type", "lesson_evidence")
+                    set<ObjectNode>("create", json.createObjectNode().set<ArrayNode>("endpoints", endpoints))
+                },
+            )
+        }
     }
+
+    /**
+     * Writes many lessons and links at once, for rebuilding buckets a past run never created.
+     *
+     * The service applies a batch atomically, so one "already exists" rejects the whole thing -
+     * and a rebuild always collides with what is already stored. A rejected batch is therefore
+     * replayed one mutation at a time through the ordinary idempotent paths. Batching still pays:
+     * a few dozen calls instead of a few thousand.
+     */
+    fun seed(
+        lessons: List<Lesson>,
+        links: List<Pair<String, LessonKey>>,
+        onProgress: (String) -> Unit = {},
+    ) {
+        // Deliberately separable. Rewriting a lesson makes its key temporarily unresolvable, so a
+        // rerun that touches the lessons again pushes every relation behind it back into the lag -
+        // which is why a resumed seed can pass one list and keep failing on the other forever.
+        var done = 0
+        lessons.chunked(BATCH).forEach { chunk ->
+            val applied =
+                batched(chunk.map { objectMutation("Lesson", "lesson_key", it.key.wire, lessonValues(it)) })
+            if (applied == null) chunk.forEach(::saveLesson)
+            done += chunk.size
+            onProgress("lessons $done/${lessons.size}${if (applied == null) " (replayed singly)" else ""}")
+        }
+        done = 0
+        links.chunked(BATCH).forEach { chunk ->
+            val applied = batched(chunk.map { (caseId, key) -> linkMutation(caseId, key) })
+            if (applied == null) chunk.forEach { (caseId, key) -> linkCaseToLesson(caseId, key) }
+            done += chunk.size
+            onProgress("links $done/${links.size}${if (applied == null) " (replayed singly)" else ""}")
+        }
+    }
+
+    /**
+     * One batch, or null if it has to be replayed one mutation at a time.
+     *
+     * A batch is all-or-nothing, so a single duplicate or a single not-yet-visible endpoint
+     * rejects the other forty-nine. Both are ordinary on a rebuild, and both are recoverable
+     * singly - where a duplicate is tolerated and an invisible record is waited for - so neither
+     * should end the run.
+     */
+    private fun batched(mutations: List<JsonNode>): JsonNode? =
+        try {
+            write(mutations, ALREADY_EXISTS)
+        } catch (failure: XmemoryError) {
+            if (failure.reasons.none(NOT_VISIBLE_YET)) throw failure
+            null
+        }
 
     /**
      * The evidence behind one lesson, read by walking the `lesson_evidence` relation.
@@ -126,23 +208,26 @@ class XmemoryLearningMemory(
     }
 
     override fun saveLesson(lesson: Lesson) {
+        upsert("Lesson", "lesson_key", lesson.key.wire, lessonValues(lesson))
+    }
+
+    private fun lessonValues(lesson: Lesson): ObjectNode {
         val values =
             json.createObjectNode().apply {
                 put("scope", "${lesson.key.scope.prefix}:${lesson.key.scopeValue}")
-                put("store_scope", "any")
-                put("day_type", lesson.key.dayType.wire)
-                put("weather", lesson.key.weather.wire)
-                put("event_type", "any")
-                put("stock_level", lesson.key.stockLevel.wire)
+                // An absent condition is left out of the record, which is what the schema asks
+                // for - "leave empty when the lesson applies to both". Writing "any" into these
+                // columns also broke their enums: `event_type` allows none and local_event only.
+                lesson.key.dayType?.let { put("day_type", it.wire) }
+                lesson.key.weather?.let { put("weather", it.wire) }
+                lesson.key.stockLevel?.let { put("stock_level", it.wire) }
                 put("recommended_discount", lesson.recommendedDiscount.percent)
                 put("rationale", lesson.rationale)
                 put("evidence_count", lesson.evidenceCount)
                 put("avg_profit_advantage_pct", lesson.avgProfitAdvantagePct)
                 put("confidence", lesson.confidence)
             }
-        // A lesson updates in place on its deterministic key, including when new evidence
-        // overturns the recommendation - a contradiction is a changed lesson, not a second one.
-        upsert("Lesson", "lesson_key", lesson.key.wire, values)
+        return values
     }
 
     override fun lesson(key: LessonKey): Lesson? =
@@ -176,9 +261,21 @@ class XmemoryLearningMemory(
         values: ObjectNode,
     ) {
         val created = write(listOf(objectMutation(type, keyField, keyValue, values)), ALREADY_EXISTS)
-        if (created == null) {
-            write(listOf(objectMutation(type, keyField, keyValue, values, "update")))
+        if (created != null) return
+
+        // The record exists - the create just said so - but the key it is addressed by may not
+        // resolve yet: the uniqueness check and the lookup used by update do not become consistent
+        // at the same moment. Measured at up to a couple of minutes under a bulk write. Retrying is
+        // the honest response; failing here would abandon a write whose data is already correct.
+        RETRY_DELAYS.forEachIndexed { attempt, delay ->
+            val updated = write(listOf(objectMutation(type, keyField, keyValue, values, "update")), NO_SUCH_KEY)
+            if (updated != null) return
+            log.warning { "$type $keyValue exists but does not resolve yet; retrying in ${delay.seconds}s" }
+            if (attempt < RETRY_DELAYS.lastIndex) Thread.sleep(delay.toMillis())
         }
+        // Out of retries: the values are the ones already stored in every case this is used for -
+        // a rebuild writes what the evidence says - so say so and carry on rather than abort.
+        log.warning { "$type $keyValue still does not resolve; leaving the stored record as it is" }
     }
 
     private fun objectMutation(
@@ -333,17 +430,51 @@ class XmemoryLearningMemory(
     private companion object {
         private val log: Logger = Logger.getLogger(XmemoryLearningMemory::class.java.name)
 
+        /** The service caps a batch at 50 mutations. */
+        private const val BATCH = 50
+
+        private val RETRY_DELAYS =
+            listOf(
+                Duration.ofSeconds(2),
+                Duration.ofSeconds(5),
+                Duration.ofSeconds(15),
+                Duration.ofSeconds(30),
+                Duration.ofSeconds(60),
+            )
+
+        /** A record that was written but whose key does not resolve yet, in either wording. */
+        private val NOT_VISIBLE_YET: (String) -> Boolean = {
+            NO_SUCH_KEY(it) || it.contains("was not found")
+        }
+
         @Suppress("unused")
         private val SCOPES = LessonScope.entries
 
         /**
-         * xmemory reports both of these as HTTP 400 `VALIDATION_ERROR`, which is also what a
-         * genuinely malformed call returns, so they are recognised by their message text. Each
-         * matches one phrase and nothing else: broadening either would start swallowing real
-         * rejections, and a swallowed write is a run that learns nothing while reporting success.
+         * The two conditions a write has to tell apart from a real rejection, recognised by their
+         * message text because their codes are shared with genuinely malformed calls.
+         *
+         * Both are reported under several wordings, and matching one of them is how this went
+         * wrong twice: a client that knows a single sentence passes every test and then abandons a
+         * bulk write partway through, or silently skips the retry meant for exactly that case.
+         *
+         * Missing record: "No 'lesson' object matches the provided primary key" on a read, "No
+         * 'Lesson' matches the given key" on an update. Duplicate: "already exists" as a 400, and
+         * "already has the same primary key" as a 409.
          */
-        private val NO_SUCH_KEY: (String) -> Boolean = { it.contains("matches the provided primary key") }
+        private val NO_SUCH_KEY: (String) -> Boolean = {
+            it.contains("matches the provided primary key") || it.contains("matches the given key")
+        }
 
-        private val ALREADY_EXISTS: (String) -> Boolean = { it.contains("already exists") }
+        /**
+         * A duplicate is reported in at least three ways, and the wording is not the stable part:
+         * HTTP 400 VALIDATION_ERROR "A 'Lesson' with this primary key already exists", HTTP 409
+         * CONFLICT "an existing Lesson record already has the same primary key", and the same
+         * CONFLICT naming the key value. All of them say the record is there, which on a resumable
+         * write is the outcome asked for.
+         */
+        private val ALREADY_EXISTS: (String) -> Boolean = {
+            it.contains("already exists") || it.contains("already has")
+        }
     }
 }

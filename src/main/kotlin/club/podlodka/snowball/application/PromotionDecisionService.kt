@@ -106,10 +106,22 @@ class PromotionDecisionService(
         return DecisionOutcome(decision, chosen.second, memoryStatus, lessons.map { it.key })
     }
 
-    /** Memory is advisory: if it cannot be reached, the agent decides without it and says so. */
+    /**
+     * Memory is advisory: if it cannot be reached, the agent decides without it and says so.
+     *
+     * The buckets are consulted strictest first and the search stops at the first hit within each
+     * scope. That is what makes the cascade affordable - a looser bucket is only read when the
+     * precise one has nothing, so a well-covered scenario costs the same two reads it always did,
+     * and reads are the expensive half of this memory.
+     */
     private fun recall(scenario: PromotionScenarioEvent): Pair<List<Lesson>, MemoryStatus> =
         try {
-            val candidates = LessonKey.bucketsFor(scenario.scenario).mapNotNull(memory::lesson)
+            val candidates =
+                LessonKey
+                    .bucketsFor(scenario.scenario)
+                    .groupBy { it.scope }
+                    .values
+                    .mapNotNull { buckets -> buckets.firstNotNullOfOrNull(memory::lesson) }
             val eligible = LessonRanker.eligible(scenario.scenario, candidates)
             eligible to if (eligible.isEmpty()) MemoryStatus.EMPTY else MemoryStatus.USED
         } catch (failure: Exception) {
