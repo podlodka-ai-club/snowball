@@ -54,6 +54,13 @@ written into it. The agent falls back to a more general bucket when the exact on
 Against clean memory the cascade removes 84% of the lost profit. The offline estimate in
 `AnalyzeLessonKeys` predicted 7.16 before the run; the run produced 7.18.
 
+The scheme was chosen by measuring variants on the held-out set, which spends that set on a
+hyperparameter - so it was re-checked on a slice that no choice touched: the last 50 training
+scenarios, again split by time, with lessons learned from the first 200 only. There the cascade
+cuts loss from 25.49 to 4.15 (84%) at 50/50 coverage against 44/50, with optimal rate unchanged
+(81.8% to 82.0%). The effect is larger on the slice it was not tuned on, which is the opposite of
+what fitting to the test set produces. `AnalyzeLessonKeys` prints both.
+
 What this does **not** establish: that the cascade beats the strict key by a statistically
 significant margin. The two disagree on six scenarios out of fifty - cascade better on four, worse
 on two, p = 0.69. The gain in money is real but concentrated in a few expensive scenarios rather
