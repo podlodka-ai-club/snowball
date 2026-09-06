@@ -212,6 +212,44 @@
     white-space: nowrap;
   }
 
+  .trace { display: flex; flex-direction: column; gap: 0; counter-reset: step; }
+  .step {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 18px;
+    padding: 22px 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .step:first-child { border-top: none; padding-top: 0; }
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--ink-3);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  .step h3 { font-size: 16px; margin-bottom: 6px; }
+  .step p { font-size: 15px; }
+  .step .body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .record {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    background: var(--sunk);
+    border-radius: 2px;
+    padding: 12px 14px;
+    color: var(--ink-2);
+    overflow-x: auto;
+    white-space: pre;
+    margin: 0;
+  }
+  .record b { color: var(--ink); font-weight: 500; }
+  .record i { color: var(--warm); font-style: normal; }
+  .record s { color: var(--cold); text-decoration: none; }
+
   .notes { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
   @media (min-width: 780px) { .notes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .note { border-left: 2px solid var(--line); padding-left: 16px; display: flex; flex-direction: column; gap: 6px; }
@@ -461,6 +499,104 @@
         <p class="context">Число ошибок упало с 28 до 10, а средняя цена оставшейся ошибки - с 1.57 до примерно 0.72.</p>
       </article>
 
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">трасса</span>
+      <h2>Путь одного урока: от записи до изменённого решения</h2>
+    </div>
+    <div class="prose">
+      <p>Всё ниже - настоящие записи и настоящий текст промпта, без пересказа. Товар: мороженое 500 мл, условия: жаркий будний день, полный склад. Обучающих сценариев с такими условиями было четыре.</p>
+    </div>
+    <div class="panel">
+      <div class="trace">
+
+        <div class="step">
+          <div class="body">
+            <h3>Оценщик записывает случай</h3>
+            <p>После каждого обучающего сценария в память уходит один неизменяемый PromotionCase: что выбрал агент, что вышло, и прибыль всех четырёх действий, которую оценщик получил, проиграв их на одном рыночном шоке.</p>
+<pre class="record">PromotionCase  case_id: CASE-v1-SCN-20110614-LONDON_CENTRAL-ICE500
+  scenario_date: 2011-06-14   weekday, hot, stock 58 (high), baseline 23
+  chosen_discount: 20    units_sold: 52    gross_profit: 37.96
+  profit_0: 30.16   profit_10: 33.82   <i>profit_20: 37.96</i>   profit_30: 33.64
+  best_discount: <i>20</i>   regret: 0.00</pre>
+            <p>Этот случай агент решил верно уже на обучении - в памяти к тому моменту лежал один более ранний случай по тому же ключу, от 4 апреля. Третий и четвёртый добавились 10 и 31 августа.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="body">
+            <h3>Случай связывается с бакетами урока</h3>
+            <p>Связь lesson_evidence ведёт от случая к каждому уроку, который он поддерживает - шесть бакетов на случай, от точных условий до самых общих. По ней урок потом пересчитывается из всей своей истории, а не из последнего наблюдения.</p>
+<pre class="record">lesson_evidence  case -> Lesson <b>sku:ICE500|store:any|weekday|hot|event:any|stock:high</b>
+lesson_evidence  case -> Lesson sku:ICE500|store:any|weekday|any|event:any|stock:high
+lesson_evidence  case -> Lesson sku:ICE500|store:any|any|any|event:any|stock:any
+                 ... и три категорийных</pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="body">
+            <h3>Урок пересчитывается из четырёх случаев</h3>
+            <p>Никакая модель этого не пишет. Learner суммирует прибыль по каждому действию по всем связанным случаям и берёт лучшее; уверенность складывается из объёма доказательств, их согласия между собой и отрыва от второго места.</p>
+<pre class="record">Lesson  lesson_key: <b>sku:ICE500|store:any|weekday|hot|event:any|stock:high</b>
+  recommended_discount: <i>20</i>
+  evidence_count: 4     avg_profit_advantage_pct: 12.25     confidence: 0.88
+  rationale: For sku:ICE500 on hot weekday high stock, 20% has the highest
+             mean gross profit across 4 evaluated cases, beating the
+             next-best action by 12.25%.</pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="body">
+            <h3>Другой процесс читает его через неделю</h3>
+            <p>Замер идёт отдельным запуском, после рестарта, против того же инстанса. 25 ноября приходит сценарий с теми же условиями. Агент идёт по бакетам от точного к общему и находит урок на первом же.</p>
+<pre class="record">benchmark-trained-cascade.log
+INFO: scenario_id=SCN-20111125-LONDON_CENTRAL-ICE500 discount=20 source=MODEL
+      memory=<i>USED</i> lessons=[sku:ICE500|store:any|weekday|hot|event:any|stock:high,
+                           category:ice_cream|store:any|weekday|hot|event:any|stock:high]</pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="body">
+            <h3>Промпт, каким его видела модель</h3>
+            <p>Шаблон один и тот же для обеих рук - меняется только блок уроков. Так измеренная разница остаётся разницей памяти, а не разницей формулировок.</p>
+<pre class="record">Scenario:
+  sku: ICE500 (Ice Cream 500ml), category: ice_cream
+  date: 2011-11-25 (weekday)
+  weather: hot, 25C
+  price: 1.61, cost: 0.52
+  baseline_sales: 23, stock: 58 (high)
+  local event: none
+
+Lessons from memory:
+  <i>1. For sku:ICE500 on hot weekday high stock, 20% has the highest mean
+     gross profit across 4 evaluated cases, beating the next-best action
+     by 12.25%. confidence 0.88</i>
+  2. For category:ice_cream on hot weekday high stock, 20% has ...
+
+Allowed actions: 0%, 10%, 20%, 30%
+Choose the discount.</pre>
+            <p>Второй урок дословно повторяет первый: в фикстуре шесть товаров и шесть категорий, соответствие один к одному. Это то самое ограничение из раздела оговорок, и в промпте оно видно невооружённым глазом.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="body">
+            <h3>Решение меняется, и оракул подтверждает</h3>
+            <p>Без памяти на этот же сценарий модель дала 10%. С уроком - 20%. Оракул, который агент не видит никогда, знает, что стоило каждое действие.</p>
+<pre class="record">без памяти:   <s>10%</s>  ->  прибыль 35.34, потеря 4.70
+с памятью:    <i>20%</i>  ->  прибыль 40.04, потеря 0.00
+
+оракул:  0% -> 31.61   10% -> 35.34   <i>20% -> 40.04</i>   30% -> 35.38</pre>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
