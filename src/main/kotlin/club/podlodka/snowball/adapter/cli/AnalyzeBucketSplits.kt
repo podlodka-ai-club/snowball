@@ -64,6 +64,13 @@ object AnalyzeBucketSplits {
         val all = events.map { it.scenario to profits(it) }
         val fit = all.dropLast(VALIDATION)
         val validation = all.takeLast(VALIDATION)
+        val heldOut = mutableListOf<PromotionScenarioEvent>()
+        ScenarioGenerationService(
+            baselineSource = DatasetBaselineSource { fixture.reader() },
+            contextEnricher = DeterministicContextEnricher(),
+            publisher = ScenarioPublisher { heldOut += it },
+        ).generate(DatasetSplit.BENCHMARK)
+        val benchmark = heldOut.map { it.scenario to profits(it) }
 
         fun best(byDiscount: Map<Discount, BigDecimal>): Discount =
             Discount.entries
@@ -155,9 +162,10 @@ object AnalyzeBucketSplits {
             label: String,
             table: Map<String, Discount>,
             useSplits: Boolean,
+            slice: List<Pair<PromotionScenario, Map<Discount, BigDecimal>>> = validation,
         ) {
             val advised =
-                validation.map { (scenario, p) ->
+                slice.map { (scenario, p) ->
                     val keys =
                         LessonKey.bucketsFor(scenario).flatMap { key ->
                             val bucket = key.wire
@@ -181,7 +189,7 @@ object AnalyzeBucketSplits {
                 "%-32s %6d/%-3d %7s%%  %11s".format(
                     label,
                     covered.size,
-                    validation.size,
+                    slice.size,
                     if (covered.isEmpty()) "-" else percent(optimal, covered.size),
                     loss.setScale(2, RoundingMode.HALF_UP),
                 ),
@@ -193,6 +201,26 @@ object AnalyzeBucketSplits {
         val table = tableFor(fit)
         score("cascade as built", table, useSplits = false)
         score("cascade + evidence-driven splits", table, useSplits = true)
+
+        // The same, learned from all 250 and scored on the 50 held-out scenarios - the slice the
+        // published numbers come from. Splits are chosen on the training data only.
+        println("\nHeld-out (learned from all ${all.size}, scored on ${benchmark.size}):\n")
+        println("policy                           coverage  optimal        loss")
+        val full = tableFor(all)
+        score("cascade as built", full, useSplits = false, slice = benchmark)
+        score("cascade + evidence-driven splits", full, useSplits = true, slice = benchmark)
+        val changed =
+            benchmark.count { (scenario, _) ->
+                val keys = LessonKey.bucketsFor(scenario).map { it.wire }
+                val plain = keys.firstNotNullOfOrNull { full[it] }
+                val evolved =
+                    keys
+                        .flatMap { b ->
+                            listOfNotNull(splits[b]?.let { "$b|$it:${features.getValue(it)(scenario)}" }, b)
+                        }.firstNotNullOfOrNull { full[it] }
+                plain != evolved
+            }
+        println("\nheld-out scenarios whose advice changes under the evolved keys: $changed of ${benchmark.size}")
 
         println("\nBuckets that disagreed with themselves: $considered; split: ${splits.size}")
         splits.entries

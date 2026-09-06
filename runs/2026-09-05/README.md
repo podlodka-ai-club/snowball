@@ -38,6 +38,14 @@ It does not improve the benchmark. Split buckets are the general levels, which t
 reaches in six held-out scenarios out of fifty; offline this policy scores 4.15 against 4.15.
 The value is the mechanism and the confidence gain inside the split buckets, not the regret line.
 
+## Checked on the held-out set as well
+
+Learned from all 250 training scenarios and scored on the 50 held-out ones - the slice every
+published number comes from - the evolved keys change the advice on **0 of 50** scenarios: 7.16
+against 7.16. The result is final and needs no live run: the mechanism works, the confidence inside
+the split buckets rises, the agent's decisions on this benchmark do not move, because the buckets
+that qualify for a split are the general levels the cascade rarely reaches.
+
 ## Gotchas found on the way
 
 - `instance_schema` is `{"yml": {"value": "<yaml text>"}}`. Thirty-two guessed variant names were
