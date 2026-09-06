@@ -4,15 +4,20 @@ import club.podlodka.snowball.adapter.memory.XmemoryError
 import club.podlodka.snowball.adapter.memory.XmemoryHttp
 import club.podlodka.snowball.adapter.memory.XmemoryLearningMemory
 import club.podlodka.snowball.config.XmemoryConfig
+import club.podlodka.snowball.domain.CommittedDocs
 import club.podlodka.snowball.domain.ContractJson
 import club.podlodka.snowball.domain.DayType
 import club.podlodka.snowball.domain.Discount
 import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.LessonKey
 import club.podlodka.snowball.domain.LessonScope
+import club.podlodka.snowball.domain.PromotionCase
+import club.podlodka.snowball.domain.PromotionDecisionEvent
+import club.podlodka.snowball.domain.SimulatorVersion
 import club.podlodka.snowball.domain.StockLevel
 import club.podlodka.snowball.domain.Weather
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.sun.net.httpserver.HttpServer
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
@@ -77,7 +82,7 @@ class XmemoryLearningMemoryTest {
             Lesson(key, Discount.TWENTY, 3, BigDecimal("12.50"), BigDecimal("0.71"), "because numbers"),
         )
 
-        val write = requests.last { it.first == "write" }.second
+        val write = requests.first { it.first == "write" }.second
         assertThat(write.has("text")).isFalse()
         assertThat(write.has("structured_mutations")).isTrue()
         val values = write.path("structured_mutations").first().path("object_mutation")
@@ -204,7 +209,7 @@ class XmemoryLearningMemoryTest {
 
         memory.saveLesson(Lesson(key, Discount.TWENTY, 3, BigDecimal("1.00"), BigDecimal("0.50"), "why"))
 
-        val mutations = requests.filter { it.first == "write" }.map { it.second.path("structured_mutations").first() }
+        val mutations = objectMutations()
         assertThat(mutations).hasSize(2)
         assertThat(mutations[1].path("object_mutation").has("update")).isTrue()
     }
@@ -242,7 +247,7 @@ class XmemoryLearningMemoryTest {
 
         memory.saveLesson(Lesson(key, Discount.TWENTY, 3, BigDecimal("1.00"), BigDecimal("0.50"), "why"))
 
-        val mutations = requests.filter { it.first == "write" }.map { it.second.path("structured_mutations").first() }
+        val mutations = objectMutations()
         assertThat(mutations).hasSize(3)
         assertThat(mutations.drop(1)).allSatisfy { assertThat(it.path("object_mutation").has("update")).isTrue() }
     }
@@ -387,10 +392,112 @@ class XmemoryLearningMemoryTest {
 
         memory.saveLesson(Lesson(key, Discount.TWENTY, 3, BigDecimal("12.50"), BigDecimal("0.71"), "because"))
 
-        val mutations = requests.filter { it.first == "write" }.map { it.second.path("structured_mutations").first() }
+        val mutations = objectMutations()
         assertThat(mutations).hasSize(2)
         assertThat(mutations[0].path("object_mutation").has("create")).isTrue()
         assertThat(mutations[1].path("object_mutation").has("update")).isTrue()
+    }
+
+    /** The first mutation of every write that carries an object, in order; relations are left out. */
+    private fun objectMutations(): List<JsonNode> =
+        requests
+            .filter { it.first == "write" }
+            .map { it.second.path("structured_mutations").first() }
+            .filter { it.has("object_mutation") }
+
+    private fun relationMutations(): List<JsonNode> =
+        requests
+            .filter { it.first == "write" }
+            .flatMap { it.second.path("structured_mutations") }
+            .filter { it.has("relation_mutation") }
+            .map { it.path("relation_mutation") }
+
+    private fun case(): PromotionCase {
+        val decision: PromotionDecisionEvent =
+            ContractJson.mapper.readValue(
+                CommittedDocs.read(CommittedDocs.DECISION_EXAMPLE),
+            )
+        return PromotionCase(
+            caseId = "CASE-v1-SCN-1",
+            scenarioId = "SCN-1",
+            simulatorVersion = SimulatorVersion.V1,
+            scenario = decision.scenario,
+            chosenDiscount = Discount.TEN,
+            chosenUnitsSold = 10,
+            chosenGrossProfit = BigDecimal("10.00"),
+            profitByDiscount = Discount.entries.associateWith { BigDecimal(it.percent) },
+            bestDiscount = Discount.THIRTY,
+        )
+    }
+
+    @Test
+    fun `a case is written after its product, and travels with the relation between them`() {
+        memory.saveCase(case())
+
+        // The product first, on its own: it is the record every case of that SKU shares, and a
+        // batch carrying its create would be refused as a whole once it exists.
+        val sku = objectMutations().first().path("object_mutation")
+        assertThat(sku.path("object_type").asText()).isEqualTo("SKU")
+        val values = sku.path("create").path("values")
+        assertThat(
+            sku
+                .path("create")
+                .path("key")
+                .path("sku_id")
+                .asText(),
+        ).isEqualTo("ICE500")
+        assertThat(values.path("name").asText()).isEqualTo("Ice Cream 500ml")
+        assertThat(values.path("category").asText()).isEqualTo("ice_cream")
+        assertThat(values.path("base_price").decimalValue()).isEqualByComparingTo("5.0")
+        assertThat(values.path("cost").decimalValue()).isEqualByComparingTo("3.0")
+        // Only the fields the schema declares; an unknown one rejects the whole write.
+        assertThat(
+            values.fieldNames().asSequence().toList(),
+        ).containsExactlyInAnyOrder("name", "category", "base_price", "cost")
+
+        // Then the case and its `case_sku` in one batch, so the relation never waits for the case
+        // to become resolvable.
+        val batch =
+            requests
+                .filter { it.first == "write" }
+                .last()
+                .second
+                .path("structured_mutations")
+        assertThat(batch).hasSize(2)
+        assertThat(batch[0].path("object_mutation").path("object_type").asText()).isEqualTo("PromotionCase")
+        val relation = batch[1].path("relation_mutation")
+        assertThat(relation.path("relation_type").asText()).isEqualTo("case_sku")
+        val endpoints =
+            relation.path("create").path("endpoints").associate {
+                it.path("object_name").asText() to
+                    it.path("key")
+            }
+        assertThat(endpoints.keys).containsExactlyInAnyOrder("case", "sku")
+        assertThat(endpoints.getValue("case").path("case_id").asText()).isEqualTo("CASE-v1-SCN-1")
+        assertThat(endpoints.getValue("sku").path("sku_id").asText()).isEqualTo("ICE500")
+    }
+
+    @Test
+    fun `a SKU lesson is linked to its one product by role`() {
+        memory.saveLesson(Lesson(key, Discount.TWENTY, 3, BigDecimal("12.50"), BigDecimal("0.71"), "because numbers"))
+
+        val scope = relationMutations().single { it.path("relation_type").asText() == "lesson_sku_scope" }
+        val endpoints =
+            scope.path("create").path("endpoints").associate {
+                it.path("object_name").asText() to
+                    it.path("key")
+            }
+        assertThat(endpoints.keys).containsExactlyInAnyOrder("lesson", "sku")
+        assertThat(endpoints.getValue("lesson").path("lesson_key").asText()).isEqualTo(key.wire)
+        assertThat(endpoints.getValue("sku").path("sku_id").asText()).isEqualTo("ICE500")
+        // The lesson exists before anything points at it.
+        assertThat(
+            objectMutations()
+                .single()
+                .path("object_mutation")
+                .path("object_type")
+                .asText(),
+        ).isEqualTo("Lesson")
     }
 
     @Test
