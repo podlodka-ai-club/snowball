@@ -1,40 +1,90 @@
-# Hacker Sprint 2 — Self-Learning FMCG Promotion Agent
+# Hacker Sprint 2 - Self-Learning FMCG Promotion Agent
 
-An autonomous promotion agent that improves its discount decisions from outcomes stored in persistent memory.
+An autonomous promotion agent that improves its discount decisions from outcomes stored in
+persistent memory.
+
+## What it does, and what that is worth
+
+The agent picks one of `0%`, `10%`, `20%`, `30%` for a product in a store on a given day. A
+deterministic simulator plays the market. An evaluator replays **all four** actions on the same
+market shock and computes regret - the profit given up against the best action. Lessons are derived
+from accumulated cases and read back before later decisions.
+
+Measured on 50 held-out scenarios, split by time, with learning switched off in both arms and the
+two memories in separate instances:
+
+| | no memory | memory, exact key | memory with fallback |
+|---|---|---|---|
+| optimal decisions | 44% | 76% | 80% |
+| total regret | 44.04 | 12.17 | 7.18 |
+| memory answered | - | 44 of 50 | 50 of 50 |
+
+Paired over the same scenarios the trained arm is better on 25 and worse on 6 (exact binomial
+p = 0.0009). Full numbers, caveats and the raw logs: [`runs/2026-09-04/`](runs/2026-09-04/).
+
+## Running it
+
+```bash
+./gradlew spotlessCheck build          # what CI runs
+./gradlew classes                      # compile before the CLIs below
+
+CP="build/classes/kotlin/main:build/resources/main:$(find ~/.gradle/caches/modules-2 -name '*.jar' | tr '\n' ':')"
+
+# one benchmark arm; --arm reads XMEM_INSTANCE_ID_CLEAN / _TRAINED from the environment
+java -cp "$CP" club.podlodka.snowball.adapter.cli.RunExperiment --split=benchmark --no-learning --arm=trained
+
+# the training run
+java -cp "$CP" club.podlodka.snowball.adapter.cli.RunExperiment --split=training --arm=trained
+
+# offline: what a different lesson-key policy would be worth, no model and no memory quota spent
+java -cp "$CP" club.podlodka.snowball.adapter.cli.AnalyzeLessonKeys
+```
+
+Needs `XMEM_API_KEY` and an instance id in the environment, plus an OpenAI-compatible model
+endpoint. Copy [`.env.example`](.env.example); the filled-in file is never committed.
 
 ## Self-learning loop
 
 ![Self-learning promotion agent](assets/self-learning-loop.svg)
 
-The demo is intentionally small: the agent chooses one of `0%`, `10%`, `20%`, or `30%` discount levels. A simulator produces sales and gross profit. An evaluator replays all allowed actions, calculates regret, and writes evaluated evidence. A learner turns accumulated evidence into reusable lessons in xmemory. Future decisions retrieve those lessons.
+**scenario -> decision -> simulated outcome -> PromotionCase -> Lesson -> lesson read -> changed
+next decision**
 
-The core behavior is:
-
-**scenario → decision → simulated outcome → PromotionCase → Lesson → lesson read → changed next decision**
-
-## MVP architecture
+## Architecture as built
 
 ![High-level architecture](assets/high-level-architecture.svg)
 
-The architecture is intentionally small:
+The committed diagrams and the component documents under `docs/` describe the **original design**.
+Two of its decisions were deliberately reversed during the sprint, and the diagrams were left as
+they were because they are committed artifacts. Where this section and a diagram disagree, this
+section is what the code does.
 
-- **Scenario Generator** fetches baseline market data through a source adapter, normalizes it, and publishes scenario events to Kafka.
-- **Kafka** topic `promotion.scenarios.v1` decouples data collection/scheduling from decision logic.
-- **Promotion Agent** consumes scenarios, reads a few relevant lessons from **xmemory**, chooses one discount, and journals the exact decision durably for idempotency and traceability.
-- **Kafka** topic `promotion.decisions.v1` carries the validated decision plus scenario snapshot to the simulator.
-- **Market Simulator** applies a hidden deterministic market model and produces one versioned `PromotionOutcomeV1` containing the chosen-action business result.
-- **Evaluator** replays all four discounts through the same pure simulator capability, chooses the oracle-best action, calculates regret, and creates one immutable **PromotionCase**.
-- **Learner** assigns each case to exactly two deterministic Lesson buckets, recomputes aggregate evidence, and creates or updates reusable **Lessons**.
-- **xmemory** persists SKU, PromotionCases, Lessons, and evidence relations across restarts.
+- **Scenario Generator** reads baseline market data through a source adapter, normalizes it, adds
+  deterministic weather/event/day context, and publishes one validated event per scenario.
+- **Promotion Agent** consumes scenarios, reads the relevant Lessons from **xmemory**, keeps at
+  most three, asks the model for one discount, validates it against the committed schema, and
+  journals the decision before handing it on.
+- **Market Simulator** applies a hidden deterministic market model and produces one versioned
+  `PromotionOutcomeV1` for the chosen action only.
+- **Evaluator** replays all four discounts through the same simulation capability, picks the
+  oracle-best action, computes regret, and creates one immutable **PromotionCase**.
+- **Learner** assigns the case to its Lesson buckets, recomputes each from all linked cases, and
+  writes them back.
+- **xmemory** persists SKU, PromotionCases, Lessons and their relations across restarts.
 
-The important property is:
+**No Kafka.** The design had two topics; the transport was deferred to in-process handoff behind
+ports, because a broker costs sprint days and buys nothing a benchmark can measure. The decision
+and its consequences are written down in the `adopt-in-process-transport` OpenSpec change. It was
+deferred, not ruled out: every component talks through a port, so a transport can be dropped in
+without touching component logic.
 
-**market data → scenario → memory-backed decision → outcome → evaluated case → reusable lesson → better next decision**
+**No framework.** Plain Kotlin on the JVM, no Spring. The dependency list is Jackson, a JSON Schema
+validator, and test libraries.
 
-Kafka remains limited to two meaningful external boundaries. Market Simulator, Evaluator, and Learner share one deployable Kotlin/Spring Boot runtime for the MVP but remain separate logical components. One JVM is a deployment choice, not a philosophical union of unrelated responsibilities.
-
-- Architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
-- Editable diagram source: [`docs/architecture/high-level-architecture.mmd`](docs/architecture/high-level-architecture.mmd)
+**The decision journal is in memory, not H2.** It gives idempotency inside a run - a scenario is
+never decided twice - but it does not survive a restart. A durable journal remains an open task in
+the OpenSpec change; today an interrupted run starts over, and that has cost us one full training
+run.
 
 ## Component deep dives
 
@@ -42,145 +92,128 @@ Kafka remains limited to two meaningful external boundaries. Market Simulator, E
 
 ![Scenario Generator architecture](assets/scenario-generator-architecture.svg)
 
-The Scenario Generator is a Kotlin microservice and the ingestion boundary of the system:
-
 - source adapters hide whether baseline data comes from a fixture, SAP, database, or API;
-- a scheduler or manual trigger starts scenario generation;
-- context enrichment adds normalized weather/event/day context;
-- the service publishes one validated immutable event to `promotion.scenarios.v1` per scenario;
-- the Promotion Agent depends only on the versioned event contract, never source-specific DTOs.
+- context enrichment adds normalized weather/event/day context, derived deterministically;
+- one validated immutable event per scenario, against the committed contract;
+- downstream depends only on the versioned event contract, never on source-specific types.
 
-For the hackathon the market is fixed to **London Central** (`LONDON_CENTRAL`, `Europe/London`) and the primary baseline source is a small fixture prepared offline from **dunnhumby Breakfast at the Frat**. The raw public dataset never becomes a runtime dependency.
+The market is fixed to **London Central** (`LONDON_CENTRAL`, `Europe/London`) and the baseline
+source is a fixture prepared offline from **dunnhumby Breakfast at the Frat**: 300 product-days,
+250 for training and 50 held out, split by date rather than at random. The raw public dataset never
+becomes a runtime dependency.
 
 - Detailed design: [`docs/scenario-generator/README.md`](docs/scenario-generator/README.md)
 - Dataset preparation: [`docs/scenario-generator/dataset-preparation.md`](docs/scenario-generator/dataset-preparation.md)
-- Baseline fixture example: [`docs/scenario-generator/baseline-fixture.example.csv`](docs/scenario-generator/baseline-fixture.example.csv)
-- Kafka JSON Schema: [`docs/scenario-generator/promotion-scenario-v1.schema.json`](docs/scenario-generator/promotion-scenario-v1.schema.json)
+- JSON Schema: [`docs/scenario-generator/promotion-scenario-v1.schema.json`](docs/scenario-generator/promotion-scenario-v1.schema.json)
 - Example event: [`docs/scenario-generator/promotion-scenario-v1.example.json`](docs/scenario-generator/promotion-scenario-v1.example.json)
-- Editable diagram source: [`docs/scenario-generator/architecture.mmd`](docs/scenario-generator/architecture.mmd)
 
 ### Promotion Agent
 
 ![Promotion Agent runtime flow](assets/promotion-agent-flow.svg)
 
-The Promotion Agent is also a Kotlin/Spring Boot service for the MVP. Its runtime flow is explicit:
-
-- consume and validate `promotion.scenarios.v1`;
-- use `scenario_id` as the durable idempotency key in the H2 `DecisionJournal`;
-- retrieve candidate Lessons from xmemory and deterministically keep at most `3` relevant Lessons;
-- build the same decision prompt for clean-memory and trained-memory runs;
+- validate the incoming scenario against its contract before anything with a consequence happens;
+- use `scenario_id` as the idempotency key in the decision journal;
+- walk the lesson buckets strictest first, stop at the first hit within each scope, keep at most
+  three lessons;
+- build the same prompt for clean-memory and trained-memory runs, so the delta is the memory;
 - ask the model for exactly one action from `0 | 10 | 20 | 30`;
-- validate the model result, retry once, then fall back to deterministic `0%` if necessary;
-- persist the exact decision payload as `DECIDED` before publishing it;
-- publish `promotion.decisions.v1`;
-- mark the journal `COMPLETED` and acknowledge the source offset only after publish succeeds.
+- validate the answer, retry once, then fall back to a deterministic `0%`, recorded as its own
+  decision source so an outage cannot masquerade as a cautious agent;
+- persist the decision before handing it on, and mark it complete only after it is accepted.
 
-On restart, a `DECIDED` scenario republishes the already persisted decision instead of calling xmemory or the model again. A `COMPLETED` scenario is acknowledged as a duplicate.
+The agent never receives the simulator, by construction and by test: it cannot replay the four
+actions and read off the answer.
 
-Operational idempotency/trace data stays in the agent's H2 journal, not in xmemory. xmemory remains product learning memory containing only SKU, PromotionCase, and Lesson.
-
-- Runtime flow explanation: [`docs/promotion-agent/FLOW.md`](docs/promotion-agent/FLOW.md)
-- PlantUML runtime flow source: [`docs/promotion-agent/flow.puml`](docs/promotion-agent/flow.puml)
+- Runtime flow: [`docs/promotion-agent/FLOW.md`](docs/promotion-agent/FLOW.md)
 - Detailed design: [`docs/promotion-agent/README.md`](docs/promotion-agent/README.md)
-- Component/topology source: [`docs/promotion-agent/architecture.mmd`](docs/promotion-agent/architecture.mmd)
-- Kafka JSON Schema: [`docs/promotion-agent/promotion-decision-v1.schema.json`](docs/promotion-agent/promotion-decision-v1.schema.json)
-- Example event: [`docs/promotion-agent/promotion-decision-v1.example.json`](docs/promotion-agent/promotion-decision-v1.example.json)
+- JSON Schema: [`docs/promotion-agent/promotion-decision-v1.schema.json`](docs/promotion-agent/promotion-decision-v1.schema.json)
 
 ### Market Simulator
 
 ![Market Simulator architecture](assets/market-simulator-architecture.svg)
 
-The Market Simulator is only the hidden market world:
+- a pure deterministic `SimulationEngine`;
+- category and context demand factors plus context-sensitive promotion elasticity;
+- units capped by stock, gross profit with fixed rounding;
+- a deterministic SHA-256 shock derived from the scenario id **and not from the discount**, so all
+  four actions are played against the same market and their difference is the effect of the
+  discount rather than noise;
+- one versioned `PromotionOutcomeV1` with `units_sold` and `gross_profit`.
 
-- consume and validate `promotion.decisions.v1` using consumer group `market-simulator-v1`;
-- run a pure deterministic `SimulationEngine`;
-- apply category/context demand factors plus context-sensitive promotion elasticity;
-- cap units by exact stock and calculate gross profit with fixed rounding rules;
-- use a small deterministic SHA-256 scenario shock;
-- produce one versioned `PromotionOutcomeV1` containing `units_sold` and `gross_profit`.
-
-**Its scope ends at `PromotionOutcomeV1`.** It does not calculate oracle actions or regret, create PromotionCases, update Lessons, or write xmemory.
-
-The same pure simulation capability is called by the Evaluator for counterfactual actions, but replay orchestration belongs to the Evaluator. Hidden coefficients and noise internals never enter the Promotion Agent prompt or xmemory.
+**Its scope ends at `PromotionOutcomeV1`.** It does not compute oracle actions or regret, create
+cases, update lessons, or write memory. Hidden coefficients never reach the agent's prompt or the
+memory.
 
 - Detailed design: [`docs/market-simulator/README.md`](docs/market-simulator/README.md)
-- Editable diagram source: [`docs/market-simulator/architecture.mmd`](docs/market-simulator/architecture.mmd)
 - Outcome JSON Schema: [`docs/market-simulator/promotion-outcome-v1.schema.json`](docs/market-simulator/promotion-outcome-v1.schema.json)
-- Example outcome: [`docs/market-simulator/promotion-outcome-v1.example.json`](docs/market-simulator/promotion-outcome-v1.example.json)
 
 ### Evaluator / Learner
 
 ![Evaluator / Learner architecture](assets/evaluator-learner-architecture.svg)
 
-This component has one job:
-
-**take one finished promotion → compare all four discounts → save one evaluated PromotionCase → improve two reusable Lessons.**
-
-Tiny example:
+**take one finished promotion -> compare all four discounts -> save one evaluated PromotionCase ->
+recompute the lessons it supports.**
 
 ```text
-Agent chose 10% -> £252
+Agent chose 10% -> 252
 
 Replay:
-0%  -> £240
-10% -> £252
-20% -> £281  <- best
-30% -> £263
+0%  -> 240
+10% -> 252
+20% -> 281  <- best
+30% -> 263
 
-Regret = £29
+Regret = 29
 ```
 
-That becomes one immutable PromotionCase. The case then updates exactly two Lesson buckets: one for the exact SKU and one for its category. Each Lesson is recomputed from all linked PromotionCases, so new evidence can strengthen or even change the recommendation.
+That becomes one immutable PromotionCase. The case then feeds **six** lesson buckets, not two:
+three levels of generality - all conditions, then without weather, then without any - for each of
+two scopes, the exact product and its category. Reads walk them strictest first and stop at the
+first hit, so a covered scenario costs the same two reads it always did. The design started with
+one bucket per scope; the benchmark showed the ceiling was coverage rather than lesson quality, and
+the cascade cut total regret from 12.17 to 7.18 while raising coverage from 44 of 50 to all 50.
 
-No LLM does arithmetic or chooses the Lesson recommendation.
-
-![Evaluator / Learner sequence](assets/evaluator-learner-sequence.svg)
+Each Lesson is recomputed from all linked cases, so new evidence can strengthen a recommendation or
+overturn it. No model does arithmetic or picks the recommendation.
 
 - Detailed design and examples: [`docs/evaluator-learner/README.md`](docs/evaluator-learner/README.md)
-- Overview diagram source: [`docs/evaluator-learner/architecture.mmd`](docs/evaluator-learner/architecture.mmd)
-- Sequence diagram source: [`docs/evaluator-learner/sequence.mmd`](docs/evaluator-learner/sequence.mmd)
 
 ### xmemory
 
 ![xmemory schema](assets/xmemory-schema.svg)
 
-The MVP memory schema contains only three domain objects:
+- **SKU** - stable product identity and basic economics.
+- **PromotionCase** - immutable evaluated evidence: scenario, chosen discount, outcome, all four
+  replay profits, simulator optimum, and regret.
+- **Lesson** - compact reusable knowledge recomputed from linked cases and read before later
+  decisions.
 
-- **SKU** — stable product identity and basic economics.
-- **PromotionCase** — immutable evaluated evidence: scenario, chosen discount, outcome, all four replay profits, simulator optimum, and regret.
-- **Lesson** — compact reusable knowledge recomputed from linked cases and retrieved before later decisions.
+Each Lesson links back to the cases that produced it, which is what makes the write -> read ->
+changed-behaviour trace visible and reproducible.
 
-Each Lesson links back to the PromotionCases that produced it, making the hackathon write → read → changed-behaviour trace visible and reproducible.
+Writes use `structured_mutations`, which the service applies without a model - that is what makes a
+few thousand records affordable. Reads ask for `raw-tables` rather than a natural-language answer,
+because the same scoped read returns a different amount of the record depending on how the query is
+worded. Everything measured about this service, including several counterintuitive behaviours that
+cost us a day each, is in [`GOTCHAS.md`](GOTCHAS.md).
 
 - Detailed design: [`docs/xmemory/README.md`](docs/xmemory/README.md)
 - XMD v1 schema: [`docs/xmemory/schema.xmd.yaml`](docs/xmemory/schema.xmd.yaml)
-- Editable diagram source: [`docs/xmemory/schema.mmd`](docs/xmemory/schema.mmd)
 
 ## Benchmark
 
 ![Benchmark clean memory vs learned memory](assets/benchmark.svg)
 
-To prove self-improvement, the Benchmark Runner compares the same agent with:
+The same agent runs against **clean** and **trained** memory in separate instances. Everything else
+is held constant: same model, same prompt, same simulator version, same scenarios in the same
+order. Training uses the 250 training scenarios with learning on; both benchmark arms use the 50
+held-out scenarios with learning off, so measurement cannot create new lessons - and a test proves
+a run with learning disabled performs zero writes.
 
-- **clean xmemory**;
-- **trained xmemory**.
+Results, caveats and every raw log are in [`runs/2026-09-04/`](runs/2026-09-04/), including a
+side-by-side page and the things these numbers do **not** establish.
 
-Everything else stays constant:
-
-- same model;
-- same prompt;
-- same simulator version and configuration;
-- same fixed scenarios and scenario IDs.
-
-Training uses roughly `200-300` scenarios with `LEARNING_ENABLED=true`. The benchmark uses `50` fixed scenarios with `LEARNING_ENABLED=false` for both clean and trained memory, so measurement itself cannot create new Lessons.
-
-Compare:
-
-- optimal action rate;
-- average regret;
-- gross profit.
+The claim is deliberately narrow: **the same agent makes better decisions because accumulated
+memory changes its behaviour.**
 
 - Benchmark notes: [`docs/benchmark/README.md`](docs/benchmark/README.md)
-- Editable diagram source: [`docs/benchmark/benchmark.mmd`](docs/benchmark/benchmark.mmd)
-
-The hackathon claim should be simple: **same agent, better decisions because accumulated memory changes its behavior.**
