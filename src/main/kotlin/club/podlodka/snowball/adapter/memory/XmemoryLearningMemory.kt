@@ -162,6 +162,16 @@ class XmemoryLearningMemory(
             endpoint("case", "case_id", caseId),
         )
 
+    private fun linkMutation(
+        caseId: String,
+        keyWire: String,
+    ): JsonNode =
+        relationMutation(
+            "lesson_evidence",
+            endpoint("lesson", "lesson_key", keyWire),
+            endpoint("case", "case_id", caseId),
+        )
+
     private fun scopeMutation(
         key: LessonKey,
         skuId: String,
@@ -290,6 +300,33 @@ class XmemoryLearningMemory(
 
     private fun upsertLesson(lesson: Lesson) {
         upsert("Lesson", "lesson_key", lesson.key.wire, lessonValues(lesson))
+    }
+
+    /**
+     * Writes a lesson under a key the domain model does not know how to spell yet.
+     *
+     * For the schema-evolution experiment: after a migration adds a condition to `Lesson`, the
+     * memory has to hold lessons keyed on it before the domain type learns the new segment. The
+     * extra fields are the migrated columns; the key is the caller's, verbatim. Nothing else
+     * changes - the same upsert, the same visibility handling.
+     */
+    fun saveLessonAs(
+        lesson: Lesson,
+        keyWire: String,
+        extraFields: Map<String, String>,
+    ) {
+        val values = lessonValues(lesson).apply { extraFields.forEach { (name, value) -> put(name, value) } }
+        upsert("Lesson", "lesson_key", keyWire, values)
+    }
+
+    /** The relation counterpart of [saveLessonAs]: links a case to a lesson by key string. */
+    fun linkCaseToLessonKey(
+        caseId: String,
+        keyWire: String,
+    ) {
+        awaitingVisibility("lesson_evidence for $keyWire") {
+            write(listOf(linkMutation(caseId, keyWire)), ALREADY_EXISTS)
+        }
     }
 
     /**

@@ -12,6 +12,7 @@ import club.podlodka.snowball.domain.DatasetSplit
 import club.podlodka.snowball.domain.Discount
 import club.podlodka.snowball.domain.Lesson
 import club.podlodka.snowball.domain.LessonKey
+import club.podlodka.snowball.domain.PromotionCase
 import club.podlodka.snowball.domain.PromotionScenarioEvent
 import club.podlodka.snowball.domain.SimulatorVersion
 import club.podlodka.snowball.port.ScenarioPublisher
@@ -73,11 +74,32 @@ object SeedLessonBuckets {
         val links = byBucket.flatMap { (key, cases) -> cases.map { it.caseId to key } }
 
         // Rewriting a lesson resets its visibility, so a resumed run can write the links alone.
-        val stage = args.getOrNull(1) ?: args.firstOrNull()?.takeIf { it.startsWith("--") } ?: "all"
-        val doLessons = stage != "--links-only"
-        val doLinks = stage != "--lessons-only"
+        val stage = args.firstOrNull { it.startsWith("--") && !it.startsWith("--decisions=") } ?: "all"
+        val doCases = stage == "--cases-only"
+        val doLessons = stage == "all" || stage == "--lessons-only"
+        val doLinks = stage == "all" || stage == "--links-only"
 
-        println("stage         ${if (doLessons && doLinks) "lessons and links" else stage}")
+        // Cases are only written into an empty instance, and never invented: the chosen action
+        // comes from the log of the real training run, so a seeded case is the case that run
+        // produced, not a fiction with the oracle's answer written into the "chosen" column.
+        val decisionsLog = args.firstOrNull { it.startsWith("--decisions=") }?.removePrefix("--decisions=")
+        val chosenByScenario: Map<String, Discount> =
+            decisionsLog
+                ?.let { path ->
+                    val pattern = Regex("""evaluated scenario_id=(\S+) chosen=(\d+)""")
+                    Path
+                        .of(path)
+                        .toFile()
+                        .readLines()
+                        .mapNotNull { line ->
+                            pattern.find(line)?.let { m ->
+                                m.groupValues[1] to Discount.fromPercent(m.groupValues[2].toInt())
+                            }
+                        }.toMap()
+                }.orEmpty()
+        require(!doCases || chosenByScenario.isNotEmpty()) { "--cases-only needs --decisions=<training log>" }
+
+        println("stage         $stage")
         println("scenarios     ${events.size}")
         println("buckets       ${lessons.size}")
         println("links         ${links.size}")
@@ -95,6 +117,30 @@ object SeedLessonBuckets {
             )
 
         val started = System.currentTimeMillis()
+        if (doCases) {
+            var written = 0
+            events.forEach { event ->
+                val chosen = chosenByScenario[event.scenarioId] ?: return@forEach
+                val outcome = engine.simulate(event.scenarioId, event.scenario, chosen)
+                val case = evidence.getValue(event)
+                memory.saveCase(
+                    PromotionCase(
+                        caseId = case.caseId,
+                        scenarioId = event.scenarioId,
+                        simulatorVersion = SimulatorVersion.V1,
+                        scenario = event.scenario,
+                        chosenDiscount = chosen,
+                        chosenUnitsSold = outcome.unitsSold,
+                        chosenGrossProfit = outcome.grossProfit,
+                        profitByDiscount = case.profitByDiscount,
+                        bestDiscount = case.bestDiscount,
+                    ),
+                )
+                written += 1
+                if (written % 50 == 0) println("cases $written/${events.size}")
+            }
+            println("cases $written/${events.size} (${events.size - written} had no recorded decision)")
+        }
         memory.seed(
             if (doLessons) lessons else emptyList(),
             if (doLinks) links else emptyList(),

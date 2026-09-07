@@ -1,0 +1,20 @@
+SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [org.slf4j.nop.NOPServiceProvider@16c0663d]
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@23223dd8]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual provider is of type [org.slf4j.nop.NOPServiceProvider@16c0663d]
+Sep 05, 2026 7:54:44 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle started split=training
+Sep 05, 2026 7:54:45 PM club.podlodka.snowball.application.ScenarioGenerationService generate
+INFO: generation cycle completed published=250 rejected=0
+stage         --cases-only
+scenarios     250
+buckets       190
+links         1500
+cases 50/250
+cases 100/250
+cases 150/250
+cases 200/250
+cases 250/250
+cases 250/250 (0 had no recorded decision)
+elapsed       435s
