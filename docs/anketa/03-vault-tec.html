@@ -35,7 +35,7 @@
   .poster h1 { font-family: var(--display); font-size: clamp(38px, 8vw, 84px); line-height: 0.95; margin: 0; color: var(--vault-yellow); text-transform: uppercase; text-shadow: 4px 4px 0 var(--vault-blue-deep); text-wrap: balance; }
   .poster .tag { font-family: var(--label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; font-size: clamp(15px, 2.2vw, 22px); margin: 10px 0 0; color: var(--paper); }
   .poster .lead { margin: 12px 0 0; font-size: 16px; max-width: 52ch; color: var(--paper); }
-  .gear { width: 190px; height: 190px; display: grid; place-items: center; text-align: center; background: var(--vault-yellow); color: var(--vault-blue-deep); border-radius: 50%; position: relative; box-shadow: 0 0 0 10px var(--vault-blue), 0 0 0 16px var(--vault-yellow); }
+  .gear { isolation: isolate; width: 190px; height: 190px; display: grid; place-items: center; text-align: center; background: var(--vault-yellow); color: var(--vault-blue-deep); border-radius: 50%; position: relative; box-shadow: 0 0 0 10px var(--vault-blue), 0 0 0 16px var(--vault-yellow); }
   .gear::before { content: ""; position: absolute; inset: -30px; border-radius: 50%; background: repeating-conic-gradient(var(--vault-yellow) 0deg 12deg, transparent 12deg 30deg); z-index: -1; }
   .gear .n { font-family: var(--display); font-size: 58px; line-height: 1; }
   .gear .l { font-family: var(--label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; margin-top: 4px; }
