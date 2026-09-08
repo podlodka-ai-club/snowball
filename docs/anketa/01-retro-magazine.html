@@ -1,0 +1,304 @@
+<title>Анкета Snowball</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Oswald:wght@400;600&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap">
+<style>
+  :root {
+    --paper: #EDE1C4;
+    --paper-deep: #E2D2AC;
+    --ink: #1E1913;
+    --ink-soft: #4A4036;
+    --red: #C2361F;
+    --teal: #237A88;
+    --mustard: #D8A12A;
+    --rule: rgba(30, 25, 19, 0.35);
+    --display: "Russo One", "Arial Black", Impact, sans-serif;
+    --label: "Oswald", "Arial Narrow", sans-serif;
+    --body: "PT Serif", Georgia, "Times New Roman", serif;
+    --mono: "PT Mono", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.55;
+    background-image:
+      radial-gradient(rgba(30,25,19,0.06) 1px, transparent 1.2px);
+    background-size: 5px 5px;
+  }
+  a { color: var(--teal); text-decoration-thickness: 1px; text-underline-offset: 3px; word-break: break-all; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--mustard); outline-offset: 2px; }
+
+  .page { max-width: 960px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* Masthead */
+  .masthead {
+    position: relative;
+    border: 4px solid var(--ink);
+    padding: 28px 28px 24px;
+    background: var(--paper);
+    overflow: hidden;
+  }
+  .masthead::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: repeating-conic-gradient(from 0deg at 88% 30%, rgba(216,161,42,0.28) 0deg 6deg, transparent 6deg 18deg);
+    pointer-events: none;
+  }
+  .masthead > * { position: relative; }
+  .masthead .eyebrow {
+    display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline;
+    font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .masthead .eyebrow b { color: var(--red); font-weight: 600; }
+  .masthead h1 {
+    font-family: var(--display);
+    font-size: clamp(56px, 11vw, 116px);
+    line-height: 0.92;
+    margin: 12px 0 8px;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-transform: uppercase;
+    text-shadow: 4px 4px 0 var(--red);
+    text-wrap: balance;
+  }
+  .masthead .sub {
+    font-family: var(--label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    font-size: clamp(16px, 2.4vw, 22px); color: var(--teal); margin: 0;
+  }
+  .badge {
+    position: absolute; right: 22px; top: 22px;
+    width: 148px; height: 148px;
+    display: grid; place-items: center; text-align: center;
+    background: var(--red); color: var(--paper);
+    clip-path: polygon(50% 0%, 61% 12%, 76% 6%, 80% 21%, 96% 24%, 92% 39%, 100% 50%, 92% 61%, 96% 76%, 80% 79%, 76% 94%, 61% 88%, 50% 100%, 39% 88%, 24% 94%, 20% 79%, 4% 76%, 8% 61%, 0% 50%, 8% 39%, 4% 24%, 20% 21%, 24% 6%, 39% 12%);
+    transform: rotate(8deg);
+    font-family: var(--display); line-height: 1;
+  }
+  .badge .big { font-size: 40px; display: block; }
+  .badge .small { font-family: var(--label); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 4px; }
+  @media (max-width: 640px) { .badge { position: static; transform: rotate(-4deg); margin: 16px auto 0; } }
+
+  /* Slogan ad block */
+  .slogan {
+    margin-top: 28px;
+    border: 3px double var(--ink);
+    padding: 22px 26px;
+    background: var(--paper-deep);
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center;
+  }
+  .slogan .stamp {
+    font-family: var(--label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px;
+    color: var(--paper); background: var(--teal); padding: 8px 12px;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+  }
+  .slogan p { margin: 0; font-size: clamp(18px, 2.6vw, 24px); line-height: 1.35; font-style: italic; }
+  .slogan p b { font-style: normal; font-family: var(--display); font-size: 0.95em; color: var(--red); }
+  @media (max-width: 640px) { .slogan { grid-template-columns: 1fr; } .slogan .stamp { writing-mode: horizontal-tb; transform: none; justify-self: start; } }
+
+  /* Key numbers strip */
+  .strip {
+    margin-top: 28px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border-top: 4px solid var(--ink); border-bottom: 4px solid var(--ink);
+  }
+  .strip div { padding: 16px 18px; border-right: 1px solid var(--rule); }
+  .strip div:last-child { border-right: 0; }
+  .strip .n { font-family: var(--display); font-size: 34px; line-height: 1; color: var(--teal); font-variant-numeric: tabular-nums; }
+  .strip .n em { font-style: normal; color: var(--red); }
+  .strip .l { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+  @media (max-width: 640px) { .strip { grid-template-columns: 1fr; } .strip div { border-right: 0; border-bottom: 1px solid var(--rule); } .strip div:last-child { border-bottom: 0; } }
+
+  /* Form sections */
+  .q { margin-top: 56px; }
+  .q-head {
+    display: grid; grid-template-columns: 64px 1fr; gap: 18px; align-items: start;
+    border-bottom: 2px solid var(--ink); padding-bottom: 14px;
+  }
+  .q-num {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--ink); color: var(--paper);
+    display: grid; place-items: center;
+    font-family: var(--display); font-size: 26px; line-height: 1;
+    box-shadow: 4px 4px 0 var(--mustard);
+  }
+  .q-kicker { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px; color: var(--red); font-weight: 600; }
+  .q-title { font-family: var(--display); font-size: clamp(22px, 3.4vw, 32px); line-height: 1.12; margin: 4px 0 8px; text-wrap: balance; }
+  .q-ask { margin: 0; color: var(--ink-soft); font-style: italic; font-size: 15.5px; max-width: 68ch; }
+  .q-ask ul { margin: 4px 0 0; padding-left: 20px; }
+  .a { padding: 22px 0 0 82px; max-width: 78ch; }
+  .a p { margin: 0 0 14px; }
+  .a p b { font-family: var(--label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 15px; color: var(--teal); margin-right: 4px; }
+  .a code { font-family: var(--mono); font-size: 0.9em; background: rgba(35,122,136,0.12); padding: 1px 5px; border-radius: 2px; }
+  @media (max-width: 640px) { .q-head { grid-template-columns: 48px 1fr; } .q-num { width: 48px; height: 48px; font-size: 20px; } .a { padding-left: 0; } }
+
+  /* Ledger for the worked example */
+  .ledger {
+    margin: 8px 0 18px;
+    border: 2px solid var(--ink); background: var(--paper-deep);
+    font-family: var(--mono); font-size: 14.5px; line-height: 1.5;
+    overflow-x: auto;
+  }
+  .ledger .row { display: grid; grid-template-columns: 150px 1fr; gap: 14px; padding: 8px 14px; border-bottom: 1px dashed var(--rule); }
+  .ledger .row:last-child { border-bottom: 0; }
+  .ledger .k { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; color: var(--ink-soft); padding-top: 3px; }
+  .ledger .hit { color: var(--red); font-weight: 700; }
+  .ledger .best { color: var(--teal); font-weight: 700; }
+  .oracle { display: flex; flex-wrap: wrap; gap: 8px 22px; font-variant-numeric: tabular-nums; }
+  @media (max-width: 640px) { .ledger .row { grid-template-columns: 1fr; gap: 4px; } }
+
+  .links { list-style: none; padding: 0; margin: 0; font-size: 15px; }
+  .links li { padding: 6px 0; border-bottom: 1px dotted var(--rule); }
+  .links li::before { content: "->"; font-family: var(--mono); color: var(--red); margin-right: 10px; }
+
+  .verdict { margin-top: 64px; border: 4px solid var(--ink); padding: 20px 26px; text-align: center; background: var(--paper-deep); }
+  .verdict .t { font-family: var(--display); font-size: clamp(20px, 3vw, 28px); text-transform: uppercase; color: var(--red); }
+  .verdict .s { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <div class="eyebrow"><b>Хакерский спринт N2</b><span>Анкета к финальному пакету</span><span>Команда Snowball</span><span>сентябрь 2026</span></div>
+    <h1>Snowball</h1>
+    <p class="sub">Промо-агент с памятью, которая окупается</p>
+    <div class="badge" aria-label="80 из 100 верных скидок"><span class="big">80</span><span class="small">из 100 верных скидок</span></div>
+  </header>
+
+  <section class="slogan" aria-label="Слоган">
+    <div class="stamp">Одной фразой</div>
+    <p><b>Новинка сезона: агент с памятью!</b> Продает ваши товары быстрее и выгоднее - ставит верную скидку в 80 случаях из 100, а человек только в 44. Также в комплекте: честный контроль и три эксперимента, которые вы можете провести сами и которые точно не сработают!</p>
+  </section>
+
+  <div class="strip" aria-label="Ключевые числа">
+    <div><div class="n">44% <em>-> 80%</em></div><div class="l">оптимальных решений на 50 отложенных сценариях</div></div>
+    <div><div class="n">44.04 <em>-> 7.18</em></div><div class="l">потерянная прибыль, без памяти и с ней</div></div>
+    <div><div class="n">p = 8.8e-4</div><div class="l">точный биномиальный парный тест</div></div>
+  </div>
+
+  <!-- 1 -->
+  <section class="q">
+    <div class="q-head">
+      <div class="q-num">1</div>
+      <div>
+        <div class="q-kicker">Вопрос формы</div>
+        <h2 class="q-title">Что и как делает ваш агент?</h2>
+        <p class="q-ask">Расскажите подетальнее про проект: какие именно задачи решает агент, как выглядят его внутренний и внешний циклы, как именно организована память, как устроено автоулучшение, откуда вы взяли данные для обучения и эвала.</p>
+      </div>
+    </div>
+    <div class="a">
+      <p><b>Что делает.</b> Snowball - промо-агент FMCG: на дату, магазин и товар выбирает скидку из четырёх (0, 10, 20, 30 процентов) так, чтобы валовая прибыль была ближе к максимальной. Сценарии однотипные, поэтому опыт переносится между акциями.</p>
+      <p><b>Внутренний цикл.</b> Генератор публикует сценарий по JSON-контракту. Агент строит ключ из наблюдаемых условий (товар, тип дня, погода, остаток), забирает из xmemory уроки по нему, кладёт в промпт до трёх лучших и получает от модели одно действие. Сценарий решается один раз, отказ модели помечается как fallback.</p>
+      <p><b>Внешний цикл.</b> Скрытый детерминированный симулятор отрабатывает акцию. Оценщик проигрывает все четыре действия на одном рыночном шоке (шум зависит от id сценария, но от скидки нет) и считает regret. Learner пересчитывает урок по ключу из всех привязанных кейсов и пишет его в память. Агент симулятор не видит ни через API, ни через логи, ни через память.</p>
+      <p><b>Память.</b> xmemory: три объекта (SKU, PromotionCase, Lesson), связь lesson_evidence от урока к кейсам-уликам. Ключ допускает незаданные условия, чтение идёт каскадом от строгого к общему по шести уровням в двух масштабах (товар, категория). Противоречия решаются обновлением урока на месте, повторный прогон улики не удваивает.</p>
+      <p><b>Автоулучшение.</b> Каждое решение добавляет улику, урок переагрегируется. Изменения конструкции памяти проверялись как мутации baseline: каскад вошёл в сдачу (потери 12.17 -> 7.18), уточнение ключа, дробление по разногласию улик и эволюция схемы через миграцию дали ноль или минус, обучение без оракула хуже отсутствия памяти. Отрицательные результаты опубликованы.</p>
+      <p><b>Данные.</b> dunnhumby "Breakfast at the Frat": 250 обучающих и 50 отложенных дней-товаров, разделение по времени. Обучение на живой модели (muse-glimmer-30b-q3, temperature 0). Замер в двух руках с разными инстансами памяти: без памяти 44% оптимальных и потери 44.04, с памятью 80% и 7.18, p = 8.8e-4.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="q">
+    <div class="q-head">
+      <div class="q-num">2</div>
+      <div>
+        <div class="q-kicker">Вопрос формы</div>
+        <h2 class="q-title">Про технический и AI стек</h2>
+        <div class="q-ask">Расскажите, какой именно стек вы выбрали, что понравилось, а что - нет:
+          <ul><li>Движок памяти</li><li>Модели (открытые/закрытые, с reasoning'ом или без)</li><li>Любые другие компоненты (эвалы/обучение)</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="a">
+      <p><b>Движок памяти.</b> xmemory. Тут без вариантов - спонсора надо поддержать! =)</p>
+      <p>Понравилось: схема с объектами и связями, а не мешок эмбеддингов, поэтому урок ссылается на кейсы-улики и его можно пересчитать; <code>structured_mutations</code> пишут без участия модели, дёшево и атомарно батчами по 50; режим <code>raw-tables</code> отдаёт строки дословно; эволюция схемы через dry-run миграции с отказом на неаддитивных изменениях (прошли протокол до конца, версия 0 -> 1).</p>
+      <p>Что мешало: полная документация инструментов лежит внутри <code>GET /instances/&lt;id&gt;</code>, и пока ее не обнаружили пришлось играть в угадывание формата по текстам ошибок; scope сужает выборку, обход связи работает только unscoped; режим xresponse отрисовывает формулировку запроса, а не содержимое; запись подтверждается раньше, чем становится читаемой по ключу (лаг до пары минут под нагрузкой, повторная перезапись объекта сбрасывает видимость); дубликат и отсутствие записи приходят тремя и двумя разными формулировками HTTP 400/409; чтения тарифицируются токенами через модель, один цикл обучения плюс бенчмарк съедает около четверти дневной квоты.</p>
+      <p><b>Модель.</b> Открытая muse-glimmer-30b-q3 на локальном инференс-сервере через OpenAI-совместимый API, с блоком рассуждений, temperature 0. Плюсы: нулевая стоимость 300 живых вызовов и полный контроль. Минусы: недетерминизм даже при temperature 0, при малом лимите токенов рассуждения съедают бюджет. Пришлось защищать разбор и помечать fallback отдельным источником решения, иначе прогон с отвалившейся моделью выглядел бы как осторожный агент.</p>
+      <p><b>Остальное.</b> Kotlin 2.4 на JVM 21, Gradle, Jackson в строгой конфигурации и networknt JSON Schema: три версионированных контракта между компонентами проверяются в тестах. Эвал свой: детерминированный симулятор рынка с шумом от id сценария, оракул проигрывает все четыре действия, метрика regret в деньгах, две руки бенчмарка в физически разных инстансах памяти, точный биномиальный парный тест. Особенно окупилась воспроизводимость симулятора: все эксперименты с ключом и обучением вслепую считались офлайн за ноль квоты, а офлайн-прогноз каскада сошёлся с живым замером. Не понравилось в собственном стеке: тесты сначала писались против выдуманного стаба xmemory и были зелёными при адаптере, который не мог прочитать ни одного поля; стаб переписали на записанные ответы сервиса.</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="q">
+    <div class="q-head">
+      <div class="q-num">3</div>
+      <div>
+        <div class="q-kicker">Вопрос формы</div>
+        <h2 class="q-title">Если бы у вас была ещё одна неделя, что бы вы сделали в первую очередь и почему именно это?</h2>
+      </div>
+    </div>
+    <div class="a">
+      <p><b>Обучение на реальных наблюдениях.</b> Сейчас learner получает от оценщика прибыль всех четырёх скидок и учится на полной картине. В магазине известен только результат выбранной акции, и следующий шаг - научить память работать с этим: логировать вероятность выбора каждого действия, оценивать невыбранные через inverse propensity или doubly robust, вести исследование с учётом его стоимости.</p>
+      <p><b>Почему это.</b> Каскад ключей и остальные эксперименты показали, что качество памяти теперь упирается в объём и природу опыта, а не в устройство ключа или схемы. Этот шаг единственный, который меняет сам результат: с ним дельту от памяти можно показать ритейлеру на его собственных данных, а не на симуляторе. Возобновляемые прогоны, забывание и observability стоят в очереди следом.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="q">
+    <div class="q-head">
+      <div class="q-num">4</div>
+      <div>
+        <div class="q-kicker">Вопрос формы</div>
+        <h2 class="q-title">Какие решения оправдали себя настолько, что вы бы рекомендовали другим командам их переиспользовать?</h2>
+        <p class="q-ask">Например: паттерн реализации, выбор технологии, архитектурное решение, продуктовая идея.</p>
+      </div>
+    </div>
+    <div class="a">
+      <p><b>Воспроизводимый симулятор рынка.</b> Для каждой акции симулятор считает, сколько принесла бы каждая из четырёх скидок при одних и тех же условиях, и разница между выбранной и лучшей - это потерянные деньги.</p>
+      <p><b>Две ветки бенчмарка в разных инстансах памяти.</b> Разделение выборки по времени, обучение на замере выключено и закреплено тестом. Дельта, которую нельзя оспорить, дороже любой фичи.</p>
+      <p><b>Каскад ключей с уроками, ссылающимися на улики.</b> Чтение от строгого ключа к общему до первого попадания подняло покрытие с 44 до 50 из 50; связь урок -> кейсы даёт пересчёт, разрешение противоречий на месте и идемпотентную запись.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="q">
+    <div class="q-head">
+      <div class="q-num">5</div>
+      <div>
+        <div class="q-kicker">Вопрос формы</div>
+        <h2 class="q-title">Какие решения оказались неудачными или не дали ожидаемой пользы?</h2>
+      </div>
+    </div>
+    <div class="a">
+      <p><b>Уточнение ключа памяти.</b> Три способа сделать урок точнее - условие руками, дробление бакетов по разногласию улик, новое измерение через миграцию схемы - дали ноль или минус. На 250 сценариях каждое дробление режет улики тоньше, чем разделяет ситуации. Сработало обратное: огрубление ключа при промахе.</p>
+      <p><b>Обучение только на выбранном действии.</b> Learner, видящий один результат за акцию, дал память хуже её отсутствия: уроки самоподкрепляются на том, что сам же попробовал. Для переноса в магазин нужна off-policy оценка.</p>
+      <p><b>Тесты против выдуманного стаба xmemory.</b> Формат ответов сочинили сами, тесты были зелёными при адаптере, который не читал назад ни одного поля. Переписали на записанные ответы сервиса.</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="q">
+    <div class="q-head">
+      <div class="q-num">6</div>
+      <div>
+        <div class="q-kicker">Вопрос формы</div>
+        <h2 class="q-title">Пример работы агента до и после обучения</h2>
+        <p class="q-ask">Подойдет вообще любая форма: видео / логи / markdown / html / whatever. Главное, чтобы можно было оценить, что именно и как поменялось спустя несколько прогонов агента.</p>
+      </div>
+    </div>
+    <div class="a">
+      <p>Три прогона на одних и тех же 50 отложенных сценариях, обучение на замере выключено. Без памяти: 44% оптимальных решений, потерянная прибыль 44.04. Обученная память со строгим ключом: 76% и 12.17. Обученная память с каскадом ключей: 80% и 7.18. Попарно: с памятью лучше на 25 сценариях, хуже на 6, поровну на 19. Ошибок 10 вместо 28, средняя цена ошибки 0.72 вместо 1.57. Кривая обучения внутри тренировочного прогона по полусотням: 52% -> 74% -> 78%.</p>
+      <p><b>Один сценарий целиком.</b> Мороженое ICE500, 25 ноября 2011, жаркий будний день, полный склад.</p>
+      <div class="ledger" aria-label="Разбор сценария SCN-20111125 ICE500">
+        <div class="row"><div class="k">Без памяти</div><div>модель дала <span class="hit">10%</span>: прибыль 35.34, недобор 4.70</div></div>
+        <div class="row"><div class="k">В памяти</div><div>четыре обучающих кейса с теми же условиями (июнь и август). Learner пересчитал из них урок: ключ sku:ICE500|store:any|weekday|hot|event:any|stock:high, рекомендация 20%, четыре улики, уверенность 0.88</div></div>
+        <div class="row"><div class="k">Замер</div><div>отдельный запуск после рестарта. Агент прошёл по ключам от точного к общему, нашёл урок на первом, в промпт попала строка "For sku:ICE500 on hot weekday high stock, 20% has the highest mean gross profit across 4 evaluated cases". Шаблон промпта в обеих руках одинаковый, меняется только блок уроков</div></div>
+        <div class="row"><div class="k">С памятью</div><div>модель дала <span class="best">20%</span>: прибыль 40.04, недобор 0</div></div>
+        <div class="row"><div class="k">Оракул</div><div class="oracle"><span>0% -> 31.61</span><span>10% -> 35.34</span><span class="best">20% -> 40.04</span><span>30% -> 35.38</span></div></div>
+      </div>
+      <p><b>Контрпример.</b> Тот же товар 18 декабря, память советует 20%, лучше было 10%, недобор 3.76. Урок обобщает несколько наблюдений и не знает шум конкретного дня.</p>
+      <p><b>Подробности и сырые логи.</b></p>
+      <ul class="links">
+        <li>отчёт "до и после" с трассой урока: <a href="https://github.com/podlodka-ai-club/snowball/blob/main/runs/2026-09-04/demo-before-after.html">runs/2026-09-04/demo-before-after.html</a></li>
+        <li>логи двух рук: <a href="https://github.com/podlodka-ai-club/snowball/blob/main/runs/2026-09-04/benchmark-clean.log">benchmark-clean.log</a> и <a href="https://github.com/podlodka-ai-club/snowball/blob/main/runs/2026-09-04/benchmark-trained-cascade.log">benchmark-trained-cascade.log</a></li>
+        <li>обучающий прогон: <a href="https://github.com/podlodka-ai-club/snowball/blob/main/runs/2026-09-04/training-250.log">training-250.log</a></li>
+        <li><code>ShowPrompt &lt;scenario_id&gt;</code> печатает промпт обеих рук для любого сценария.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="verdict">
+    <div class="t">Проверено контрольной группой, подтверждено статистикой</div>
+    <div class="s">github.com/podlodka-ai-club/snowball</div>
+  </footer>
+</div>
